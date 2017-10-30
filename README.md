@@ -45,6 +45,9 @@ To use the console, simply start typing.
 - Add ability to drag and drop log and config files
 - Find a proper set of icons
 - Add customisable sector colour coding
+- Add ability to edit and delete log entries within app
+- Streamline input: make quotes optional if Sector, Project, or Description is just one word
+- Console command history; pressing up and down arrow keys shows recent console input
 
 ## Development
 
