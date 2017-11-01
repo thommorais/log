@@ -42,12 +42,15 @@ To use the console, simply start typing.
 - `set time 24` - Set the time format to 12- or 24-hours
 
 ## To-do
-- Add ability to drag and drop log and config files
-- Find a proper set of icons
+- Create an app icon
+- Add ability to drag-and-drop log and config files
+- Find a proper set of icons for the UI
 - Add customisable sector colour coding
 - Add ability to edit and delete log entries within app
 - Streamline input: make quotes optional if Sector, Project, or Description is just one word
 - Console command history; pressing up and down arrow keys shows recent console input
+- Add ability to sort table columns
+- Pomodoro timer
 
 ## Development
 
