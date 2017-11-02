@@ -29,13 +29,9 @@ Log.vis = {
      */
 
     addEntry = (e, width, dp, margin) => {
-      let v = document.createElement("div"),
-          b = e.c == "PHO" ? "bg-blu" :
-              e.c == "RES" ? "bg-grn" :
-              e.c == "DSG" ? "bg-red" :
-              e.c == "ACA" ? "bg-ylw" : "bg-blanc"
+      let v = document.createElement("div")
 
-      v.className    = `psr t0 sh1 mb2 lf ${b}`
+      v.className    = `psr t0 sh1 mb2 lf bg-blanc`
       v.style.width  = `${width}%`
       v.style.margin = `0 0 0 ${margin}%`
       v.style.backgroundColor = Log.config.ui.colour
@@ -132,13 +128,9 @@ Log.vis = {
      */
 
     addEntry = (e, w) => {
-      let d = document.createElement("div"),
-          b = "PHO" == e.c ? "bg-blu" :
-              "RES" == e.c ? "bg-grn" :
-              "DSG" == e.c ? "bg-red" :
-              "ACA" == e.c ? "bg-ylw" : "bg-blanc"
+      let d = document.createElement("div")
 
-      d.className    = `psa sw1 ${b}`
+      d.className    = `psa sw1 bg-blanc`
       d.style.height = `${w}%`
       d.style.bottom = `${lw}%`
       d.style.backgroundColor = Log.config.ui.colour
@@ -196,13 +188,9 @@ Log.vis = {
         lp = 0, // the percentage of the last data element
 
     add = (e, width, dp, margin) => {
-      let d = document.createElement("div"),
-          b = e.c == "PHO" ? "bg-blu" :
-              e.c == "RES" ? "bg-grn" :
-              e.c == "DSG" ? "bg-red" :
-              e.c == "ACA" ? "bg-ylw" : "bg-blanc"
+      let d = document.createElement("div")
 
-      d.className    = `psr t0 hf mb2 lf ${b}`
+      d.className    = `psr t0 hf mb2 lf`
       d.style.width  = `${width}%`
       d.style.margin = `0 0 0 ${margin}%`
       d.style.backgroundColor = Log.config.ui.colour
@@ -248,7 +236,7 @@ Log.vis = {
       d.style.width = `4.166666666666667%`
       d.id = t
 
-      n.className = `sw1 hf cn ${b}`
+      n.className = `sw1 hf cn`
       n.style.backgroundColor = Log.config.ui.colour
 
       e.className = "psa b0 wf"
@@ -284,7 +272,7 @@ Log.vis = {
       v.style.width  = "14.285714285714286%" // 100 / 7
       v.id           = t
 
-      n.className    = `sw1 hf cn ${b}`
+      n.className    = `sw1 hf cn`
       n.style.backgroundColor = Log.config.ui.colour
 
       e.className    = "psa b0 wf"
@@ -315,13 +303,9 @@ Log.vis = {
 
     add = sec => {
       let d = document.createElement("div"),
-          v = Log.data.sp(ent, sec),
-          b = s == "PHO" ? "blu" :
-              s == "RES" ? "grn" :
-              s == "DSG" ? "red" :
-              s == "ACA" ? "ylw" : "blanc"
+          v = Log.data.sp(ent, sec)
 
-      d.className   = `psr t0 hf mb2 lf bg-${b}`
+      d.className   = `psr t0 hf mb2 lf bg-blanc`
       d.style.width = `${v}%`
       d.title       = `${sec} (${v.toFixed(2)}%)`
 
