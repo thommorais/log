@@ -283,7 +283,7 @@ Log.vis = {
       v.id           = t
 
       n.className    = `sw1 hf cn`
-      n.style.backgroundColor = i == (new Date).getDay() ? Log.config.ui.accent : Log.config.ui.colour
+      n.style.backgroundColor = i == (new Date).getHours() ? Log.config.ui.accent : Log.config.ui.colour
 
       e.className    = "psa b0 wf"
       e.style.height = `${d[i] / m * 100}%`
@@ -329,10 +329,9 @@ Log.vis = {
    * Display sector bars
    * @param {Object[]=} ent - Log entries
    * @param {string=}   con - The container
-   * @param {boolean}   grd - Enable gridview
    */
 
-  sectorBars(ent = Log.log, con = "sectorBars", grd = false) {
+  sectorBars(ent = Log.log, con = "sectorBars") {
     let s = Log.data.listSectors(ent).sort(),
 
     /**
@@ -352,15 +351,12 @@ Log.vis = {
       let sh = Log.data.sh(ent, sec),
 
           li = document.createElement("li"),
-          ni = document.createElement("div"),
           tl = document.createElement("span"),
           st = document.createElement("span"),
           br = document.createElement("div"),
           dt = document.createElement("div")
 
-      li.className = grd ? "dib mb2 p2 f6 c4" : "mb4 f6 lhc"
-
-      if (grd) ni.className = "p3 bg-e"
+      li.className = "mb4 f6 lhc"
 
       tl.className = "dib sw6 f6 mon upc tk elip"
       st.className = "f6 rf"
@@ -374,17 +370,9 @@ Log.vis = {
       st.innerHTML = `${sh.toFixed(2)} h`
 
       br.appendChild(dt)
-
-      if (grd){
-        ni.appendChild(tl)
-        ni.appendChild(st)
-        ni.appendChild(br)
-        li.appendChild(ni)
-      } else {
-        li.appendChild(tl)
-        li.appendChild(st)
-        li.appendChild(br)
-      }
+      li.appendChild(tl)
+      li.appendChild(st)
+      li.appendChild(br)
 
       document.getElementById(con).appendChild(li)
     }
@@ -396,10 +384,9 @@ Log.vis = {
    * Display project bars
    * @param {Object[]=} ent - Log entries
    * @param {string=}   con - The container
-   * @param {boolean}   grd - Enable gridview
    */
 
-  projectBars(ent = Log.log, con = "projectBars", grd = false) {
+  projectBars(ent = Log.log, con = "projectBars") {
     let s = Log.data.listProjects(ent).sort(),
 
     /**
@@ -419,15 +406,12 @@ Log.vis = {
       let sh = Log.data.ph(ent, pro),
 
           li = document.createElement("li"),
-          ni = document.createElement("div"),
           tl = document.createElement("span"),
           st = document.createElement("span"),
           br = document.createElement("div"),
           dt = document.createElement("div")
 
-      li.className = grd ? "dib mb2 p2 f6 c4" : "mb4 f6 lhc"
-
-      if (grd) ni.className = "p3 bg-e"
+      li.className = "mb4 f6 lhc"
 
       tl.className = "dib sw6 f6 mon upc tk elip"
       st.className = "f6 rf"
@@ -441,17 +425,9 @@ Log.vis = {
       st.innerHTML = `${sh.toFixed(2)} h`
 
       br.appendChild(dt)
-
-      if (grd){
-        ni.appendChild(tl)
-        ni.appendChild(st)
-        ni.appendChild(br)
-        li.appendChild(ni)
-      } else {
-        li.appendChild(tl)
-        li.appendChild(st)
-        li.appendChild(br)
-      }
+      li.appendChild(tl)
+      li.appendChild(st)
+      li.appendChild(br)
 
       document.getElementById(con).appendChild(li)
     }
