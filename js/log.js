@@ -37,7 +37,7 @@ var Log = {
    * @param {boolean} status - Log status
    */
 
-  timer(status) {
+  timer(status, con = "timer") {
     if (status) {
       let l = Log.time.convert(
                 Log.time.parse(Log.log[Log.log.length - 1].s)
@@ -52,7 +52,7 @@ var Log = {
         m %= 60
         s %= 60
 
-        document.getElementById("timer").innerHTML = `${`0${h}`.substr(-2)}:${`0${m}`.substr(-2)}:${`0${s}`.substr(-2)}`
+        document.getElementById(con).innerHTML = `${`0${h}`.substr(-2)}:${`0${m}`.substr(-2)}:${`0${s}`.substr(-2)}`
       }
 
       Log.clock = setInterval(function() { tick() }, 1E3)
@@ -184,22 +184,35 @@ var Log = {
     document.getElementById(`b-${s}`).className = "pv1 tab on bg-cl of mr3"
   },
 
-  /**
-   * Open a tab
-   */
+  screensaver() {
+    let div = document.createElement("div"),
+        inn = document.createElement("div"),
+        title = document.createElement("h2"),
+        time = document.createElement("h1"),
+        desc = document.createElement("p"),
+        ent = Log.log[Log.log.length - 1]
 
-  subtab(s) {
-    let x = document.getElementsByClassName("subsect"),
-        b = document.getElementsByClassName("subtab")
+    time.id = "screentimer"
 
-    for (let i = 0, l = x.length; i < l; i++)
-      x[i].style.display = "none"
+    div.className = "vh vw psa t0 l0 ac pt7"
+    div.style.backgroundColor = Log.config.ui.bg
+    div.style.color = Log.config.ui.colour
 
-    for (let i = 0, l = b.length; i < l; i++)
-      b[i].className = "pv1 subtab on bg-cl o5 mr3"
+    Log.timer(Log.status(), "screentimer")
 
-    document.getElementById(s).style.display = "block"
-    document.getElementById(`b-${s}`).className = "pv1 subtab on bg-cl of mr3"
+    time.className = "f1 lht fwb mb1"
+
+    title.className = "f6 upc tk"
+    title.innerHTML = `${ent.c}: ${ent.t}`
+
+    desc.className = "mb2 f4 fwn"
+    desc.innerHTML = `${ent.d}`
+
+    div.appendChild(time)
+    div.appendChild(desc)
+    div.appendChild(title)
+
+    document.body.appendChild(div)
   },
 
   build() {
@@ -302,8 +315,9 @@ var Log = {
 
     Log.build()
 
+    if (Log.log[Log.log.length - 1].e == "undefined") Log.screensaver()
+
     let ld = Log.data,
-        // sp = ld.sp,
 
         n = new Date(),
         y = new Date(n),
@@ -343,11 +357,7 @@ var Log = {
     document.getElementById("fpt").innerHTML = fc.pt
     document.getElementById("fsd").innerHTML = fc.sd.toFixed(2) + " h"
 
-    let status = Log.status()
-
-    Log.timer(status)
-
-    document.getElementById("status").className = status ? "rf mb4 f6 pulse" : "rf mb4 f6"
+    Log.timer(Log.status())
 
     let lhh = ld.lh(),
         lht = ld.lh(en),
@@ -394,7 +404,6 @@ var Log = {
     })
 
     Log.vis.peakH(undefined, "peakTimesHistory")
-    // Log.vis.sectorBar(en)
     Log.vis.sectorBars(en)
     Log.vis.projectBars(en)
 
