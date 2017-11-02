@@ -7,12 +7,6 @@
   <meta name="author" content="Josh Avanier">
   <meta name="description" content="A log and time-tracking system">
   <link rel="stylesheet" href="css/macian.min.css">
-  <style>
-    button {color: inherit}
-    .on {outline: none}
-    ::-webkit-scrollbar {display: none}
-    .pulse{animation-name:pulse;animation-duration:2.4s;animation-delay:0s;animation-iteration-count:infinite;animation-timing-function:ease-in-out;animation-direction:alternate}@keyframes pulse{from{opacity: .1}to{opacity:1}}
-  </style>
   <script src="utils/aequirys.min.js"></script>
   <script src="utils/monocal.min.js"></script>
 </head>
@@ -27,14 +21,11 @@
     <button id="b-tab" class="pv1 tab on bg-cl o5 mr3" onclick="Log.tab('tab')" title="Data Table">&#128911;</button>
     <button id="b-set" class="pv1 tab on bg-cl o5 mr3" onclick="Log.tab('set')" title="Guide">?</button>
 
-    <div class="rf f5">
-      <span id="timer" class="dn di-m di-l mr3" title="Current Log Session Duration">00:00:00</span>
-      <span id="status" title="Log Status">&#9210;</span>
-    </div>
+    <span id="timer" class="rf f5 dn di-m di-l" title="Current Log Session Duration">00:00:00</span>
   </header>
 
   <div id="ovw" class="sect h9">
-    <div class="c2 pr4-l mb4">
+    <div class="c2 mb4">
       <h3 id="peakTimesTitle" class="mb4 f6 fwn" title="Peak Times">&#9650;</h3>
 
       <div id="phc" class="mb4 sh5 wf" title="Peak Hours"></div>
@@ -94,7 +85,7 @@
         <div id="dayChart" class="mb3 psr wf sh2" title="Today's Timeline"></div>
       </div>
 
-      <div id="weekChart" class="vh3 mb5"></div>
+      <div id="weekChart" class="vh3 mb4"></div>
 
       <ul class="lsn f6 lhc">
         <li class="mb4 w5 w2-m w2-l lf">
@@ -134,24 +125,24 @@
         </li>
       </ul>
     </div>
-    <div class="c2 pl4-l hf-l oya-l">
+    <div class="c2 hf-l oya-l">
       <h3 id="sectorsTodayTitle" class="mb4 f6 fwn"></h3>
-      <ul id="sectorBars" class="lsn mb4 h4-l oya-l"></ul>
-      <ul id="projectBars" class="lsn h4-l oya-l"></ul>
+      <ul id="sectorBars" class="nodrag lsn mb4 h4-l oya-l"></ul>
+      <ul id="projectBars" class="nodrag lsn h4-l oya-l"></ul>
     </div>
   </div>
 
   <div id="lis" class="dn sect h9 r">
 
-    <div class="c3 pr4-l hf-l">
+    <div class="c2 hf-l">
       <h3 id="sectorsTitle" class="mb3 f6 fwn"></h3>
-      <ul id="sectorsList" class="lsn h9-l oya-l pr3"></ul>
+      <ul id="sectorsList" class="nodrag lsn h9-l oya-l pr3"></ul>
     </div>
 
-    <div class="c6 ph4-l">
+    <div class="c8 ph4-l">
       <h3 id="statsTitle" class="mb4 f6 fwn"></h3>
 
-      <div class="mb5 vh3 wf" id="peakTimesHistory" title="Peak Times: What your average day looks like"></div>
+      <div class="mb4 vh3 wf" id="peakTimesHistory" title="Peak Times: What your average day looks like"></div>
 
       <ul class="lsn f6 lhc">
         <li class="mb4 w5 w2-m w2-l lf">
@@ -177,16 +168,16 @@
       </ul>
     </div>
 
-    <div class="c3 pl4-l hf-l">
+    <div class="c2 hf-l">
       <h3 id="projectsTitle" class="mb3 f6 fwn"></h3>
-      <ul id="projectsList" class="lsn h9-l oya-l pr3"></ul>
+      <ul id="projectsList" class="nodrag lsn h9-l oya-l pr3"></ul>
     </div>
   </div>
 
-  <div id="vis" class="dn sect h9 r" title="Distribution of Time: Each row is a day and each bar is a log session."></div>
+  <div id="vis" class="nodrag dn sect h9 r" title="Distribution of Time: Each row is a day and each bar is a log session."></div>
 
   <div id="tab" class="dn sect wf h9 oya">
-    <table class="bn wf">
+    <table class="nodrag bn wf">
       <thead>
         <tr class="f6 al">
           <th id="tableDate" title="Date"></th>
@@ -203,8 +194,7 @@
   </div>
 
   <div id="set" class="dn sect wf r h9-l f6 lhc oya">
-
-    <div class="mb5 mb0-l c6 pr4-l hf-l oya-l">
+    <div class="nodrag mb5 mb0-l c6 pr4-l hf-l oya-l">
       <h2 class="mb3 f5">Guide</h2>
       <p class="mb4">The Log is designed for single-tasking. When you start a log, focus on your activity; when you feel like stopping, simply end the log.
 
@@ -258,12 +248,6 @@
         <p>set time 24</p>
       </div>
 
-      <p class="mb3 m">To change the interface's text colour, set a hexadecimal colour of your choice. HTML-friendly colour names are also accepted:</p>
-      <div class="mb4 bl pl3 m">
-        <p class="mb2">set color #112233</p>
-        <p>set color black</p>
-      </div>
-
       <p class="mb2 m">And lastly, if you have an existing log and/or config file, you may want to import them. You simply need to supply the location of the folder where your log.js and config.js is stored. You will also have to restart the Log.</p>
       <p class="mb3 m">This will be the case for now but rest assured I will find a way to remedy this so you wouldn't have to import your data with every update.</p>
       <div class="bl pl3 m">
@@ -271,8 +255,7 @@
       </div>
 
     </div>
-
-    <div class="mb5 mb0-l c6 pl4-l">
+    <div class="nodrag mb5 mb0-l c6 pl4-l">
       <h2 class="mb3 f5">About</h2>
       <p class="mb4 m">The Log is a log and time-tracking system created by Josh Avanier. Its primary purpose is to provide insight to how one's time is spent &mdash; insight that may then be used to optimise personal productivity and better manage time.</p>
 
@@ -287,17 +270,23 @@
     </div>
   </div>
 
-  <form id="cmd" class="dn psf b0 l0 wf f6 bst" action="#" onsubmit="return false;" autocomplete="off" spellcheck="false">
+  <form id="cmd" class="dn psf b0 l0 wf f6 bst z9" action="#" onsubmit="return false;" autocomplete="off" spellcheck="false">
     <input type="text" class="wf bg-1 blanc on bn p4" id="console" autofocus="autofocus" placeholder="> Log.console" />
   </form>
 
   <script src="data/config.js"></script>
+  <script src="data/palette.js"></script>
   <script src="data/log.js"></script>
 
   <script src="js/log.js"></script>
+  <script src="js/options.js"></script>
+  <script src="js/console.js"></script>
+  <script src="js/vis.js"></script>
+  <script src="js/time.js"></script>
+  <script src="js/data.js"></script>
 
   <script>
-    Log.init()
+    Log.init(log)
   </script>
 
 </body>
