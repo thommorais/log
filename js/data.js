@@ -24,28 +24,16 @@ Log.data = {
           date = lt.date(es),
           end = lt.date(ee)
 
-      if (date !== end) {
+      if (date !== end && e.e !== "undefined") {
         let a = lt.convert(es),
             ne = (+(new Date(a.getFullYear(), a.getMonth(), a.getDate(), 23, 59)).getTime() / 1E3).toString(16)
 
-        p.push({
-          s: e.s,
-          e: ne,
-          c: e.c,
-          t: e.t,
-          d: e.d
-        })
+        p.push({ s: e.s, e: ne, c: e.c, t: e.t, d: e.d })
 
         let ea = lt.convert(ee),
             ns = (+(new Date(ea.getFullYear(), ea.getMonth(), ea.getDate(), 0, 0)).getTime() / 1E3).toString(16)
 
-        p.push({
-          s: ns,
-          e: e.e,
-          c: e.c,
-          t: e.t,
-          d: e.d
-        })
+        p.push({ s: ns, e: e.e, c: e.c, t: e.t, d: e.d })
 
       } else {
         p.push(e)
@@ -165,6 +153,21 @@ Log.data = {
 
     for (let i = 0, l = Log.log.length; i < l; i++)
       Log.log[i].e != "undefined" && Log.log[i].t == p && e.push(Log.log[i])
+
+    return e
+  },
+
+  /**
+   * Get entries of a specific sector
+   * @param {string} s - A sector
+   * @returns {Object[]} Log entries
+   */
+
+  getEntriesBySector(s) {
+    let e = []
+
+    for (let i = 0, l = Log.log.length; i < l; i++)
+      Log.log[i].e != "undefined" && Log.log[i].c == s && e.push(Log.log[i])
 
     return e
   },

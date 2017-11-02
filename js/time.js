@@ -91,14 +91,12 @@ Log.time = {
     let a = Log.time.convert(t),
         f = Log.config.system.calendar
 
-    if (f == "gregorian") {
-      return `${a.getFullYear()} ${a.getMonth()} ${a.getDate()}`
-    } else if (f == "monocal") {
+    if (f == "gregorian")
+      return `${a.getFullYear()} ${a.getMonth() + 1} ${a.getDate()}`
+    else if (f == "monocal")
       return MONO.short(MONO.convert(a))
-    } else if (f == "aequirys") {
+    else if (f == "aequirys")
       return Aequirys.display(Aequirys.convert(a))
-    }
-
   },
 
   /**

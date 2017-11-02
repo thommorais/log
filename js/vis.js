@@ -31,10 +31,15 @@ Log.vis = {
     addEntry = (e, width, dp, margin) => {
       let v = document.createElement("div")
 
-      v.className    = `psr t0 sh1 mb2 lf bg-blanc`
+      v.style.backgroundColor = Log.config.ui.colour
+
+      for (let key in palette) {
+        if (e.c == key) v.style.backgroundColor = palette[key]
+      }
+
+      v.className    = `psr t0 sh1 mb2 lf`
       v.style.width  = `${width}%`
       v.style.margin = `0 0 0 ${margin}%`
-      v.style.backgroundColor = Log.config.ui.colour
 
       let id = con + Log.time.date(Log.time.parse(e.s))
       document.getElementById(id).appendChild(v)
@@ -130,10 +135,15 @@ Log.vis = {
     addEntry = (e, w) => {
       let d = document.createElement("div")
 
+      d.style.backgroundColor = Log.config.ui.colour
+
+      for (let key in palette) {
+        if (e.c == key) d.style.backgroundColor = palette[key]
+      }
+
       d.className    = `psa sw1 bg-blanc`
       d.style.height = `${w}%`
       d.style.bottom = `${lw}%`
-      d.style.backgroundColor = Log.config.ui.colour
 
       let id = Log.time.date(Log.time.parse(e.s))
       document.getElementById(id).appendChild(d)
@@ -190,10 +200,12 @@ Log.vis = {
     add = (e, width, dp, margin) => {
       let d = document.createElement("div")
 
-      d.className    = `psr t0 hf mb2 lf`
+      d.className    = `nodrag psr t0 hf mb2 lf`
       d.style.width  = `${width}%`
       d.style.margin = `0 0 0 ${margin}%`
       d.style.backgroundColor = Log.config.ui.colour
+
+      d.setAttribute("title", `${e.c}: ${e.t}`)
 
       document.getElementById(con).appendChild(d)
 
@@ -229,15 +241,14 @@ Log.vis = {
       let d = document.createElement("div"),
           e = document.createElement("div"),
           n = document.createElement("div"),
-          t = `${con}-${i}`,
-          b = i == (new Date).getHours() ? "of" : "o5"
+          t = `${con}-${i}`
 
       d.className = "dib hf psr"
       d.style.width = `4.166666666666667%`
       d.id = t
 
       n.className = `sw1 hf cn`
-      n.style.backgroundColor = Log.config.ui.colour
+      n.style.backgroundColor = i == (new Date).getHours() ? Log.config.ui.accent : Log.config.ui.colour
 
       e.className = "psa b0 wf"
       e.style.height = `${h[i] / m * 100}%`
@@ -265,15 +276,14 @@ Log.vis = {
       let v = document.createElement("div"),
           e = document.createElement("div"),
           n = document.createElement("div"),
-          t = `${con}-${i}`,
-          b = i == (new Date).getDay() ? "of" : "o5"
+          t = `${con}-${i}`
 
       v.className    = "dib hf psr"
       v.style.width  = "14.285714285714286%" // 100 / 7
       v.id           = t
 
       n.className    = `sw1 hf cn`
-      n.style.backgroundColor = Log.config.ui.colour
+      n.style.backgroundColor = i == (new Date).getDay() ? Log.config.ui.accent : Log.config.ui.colour
 
       e.className    = "psa b0 wf"
       e.style.height = `${d[i] / m * 100}%`
@@ -319,9 +329,10 @@ Log.vis = {
    * Display sector bars
    * @param {Object[]=} ent - Log entries
    * @param {string=}   con - The container
+   * @param {boolean}   grd - Enable gridview
    */
 
-  sectorBars(ent = Log.log, con = "sectorBars") {
+  sectorBars(ent = Log.log, con = "sectorBars", grd = false) {
     let s = Log.data.listSectors(ent).sort(),
 
     /**
@@ -341,28 +352,39 @@ Log.vis = {
       let sh = Log.data.sh(ent, sec),
 
           li = document.createElement("li"),
+          ni = document.createElement("div"),
           tl = document.createElement("span"),
           st = document.createElement("span"),
           br = document.createElement("div"),
           dt = document.createElement("div")
 
-      li.className = "mb4 f6"
+      li.className = grd ? "dib mb2 p2 f6 c4" : "mb4 f6 lhc"
 
-      tl.className = "f6 mb2 mon upc tk"
+      if (grd) ni.className = "p3 bg-e"
+
+      tl.className = "dib sw6 f6 mon upc tk elip"
       st.className = "f6 rf"
-      br.className = "wf sh1 mb3"
+      br.className = "wf sh1"
 
       dt.className   = "psr t0 hf lf"
       dt.style.backgroundColor = Log.config.ui.colour
       dt.style.width = `${(Log.data.sp(ent, sec))}%`
 
       tl.innerHTML = sec
-      st.innerHTML = `LH ${sh.toFixed(2)}`
+      st.innerHTML = `${sh.toFixed(2)} h`
 
       br.appendChild(dt)
-      li.appendChild(tl)
-      li.appendChild(st)
-      li.appendChild(br)
+
+      if (grd){
+        ni.appendChild(tl)
+        ni.appendChild(st)
+        ni.appendChild(br)
+        li.appendChild(ni)
+      } else {
+        li.appendChild(tl)
+        li.appendChild(st)
+        li.appendChild(br)
+      }
 
       document.getElementById(con).appendChild(li)
     }
@@ -374,9 +396,10 @@ Log.vis = {
    * Display project bars
    * @param {Object[]=} ent - Log entries
    * @param {string=}   con - The container
+   * @param {boolean}   grd - Enable gridview
    */
 
-  projectBars(ent = Log.log, con = "projectBars") {
+  projectBars(ent = Log.log, con = "projectBars", grd = false) {
     let s = Log.data.listProjects(ent).sort(),
 
     /**
@@ -396,28 +419,39 @@ Log.vis = {
       let sh = Log.data.ph(ent, pro),
 
           li = document.createElement("li"),
+          ni = document.createElement("div"),
           tl = document.createElement("span"),
           st = document.createElement("span"),
           br = document.createElement("div"),
           dt = document.createElement("div")
 
-      li.className   = "mb4 f6"
+      li.className = grd ? "dib mb2 p2 f6 c4" : "mb4 f6 lhc"
 
-      tl.className   = "f6 mb2 mon upc tk"
-      tl.innerHTML   = pro
+      if (grd) ni.className = "p3 bg-e"
 
-      st.className   = "f6 rf"
-      st.innerHTML   = `LH ${sh.toFixed(2)}`
+      tl.className = "dib sw6 f6 mon upc tk elip"
+      st.className = "f6 rf"
+      br.className = "wf sh1"
 
-      br.className   = "wf sh1 mb3"
       dt.className   = "psr t0 hf lf"
       dt.style.backgroundColor = Log.config.ui.colour
       dt.style.width = `${(Log.data.pp(ent, pro))}%`
 
+      tl.innerHTML = pro
+      st.innerHTML = `${sh.toFixed(2)} h`
+
       br.appendChild(dt)
-      li.appendChild(tl)
-      li.appendChild(st)
-      li.appendChild(br)
+
+      if (grd){
+        ni.appendChild(tl)
+        ni.appendChild(st)
+        ni.appendChild(br)
+        li.appendChild(ni)
+      } else {
+        li.appendChild(tl)
+        li.appendChild(st)
+        li.appendChild(br)
+      }
 
       document.getElementById(con).appendChild(li)
     }

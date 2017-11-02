@@ -13,7 +13,7 @@ Log = window.Log || {}
 Log.console = {
 
   commands: [
-    "start", "end", "delete", "set", "import"
+    "start", "end", "delete", "set", "import", "filter"
   ],
 
   parse(input) {
@@ -36,20 +36,11 @@ Log.console = {
         case 4:
           Log.console.importUser(input);
           break;
+        case 5:
+          Log.console.filter(input);
+          break;
       }
     } else return
-  },
-
-  importUser: {
-
-    log(loc) {
-      shell.cat(loc).to(`${__dirname}/data/config.js`)
-    },
-
-    config(loc) {
-      shell.cat(loc).to(`${__dirname}/data/config.js`)
-    }
-
   },
 
   importUser(input) {
@@ -71,20 +62,37 @@ Log.console = {
 
   startLog(s) {
     let ch = s.split(""),
-        indices = []
-
-    for (let i = 0, l = ch.length; i < l; i++)
-      if (ch[i] === "\"") indices.push(i)
-
-    let time = new Date(),
-        start = (new Date(time.getFullYear(), time.getMonth(), time.getDate(), time.getHours(), time.getMinutes(), time.getSeconds()).getTime() / 1E3).toString(16),
+        indices = [],
         sect = "",
         proj = "",
         desc = ""
 
-    for (let i = indices[0] + 1, l = indices[1]; i < l; i++) sect += ch[i]
-    for (let i = indices[2] + 1, l = indices[3]; i < l; i++) proj += ch[i]
-    for (let i = indices[4] + 1, l = indices[5]; i < l; i++) desc += ch[i]
+    if (s.indexOf(`"`) >= 0) {
+      for (let i = 0, l = ch.length; i < l; i++)
+        if (ch[i] === "\"") indices.push(i)
+
+      for (let i = indices[0] + 1, l = indices[1]; i < l; i++) sect += ch[i]
+      for (let i = indices[2] + 1, l = indices[3]; i < l; i++) proj += ch[i]
+      for (let i = indices[4] + 1, l = indices[5]; i < l; i++) desc += ch[i]
+    } else if (s.indexOf(`;`) >= 0) {
+      let p = s.split(`;`)
+      sect = p[0].substring(6, p[0].length).trim()
+      proj = p[1].trim()
+      desc = p[2].trim()
+    } else if (s.indexOf(`|`) >= 0) {
+      let p = s.split(`|`)
+      sect = p[0].substring(6, p[0].length).trim()
+      proj = p[1].trim()
+      desc = p[2].trim()
+    } else if (s.indexOf(`,`) >= 0) {
+      let p = s.split(`,`)
+      sect = p[0].substring(6, p[0].length).trim()
+      proj = p[1].trim()
+      desc = p[2].trim()
+    }
+
+    let time = new Date(),
+        start = (new Date(time.getFullYear(), time.getMonth(), time.getDate(), time.getHours(), time.getMinutes(), time.getSeconds()).getTime() / 1E3).toString(16)
 
     let entry = `{s:"${start}",e:"undefined",c:"${sect}",t:"${proj}",d:"${desc}"},\n]`
 
@@ -108,7 +116,6 @@ Log.console = {
     let time = new Date(),
         end = (new Date(time.getFullYear(), time.getMonth(), time.getDate(), time.getHours(), time.getMinutes(), time.getSeconds()).getTime() / 1E3).toString(16)
 
-    // sed -i -e "s/undefined/$D/g" $1
     shell.sed('-i', 'undefined', end, (__dirname + "/data/log.js"))
     shell.cd()
     shell.sed('-i', 'undefined', end, ".log-data/log.js")
@@ -128,6 +135,8 @@ Log.console = {
       Log.options.setBG(c[2])
     } else if (a == "color" || a == "colour" || a == "text") {
       Log.options.setColour(c[2])
+    } else if (a == "highlight" || a == "accent") {
+      Log.options.setAccent(c[2])
     } else if (a == "font" || a == "typeface" || a == "type") {
       Log.options.setFont(c[2])
     } else if (a == "icons" || a == "icon") {
@@ -163,4 +172,32 @@ Log.console = {
   importConfig(config = `${HOME}/.log-data/config.js`) {
     shell.cat(config).to(`${__dirname}/data/config.js`)
   },
+
+  /**
+   * Filter logs
+   */
+
+  filter(s) {
+    let c = s.split(" "),
+        a = c[1].toLowerCase(),
+        indices = [],
+        f = "",
+        h = s.split("")
+
+    for (let i = 0, l = h.length; i < l; i++)
+      if (h[i] == `"`) indices.push(i)
+
+    for (let i = indices[0] + 1, l = indices[1]; i < l; i++) f += h[i]
+
+    if (a == "category" || a == "sector") {
+      Log.reset()
+      Log.init(Log.data.getEntriesBySector(f))
+    } else if (a == "project" || a == "title") {
+      Log.reset()
+      Log.init(Log.data.getEntriesByProject(f))
+    } else if (a == "none" || a == "reset") {
+      Log.reset()
+      Log.init(log)
+    } else return
+  }
 }

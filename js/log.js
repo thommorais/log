@@ -19,6 +19,7 @@ var Log = {
 
   log: [], // holds user's logs
   config: {}, // holds user's preferences
+  palette: {}, // holds user's sector palette
   clock: {}, // holds timer interval
 
   /**
@@ -116,10 +117,12 @@ var Log = {
           es = Log.time.parse(e.s),
           ee = Log.time.parse(e.e)
 
+          ee = e.e === "undefined" ? "-" : Log.time.parse(e.e)
+
       c1.innerHTML = Log.time.displayDate(es)
       c2.innerHTML = Log.time.stamp(es)
-      c3.innerHTML = Log.time.stamp(ee)
-      c4.innerHTML = Log.time.duration(es, ee).toFixed(2)
+      c3.innerHTML = e.e === "undefined" ? "-" : Log.time.stamp(ee)
+      c4.innerHTML = e.e === "undefined" ? "-" : Log.time.duration(es, ee).toFixed(2)
       c5.innerHTML = e.c
       c6.innerHTML = e.t
       c7.innerHTML = e.d
@@ -179,6 +182,24 @@ var Log = {
 
     document.getElementById(s).style.display = "block"
     document.getElementById(`b-${s}`).className = "pv1 tab on bg-cl of mr3"
+  },
+
+  /**
+   * Open a tab
+   */
+
+  subtab(s) {
+    let x = document.getElementsByClassName("subsect"),
+        b = document.getElementsByClassName("subtab")
+
+    for (let i = 0, l = x.length; i < l; i++)
+      x[i].style.display = "none"
+
+    for (let i = 0, l = b.length; i < l; i++)
+      b[i].className = "pv1 subtab on bg-cl o5 mr3"
+
+    document.getElementById(s).style.display = "block"
+    document.getElementById(`b-${s}`).className = "pv1 subtab on bg-cl of mr3"
   },
 
   build() {
@@ -258,6 +279,7 @@ var Log = {
     Log.res.stats()
     Log.res.chart("peakTimesHistory")
 
+    c("sectorBars")
     c("projectBars")
     c("sectorsList")
     c("projectsList")
@@ -269,8 +291,9 @@ var Log = {
    * Initialise
    */
 
-  init() {
+  init(log) {
     Log.config = config
+    Log.palette = palette
     Log.log = Log.data.parse(log)
 
     document.getElementById("app").style.backgroundColor = Log.config.ui.bg
@@ -375,8 +398,8 @@ var Log = {
     Log.vis.sectorBars(en)
     Log.vis.projectBars(en)
 
-    Log.vis.sectorBars(undefined, "sectorsList")
-    Log.vis.projectBars(undefined, "projectsList")
+    Log.vis.sectorBars(undefined, "sectorsList", true)
+    Log.vis.projectBars(undefined, "projectsList", true)
 
     Log.vis.line(mn, "vis")
     Log.display(Log.log, 50, "logbook")
