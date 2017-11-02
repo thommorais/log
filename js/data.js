@@ -12,6 +12,49 @@
 Log = window.Log || {}
 Log.data = {
 
+  parse(a = Log.log) {
+    let p = [],
+        lt = Log.time
+
+    for (let i = 0, l = a.length; i < l; i++) {
+      let e = a[i]
+
+      let es = lt.parse(e.s),
+          ee = lt.parse(e.e),
+          date = lt.date(es),
+          end = lt.date(ee)
+
+      if (date !== end) {
+        let a = lt.convert(es),
+            ne = (+(new Date(a.getFullYear(), a.getMonth(), a.getDate(), 23, 59)).getTime() / 1E3).toString(16)
+
+        p.push({
+          s: e.s,
+          e: ne,
+          c: e.c,
+          t: e.t,
+          d: e.d
+        })
+
+        let ea = lt.convert(ee),
+            ns = (+(new Date(ea.getFullYear(), ea.getMonth(), ea.getDate(), 0, 0)).getTime() / 1E3).toString(16)
+
+        p.push({
+          s: ns,
+          e: e.e,
+          c: e.c,
+          t: e.t,
+          d: e.d
+        })
+
+      } else {
+        p.push(e)
+      }
+    }
+
+    return p
+  },
+
   /**
    * Get entries
    * @param {Object} d - A date

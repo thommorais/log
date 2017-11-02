@@ -22,29 +22,6 @@ var Log = {
   clock: {}, // holds timer interval
 
   /**
-   * Save
-   */
-
-  save: {
-
-    /**
-     * Save log file
-     */
-
-    log() {
-      shell.cp(`${__dirname}/data/log.js`, `${HOME}/.log-data/log.js`)
-    },
-
-    /**
-     * Save config file
-     */
-
-    config() {
-      shell.cp(`${__dirname}/data/config.js`, `${HOME}/.log-data/config.js`)
-    }
-  },
-
-  /**
    * Get log status; true means a session is in progress
    * @returns {boolean} Log status
    */
@@ -206,29 +183,33 @@ var Log = {
 
   build() {
 
-    let icon = Log.config.ui.icons
+    let icon = Log.config.ui.icons,
 
-    document.getElementById("b-ovw").innerHTML = icon ? "&#128902;" : "Overview"
-    document.getElementById("b-lis").innerHTML = icon ? "&#9783;" : "Details"
-    document.getElementById("b-vis").innerHTML = icon ? "&#9781;" : "Visualisation"
-    document.getElementById("b-tab").innerHTML = icon ? "&#128911;" : "Table"
-    document.getElementById("b-set").innerHTML = icon ? "?" : "Guide"
+    ic = (a, b, c) => {
+      document.getElementById(a).innerHTML = icon ? b : c
+    }
 
-    document.getElementById("peakTimesTitle").innerHTML = icon ? "&#9650;" : "Peak Times"
-    document.getElementById("forecastTitle").innerHTML = icon ? "&#9670;" : "Forecast"
-    document.getElementById("overviewTitle").innerHTML = icon ? "&#128902;" : "Overview"
-    document.getElementById("sectorsTodayTitle").innerHTML = icon ? "&#11206;" : "Sectors"
-    document.getElementById("sectorsTitle").innerHTML = icon ? "&#11206;" : "Sectors"
-    document.getElementById("statsTitle").innerHTML = icon ? "&#9650;" : "Statistics"
-    document.getElementById("projectsTitle").innerHTML = icon ? "&#9964;" : "Projects"
+    ic("b-ovw", "&#128902;", "Overview")
+    ic("b-lis", "&#9783;", "Details")
+    ic("b-vis", "&#9781;", "Visualisation")
+    ic("b-tab", "&#128911;", "Table")
+    ic("b-set", "?", "Guide")
 
-    document.getElementById("tableDate").innerHTML = icon ? "&#128710;" : "Date"
-    document.getElementById("tableStart").innerHTML = icon ? "&#9210;" : "Start"
-    document.getElementById("tableEnd").innerHTML = icon ? "&#9209;" : "End"
-    document.getElementById("tableDuration").innerHTML = icon ? "&#11118;" : "Duration"
-    document.getElementById("tableSector").innerHTML = icon ? "&#11206;" : "Sector"
-    document.getElementById("tableProject").innerHTML = icon ? "&#9964;" : "Project"
-    document.getElementById("tableActivity").innerHTML = icon ? "&#11042;" : "Activity"
+    ic("peakTimesTitle", "&#9650;", "Peak Times")
+    ic("forecastTitle", "&#9670;", "Forecast")
+    ic("overviewTitle", "&#128902;", "Overview")
+    ic("sectorsTodayTitle", "&#11206;", "Sectors")
+    ic("sectorsTitle", "&#11206;", "Sectors")
+    ic("statsTitle", "&#9650;", "Statistics")
+    ic("projectsTitle", "&#9964;", "Projects")
+
+    ic("tableDate", "&#128710;", "Date")
+    ic("tableStart", "&#9210;", "Start")
+    ic("tableEnd", "&#9209;", "End")
+    ic("tableDuration", "&#11118;", "Duration")
+    ic("tableSector", "&#11206;", "Sector")
+    ic("tableProject", "&#9964;", "Project")
+    ic("tableActivity", "&#11042;", "Activity")
   },
 
   refresh() {
@@ -264,25 +245,24 @@ var Log = {
   },
 
   reset() {
+    let c = e => {
+      document.getElementById(e).innerHTML = ""
+    }
 
     Log.res.timer()
-
     Log.res.forecast()
-
     Log.res.chart("phc")
     Log.res.chart("pdc")
     Log.res.chart("dayChart")
     Log.res.chart("weekChart")
-
     Log.res.stats()
-
     Log.res.chart("peakTimesHistory")
 
-    document.getElementById("projectBars").innerHTML = ""
-    document.getElementById("sectorsList").innerHTML = ""
-    document.getElementById("projectsList").innerHTML = ""
-    document.getElementById("vis").innerHTML = ""
-    document.getElementById("logbook").innerHTML = ""
+    c("projectBars")
+    c("sectorsList")
+    c("projectsList")
+    c("vis")
+    c("logbook")
   },
 
   /**
@@ -291,7 +271,7 @@ var Log = {
 
   init() {
     Log.config = config
-    Log.log = log
+    Log.log = Log.data.parse(log)
 
     document.getElementById("app").style.backgroundColor = Log.config.ui.bg
     document.getElementById("app").style.color = Log.config.ui.colour
@@ -300,7 +280,7 @@ var Log = {
     Log.build()
 
     let ld = Log.data,
-        sp = ld.sp,
+        // sp = ld.sp,
 
         n = new Date(),
         y = new Date(n),
