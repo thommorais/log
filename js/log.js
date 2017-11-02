@@ -129,7 +129,7 @@ var Log = {
     }
 
     // Display last {num} entries
-    let b = takeRight(ent, num)
+    let b = takeRight(ent, num).reverse()
 
     for (let i = 0, l = b.length; i < l; i++) en(b[i], i)
   },
