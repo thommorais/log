@@ -104,15 +104,15 @@ var Log = {
      */
 
     en = (e, i) => {
-      let row = document.getElementById(con).insertRow(i),
+      let rw = document.getElementById(con).insertRow(i),
 
-          c1 = row.insertCell(0),
-          c2 = row.insertCell(1),
-          c3 = row.insertCell(2),
-          c4 = row.insertCell(3),
-          c5 = row.insertCell(4),
-          c6 = row.insertCell(5),
-          c7 = row.insertCell(6),
+          c1 = rw.insertCell(0),
+          c2 = rw.insertCell(1),
+          c3 = rw.insertCell(2),
+          c4 = rw.insertCell(3),
+          c5 = rw.insertCell(4),
+          c6 = rw.insertCell(5),
+          c7 = rw.insertCell(6),
 
           es = Log.time.parse(e.s),
           ee = Log.time.parse(e.e)
@@ -258,10 +258,6 @@ var Log = {
       document.getElementById("timer").innerHTML = "00:00:00"
     },
 
-    chart(con) {
-      document.getElementById(con).innerHTML = ""
-    },
-
     forecast() {
       document.getElementById("fsf").innerHTML = "???"
       document.getElementById("fpf").innerHTML = "???"
@@ -271,7 +267,7 @@ var Log = {
 
     stats() {
       let e = "LHH LHT LPH LPT ASD ASDT LSN LSX LSNH LSXH".split(" "),
-          r = e => { document.getElementById(e).innerHTML = "0.00" }
+          r = e => document.getElementById(e).innerHTML = "0.00"
 
       for (let i = 0, l = e.length; i < l; i++) r(e[i])
     },
@@ -279,19 +275,19 @@ var Log = {
   },
 
   reset() {
-    let c = e => {
-      document.getElementById(e).innerHTML = ""
-    }
+    let c = e => document.getElementById(e).innerHTML = ""
 
     Log.res.timer()
     Log.res.forecast()
-    Log.res.chart("phc")
-    Log.res.chart("pdc")
-    Log.res.chart("dayChart")
-    Log.res.chart("weekChart")
-    Log.res.stats()
-    Log.res.chart("peakTimesHistory")
 
+    c("phc")
+    c("pdc")
+    c("dayChart")
+    c("weekChart")
+
+    Log.res.stats()
+
+    c("peakTimesHistory")
     c("sectorBars")
     c("projectBars")
     c("sectorsList")
@@ -315,10 +311,9 @@ var Log = {
 
     Log.build()
 
-    if (Log.log[Log.log.length - 1].e == "undefined") Log.screensaver()
+    Log.log[Log.log.length - 1].e == "undefined" && Log.screensaver()
 
     let ld = Log.data,
-
         n = new Date(),
         y = new Date(n),
 
@@ -333,8 +328,7 @@ var Log = {
     t = (e, c) => {
       let s = "", r, d = document.getElementById(e)
 
-      c > 0 ? (s = `+${c.toFixed(2)}%`) :
-        (s = `${c.toFixed(2)}%`)
+      c > 0 ? (s = `+${c.toFixed(2)}%`) : (s = `${c.toFixed(2)}%`)
 
       d.innerHTML = s
     }

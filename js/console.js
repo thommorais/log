@@ -43,6 +43,11 @@ Log.console = {
     } else return
   },
 
+  /**
+   * Import user log and config files
+   * @param {string} input - Input parameters
+   */
+
   importUser(input) {
     let s = input.split(" ")
 
@@ -53,6 +58,26 @@ Log.console = {
 
     if (shell.test("-f", `${s[1]}/log.js`))
       shell.cat(`${s[1]}/log.js`).to(`${__dirname}/data/log.js`)
+  },
+
+  /**
+   * Import logs
+   * @param {string=} loc - File location
+   */
+
+  importLog(loc = `${HOME}/.log-data/log.js`) {
+    shell.cat(loc).to(`${__dirname}/data/log.js`)
+    loc !== undefined && shell.cat(l).to(`${HOME}/.log-data/log.js`)
+  },
+
+  /**
+   * Import user preferences
+   * @param {string=} loc - File location
+   */
+
+  importConfig(loc = `${HOME}/.log-data/config.js`) {
+    shell.cat(loc).to(`${__dirname}/data/config.js`)
+    loc !== undefined && shell.cat(l).to(`${HOME}/.log-data/config.js`)
   },
 
   /**
@@ -69,11 +94,11 @@ Log.console = {
 
     if (s.indexOf(`"`) >= 0) {
       for (let i = 0, l = ch.length; i < l; i++)
-        if (ch[i] === "\"") indices.push(i)
+        ch[i] === "\"" && indices.push(i)
 
-      for (let i = indices[0] + 1, l = indices[1]; i < l; i++) sect += ch[i]
-      for (let i = indices[2] + 1, l = indices[3]; i < l; i++) proj += ch[i]
-      for (let i = indices[4] + 1, l = indices[5]; i < l; i++) desc += ch[i]
+      for (let i = indices[0] + 1; i < indices[1]; i++) sect += ch[i]
+      for (let i = indices[2] + 1; i < indices[3]; i++) proj += ch[i]
+      for (let i = indices[4] + 1; i < indices[5]; i++) desc += ch[i]
     } else if (s.indexOf(`;`) >= 0) {
       let p = s.split(`;`)
       sect = p[0].substring(6, p[0].length).trim()
@@ -112,20 +137,29 @@ Log.console = {
     Log.refresh()
   },
 
-  endLog() {
-    let time = new Date(),
-        end = (new Date(time.getFullYear(), time.getMonth(), time.getDate(), time.getHours(), time.getMinutes(), time.getSeconds()).getTime() / 1E3).toString(16)
+  /**
+   * End a log entry
+   */
 
-    shell.sed('-i', 'undefined', end, (__dirname + "/data/log.js"))
+  endLog() {
+    let t = new Date(),
+        e = (new Date(t.getFullYear(), t.getMonth(), t.getDate(), t.getHours(), t.getMinutes(), t.getSeconds()).getTime() / 1E3).toString(16)
+
+    shell.sed('-i', 'undefined', e, (__dirname + "/data/log.js"))
     shell.cd()
-    shell.sed('-i', 'undefined', end, ".log-data/log.js")
+    shell.sed('-i', 'undefined', e, ".log-data/log.js")
     shell.cd(__dirname)
 
-    log[log.length - 1].e = `${end}`
+    log[log.length - 1].e = `${e}`
 
     clearInterval(timer)
     Log.refresh()
   },
+
+  /**
+   * Set a config attribute
+   * @param {string} s - The input parameters
+   */
 
   set(s) {
     let c = s.split(" "),
@@ -156,24 +190,6 @@ Log.console = {
   },
 
   /**
-   * Import logs
-   * @param {string=} loc - File location
-   */
-
-  importLog(loc = `${HOME}/.log-data/log.js`) {
-    shell.cat(loc).to(`${__dirname}/data/log.js`)
-  },
-
-  /**
-   * Import user preferences
-   * @param {string=} config - File location
-   */
-
-  importConfig(config = `${HOME}/.log-data/config.js`) {
-    shell.cat(config).to(`${__dirname}/data/config.js`)
-  },
-
-  /**
    * Filter logs
    */
 
@@ -185,9 +201,10 @@ Log.console = {
         h = s.split("")
 
     for (let i = 0, l = h.length; i < l; i++)
-      if (h[i] == `"`) indices.push(i)
+      h[i] == `"` && indices.push(i)
 
-    for (let i = indices[0] + 1, l = indices[1]; i < l; i++) f += h[i]
+    for (let i = indices[0] + 1, l = indices[1]; i < l; i++)
+      f += h[i]
 
     if (a == "category" || a == "sector") {
       Log.reset()

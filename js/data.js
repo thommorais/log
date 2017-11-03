@@ -12,25 +12,29 @@
 Log = window.Log || {}
 Log.data = {
 
+  /**
+   * Parse log data
+   * @param {Object=} a - Log data
+   */
+
   parse(a = Log.log) {
-    let p = [],
-        lt = Log.time
+    let p = []
 
     for (let i = 0, l = a.length; i < l; i++) {
       let e = a[i]
 
-      let es = lt.parse(e.s),
-          ee = lt.parse(e.e),
-          date = lt.date(es),
-          end = lt.date(ee)
+      let es = Log.time.parse(e.s),
+          ee = Log.time.parse(e.e),
+          date = Log.time.date(es),
+          end = Log.time.date(ee)
 
       if (date !== end && e.e !== "undefined") {
-        let a = lt.convert(es),
+        let a = Log.time.convert(es),
             ne = (+(new Date(a.getFullYear(), a.getMonth(), a.getDate(), 23, 59)).getTime() / 1E3).toString(16)
 
         p.push({ s: e.s, e: ne, c: e.c, t: e.t, d: e.d })
 
-        let ea = lt.convert(ee),
+        let ea = Log.time.convert(ee),
             ns = (+(new Date(ea.getFullYear(), ea.getMonth(), ea.getDate(), 0, 0)).getTime() / 1E3).toString(16)
 
         p.push({ s: ns, e: e.e, c: e.c, t: e.t, d: e.d })
@@ -214,10 +218,7 @@ Log.data = {
 
   peakDays(a = Log.log) {
     let d = new Array(7).fill(0),
-
-    count = e => {
-      d[(Log.time.convert(Log.time.parse(e.s))).getDay()]++
-    }
+    count = e => d[(Log.time.convert(Log.time.parse(e.s))).getDay()]++
 
     for (let i = 0, l = a.length; i < l; i++)
       a[i].e != "undefined" && count(a[i])
@@ -233,10 +234,7 @@ Log.data = {
 
   peakHours(a = Log.log) {
     let h = new Array(24).fill(0),
-
-    count = e => {
-      h[(Log.time.convert(Log.time.parse(e.s))).getHours()]++
-    }
+    count = e => h[(Log.time.convert(Log.time.parse(e.s))).getHours()]++
 
     for (let i = 0, l = a.length; i < l; i++)
       a[i].e != "undefined" && count(a[i])

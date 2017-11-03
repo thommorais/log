@@ -137,9 +137,8 @@ Log.vis = {
 
       d.style.backgroundColor = Log.config.ui.colour
 
-      for (let key in palette) {
+      for (let key in palette)
         if (e.c == key) d.style.backgroundColor = palette[key]
-      }
 
       d.className    = `psa sw1 bg-blanc`
       d.style.height = `${w}%`
