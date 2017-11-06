@@ -13,7 +13,7 @@ Log = window.Log || {}
 Log.console = {
 
   commands: [
-    "start", "end", "delete", "set", "import", "filter"
+    "start", "end", "delete", "set", "import", "filter", "export"
   ],
 
   parse(input) {
@@ -39,6 +39,9 @@ Log.console = {
         case 5:
           Log.console.filter(input);
           break;
+        case 6:
+          Log.console.exportUser();
+          break;
       }
     } else return
   },
@@ -62,8 +65,18 @@ Log.console = {
     Log.refresh()
   },
 
-  exportUser(input) {
+  exportUser() {
+    let data = JSON.stringify(JSON.parse(localStorage.getItem("user")))
 
+    dialog.showSaveDialog((fileName) => {
+      if (fileName === undefined) return
+      fs.writeFile(fileName, data, (err) => {
+        if (err) {
+          alert("An error ocurred creating the file "+ err.message)
+          return
+        }
+      })
+    })
   },
 
   /**
