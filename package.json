@@ -1,6 +1,6 @@
 {
   "name": "Log",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "A log and time-tracking system",
   "repository": "https://github.com/joshavanier/log",
   "main": "./main.js",
@@ -9,7 +9,7 @@
     "start": "electron ."
   },
   "devDependencies": {
-    "electron": "^1.7.5",
+    "electron": "^1.8.1",
     "electron-prebuilt": "^1.4.13"
   },
   "dependencies": {
