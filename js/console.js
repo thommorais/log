@@ -177,7 +177,9 @@ Log.console = {
       Log.options.setDateFormat(c[2])
     } else if (a == "weekstart") {
       Log.options.setWeekStart(c[2])
-    }
+    } else if (a == "category" || a == "sector" || a == "cat" || a == "sec") {
+      Log.options.setColourCode(s)
+    } else return
   },
 
   /**

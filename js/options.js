@@ -45,8 +45,21 @@ Log.options = {
     Log.refresh()
   },
 
-  setColourCode(sec, col) {
+  setColourCode(s) {
+    let ch = s.split(""),
+        indices = [],
+        sec = ""
 
+    for (let i = 0, l = ch.length; i < l; i++)
+      ch[i] === "\"" && indices.push(i)
+
+    for (let i = indices[0] + 1; i < indices[1]; i++) sec += ch[i]
+
+    let col = s.substring(indices[1] + 1, s.length).trim()
+
+    user.palette[sec] = col
+    localStorage.setItem("user", JSON.stringify(user))
+    Log.refresh()
   },
 
   /**

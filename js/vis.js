@@ -31,11 +31,7 @@ Log.vis = {
     addEntry = (e, width, dp, margin) => {
       let v = document.createElement("div")
 
-      v.style.backgroundColor = Log.config.ui.colour
-
-      for (let key in palette) {
-        if (e.c == key) v.style.backgroundColor = palette[key]
-      }
+      v.style.backgroundColor = Log.palette[e.c] || Log.config.ui.colour
 
       v.className    = `psr t0 sh1 mb2 lf`
       v.style.width  = `${width}%`
@@ -135,10 +131,7 @@ Log.vis = {
     addEntry = (e, w) => {
       let d = document.createElement("div")
 
-      d.style.backgroundColor = Log.config.ui.colour
-
-      for (let key in palette)
-        if (e.c == key) d.style.backgroundColor = palette[key]
+      d.style.backgroundColor = Log.palette[e.c] || Log.config.ui.colour
 
       d.className    = `psa sw1 bg-blanc`
       d.style.height = `${w}%`
@@ -202,7 +195,8 @@ Log.vis = {
       d.className    = `nodrag psr t0 hf mb2 lf`
       d.style.width  = `${width}%`
       d.style.margin = `0 0 0 ${margin}%`
-      d.style.backgroundColor = Log.config.ui.colour
+
+      d.style.backgroundColor = Log.palette[e.c] || Log.config.ui.colour
 
       d.setAttribute("title", `${e.c}: ${e.t}`)
 
