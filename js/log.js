@@ -301,17 +301,35 @@ var Log = {
    */
 
   init(log) {
-    Log.config = config
-    Log.palette = palette
-    Log.log = Log.data.parse(log)
+    Log.config = config || {}
+    Log.palette = palette || {}
+    Log.log = Log.data.parse(log) || []
 
     document.getElementById("app").style.backgroundColor = Log.config.ui.bg
     document.getElementById("app").style.color = Log.config.ui.colour
     document.getElementById("app").style.fontFamily = Log.config.ui.font
 
+    document.getElementById("cmd").addEventListener("submit", function() {
+      Log.console.parse(document.getElementById("console").value)
+      document.getElementById("console").value = ""
+    })
+
+    document.addEventListener("keydown", function(e) {
+      if (e.which >= 65 && e.which <= 90) {
+        document.getElementById("cmd").style.display = "block"
+        document.getElementById("console").focus()
+      } else if (e.key == "Escape") {
+        document.getElementById("console").value = ""
+        document.getElementById("cmd").style.display = "none"
+      }
+      return
+    })
+
+    if (Log.log.length == 0) return
+
     Log.build()
 
-    Log.log[Log.log.length - 1].e == "undefined" && Log.screensaver()
+    // Log.log[Log.log.length - 1].e == "undefined" && Log.screensaver()
 
     let ld = Log.data,
         n = new Date(),
@@ -380,22 +398,6 @@ var Log = {
 
     for (let i = 0, l = tels.length; i < l; i++)
       t(tels[i], tval[i])
-
-    document.getElementById("cmd").addEventListener("submit", function() {
-      Log.console.parse(document.getElementById("console").value)
-      document.getElementById("console").value = ""
-    })
-
-    document.addEventListener("keydown", function(e) {
-      if (e.which >= 65 && e.which <= 90) {
-        document.getElementById("cmd").style.display = "block"
-        document.getElementById("console").focus()
-      } else if (e.key == "Escape") {
-        document.getElementById("console").value = ""
-        document.getElementById("cmd").style.display = "none"
-      }
-      return
-    })
 
     Log.vis.peakH(undefined, "peakTimesHistory")
     Log.vis.sectorBars(en)
