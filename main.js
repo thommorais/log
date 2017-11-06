@@ -2,8 +2,6 @@ const {app, BrowserWindow, webFrame} = require('electron')
 const path = require('path')
 const url = require('url')
 
-require('electron-reload')(__dirname)
-
 var win
 
 function createWindow () {
