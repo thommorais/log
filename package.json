@@ -1,6 +1,6 @@
 {
   "name": "Log",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "A log and time-tracking system",
   "repository": "https://github.com/joshavanier/log",
   "main": "./main.js",
@@ -13,8 +13,10 @@
     "electron-prebuilt": "^1.4.13"
   },
   "dependencies": {
+    "electron-json-storage": "^4.0.2",
     "electron-packager": "^8.4.0",
     "electron-reload": "^1.2.2",
+    "electron-storage": "^1.0.7",
     "shelljs": "0.7.8"
   }
 }
