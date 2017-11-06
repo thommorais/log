@@ -304,9 +304,6 @@ var Log = {
       console.log(user)
     } else {
       user.log = Log.data.parse(log)
-      user.config = config
-      user.palette = palette
-
       localStorage.setItem("user", JSON.stringify(user))
     }
 
