@@ -49,35 +49,21 @@ Log.console = {
    */
 
   importUser(input) {
-    let s = input.split(" ")
+    let s = input.split(" "), file = ""
 
     if (s[1].substr(-1) === '/') s[1].substr(0, s[1].length - 1)
 
-    if (shell.test("-f", `${s[1]}/config.js`))
-      shell.cat(`${s[1]}/config.js`).to(`${__dirname}/data/config.js`)
+    if (shell.test("-f", `${s[1]}`))
+      file = shell.cat(`${s[1]}`)
 
-    if (shell.test("-f", `${s[1]}/log.js`))
-      shell.cat(`${s[1]}/log.js`).to(`${__dirname}/data/log.js`)
+    localStorage.setItem("user", file)
+    user = JSON.parse(localStorage.getItem("user"))
+
+    Log.refresh()
   },
 
-  /**
-   * Import logs
-   * @param {string=} loc - File location
-   */
+  exportUser(input) {
 
-  importLog(loc = `${HOME}/.log-data/log.js`) {
-    shell.cat(loc).to(`${__dirname}/data/log.js`)
-    loc !== undefined && shell.cat(l).to(`${HOME}/.log-data/log.js`)
-  },
-
-  /**
-   * Import user preferences
-   * @param {string=} loc - File location
-   */
-
-  importConfig(loc = `${HOME}/.log-data/config.js`) {
-    shell.cat(loc).to(`${__dirname}/data/config.js`)
-    loc !== undefined && shell.cat(l).to(`${HOME}/.log-data/config.js`)
   },
 
   /**
@@ -119,20 +105,15 @@ Log.console = {
     let time = new Date(),
         start = (new Date(time.getFullYear(), time.getMonth(), time.getDate(), time.getHours(), time.getMinutes(), time.getSeconds()).getTime() / 1E3).toString(16)
 
-    let entry = `{s:"${start}",e:"undefined",c:"${sect}",t:"${proj}",d:"${desc}"},\n]`
-
-    shell.sed('-i', ']', `${entry}`, (__dirname + "/data/log.js"))
-    shell.cd()
-    shell.sed('-i', ']', entry, ".log-data/log.js")
-    shell.cd(__dirname)
-
-    log.push({
+    user.log.push({
       s: start,
       e: "undefined",
       c: sect,
       t: proj,
       d: desc
     })
+
+    localStorage.setItem("user", JSON.stringify(user))
 
     Log.refresh()
   },
@@ -145,12 +126,9 @@ Log.console = {
     let t = new Date(),
         e = (new Date(t.getFullYear(), t.getMonth(), t.getDate(), t.getHours(), t.getMinutes(), t.getSeconds()).getTime() / 1E3).toString(16)
 
-    shell.sed('-i', 'undefined', e, (__dirname + "/data/log.js"))
-    shell.cd()
-    shell.sed('-i', 'undefined', e, ".log-data/log.js")
-    shell.cd(__dirname)
+    user.log[user.log.length - 1].e = `${e}`
 
-    log[log.length - 1].e = `${e}`
+    localStorage.setItem("user", JSON.stringify(user))
 
     clearInterval(timer)
     Log.refresh()

@@ -9,11 +9,7 @@
 
 "use strict";
 
-var shell = require("shelljs")
-
-shell.cd()
-const HOME = shell.pwd()
-shell.cd(__dirname)
+var data
 
 var Log = {
 
@@ -301,13 +297,27 @@ var Log = {
    */
 
   init(log) {
-    Log.config = config || {}
-    Log.palette = palette || {}
-    Log.log = Log.data.parse(log) || []
+
+    if (localStorage.hasOwnProperty("user")) {
+      user = JSON.parse(localStorage.getItem("user"))
+      console.log(user)
+    } else {
+      user.log = Log.data.parse(log)
+      user.config = config
+      user.palette = palette
+
+      localStorage.setItem("user", JSON.stringify(user))
+    }
+
+    Log.log = user.log
+    Log.config = user.config
+    Log.palette = user.palette
 
     document.getElementById("app").style.backgroundColor = Log.config.ui.bg
     document.getElementById("app").style.color = Log.config.ui.colour
     document.getElementById("app").style.fontFamily = Log.config.ui.font
+
+    Log.build()
 
     document.getElementById("cmd").addEventListener("submit", function() {
       Log.console.parse(document.getElementById("console").value)
@@ -322,12 +332,12 @@ var Log = {
         document.getElementById("console").value = ""
         document.getElementById("cmd").style.display = "none"
       }
-      return
     })
 
-    if (Log.log.length == 0) return
-
-    Log.build()
+    if (Log.log.length == 0) {
+      console.log("Log is empty")
+      return
+    }
 
     // Log.log[Log.log.length - 1].e == "undefined" && Log.screensaver()
 

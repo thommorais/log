@@ -18,8 +18,9 @@ Log.options = {
    */
 
   setBG(c) {
-    shell.sed("-i", /^.*bg:.*$/, `\t\tbg: "${c}",`, "data/config.js")
-    Log.config.ui.bg = c
+    user.config.ui.bg = c
+    localStorage.setItem("user", JSON.stringify(user))
+    Log.refresh()
   },
 
   /**
@@ -28,8 +29,9 @@ Log.options = {
    */
 
   setColour(c) {
-    shell.sed("-i", /^.*colour:.*$/, `\t\tcolour: "${c}",`, "data/config.js")
-    Log.config.ui.colour = c
+    user.config.ui.colour = c
+    localStorage.setItem("user", JSON.stringify(user))
+    Log.refresh()
   },
 
   /**
@@ -38,8 +40,13 @@ Log.options = {
    */
 
   setAccent(c) {
-    shell.sed("-i", /^.*accent:.*$/, `\t\taccent: "${c}",`, "data/config.js")
-    Log.config.ui.accent = c
+    user.config.ui.accent = c
+    localStorage.setItem("user", JSON.stringify(user))
+    Log.refresh()
+  },
+
+  setColourCode(sec, col) {
+
   },
 
   /**
@@ -48,8 +55,9 @@ Log.options = {
    */
 
   setFont(font) {
-    shell.sed("-i", /^.*font:.*$/, `\t\tfont: "${f}",`, "data/config.js")
-    Log.config.ui.font = f
+    user.config.ui.font = f
+    localStorage.setItem("user", JSON.stringify(user))
+    Log.refresh()
   },
 
   /**
@@ -58,8 +66,9 @@ Log.options = {
    */
 
   setIcons(a) {
-    shell.sed("-i", /^.*icons:.*$/, `\t\ticons: ${a},`, "data/config.js")
-    Log.config.ui.icons = a
+    user.config.ui.icons = a
+    localStorage.setItem("user", JSON.stringify(user))
+    Log.refresh()
   },
 
   /**
@@ -68,8 +77,9 @@ Log.options = {
    */
 
   setView(n) {
-    shell.sed("-i", /^.*view:.*$/, `\t\tview: ${n},`, "data/config.js")
-    Log.config.ui.view = n
+    user.config.ui.view = n
+    localStorage.setItem("user", JSON.stringify(user))
+    Log.refresh()
   },
 
   /**
@@ -78,8 +88,9 @@ Log.options = {
    */
 
   setCalendar(c) {
-    shell.sed("-i", /^.*calendar:.*$/, `\t\tcalendar: "${c}",`, "data/config.js")
-    Log.config.system.calendar = c
+    user.config.system.calendar = c
+    localStorage.setItem("user", JSON.stringify(user))
+    Log.refresh()
   },
 
   /**
@@ -88,8 +99,9 @@ Log.options = {
    */
 
   setTimeFormat(f) {
-    shell.sed("-i", /^.*timeFormat:.*$/, `\t\ttimeFormat: "${f}",`, "data/config.js")
-    Log.config.system.timeFormat = f
+    user.config.system.timeFormat = f
+    localStorage.setItem("user", JSON.stringify(user))
+    Log.refresh()
   },
 
   /**
@@ -98,7 +110,8 @@ Log.options = {
    */
 
   setWeekStart(d) {
-    shell.sed("-i", /^.*weekStart:.*$/, `\t\tweekStart: "${d}",`, "data/config.js")
-    Log.config.system.weekStart = d
+    user.config.system.weekStart = d
+    localStorage.setItem("user", JSON.stringify(user))
+    Log.refresh()
   }
 }
