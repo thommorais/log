@@ -301,7 +301,6 @@ var Log = {
 
     if (localStorage.hasOwnProperty("user")) {
       user = JSON.parse(localStorage.getItem("user"))
-      console.log(user)
     } else {
       user.log = Log.data.parse(log)
       localStorage.setItem("user", JSON.stringify(user))
