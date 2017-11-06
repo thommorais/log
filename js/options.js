@@ -67,7 +67,7 @@ Log.options = {
    * @param {string} f - The font family
    */
 
-  setFont(font) {
+  setFont(f) {
     user.config.ui.font = f
     localStorage.setItem("user", JSON.stringify(user))
     Log.refresh()
