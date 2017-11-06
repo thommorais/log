@@ -1,10 +1,10 @@
-/*@import url('https://fonts.googleapis.com/css?family=Roboto|Roboto+Mono');*/
+@import url('https://fonts.googleapis.com/css?family=Roboto|Roboto+Mono');
 body {
   max-width: 1500px;
-  /*-webkit-app-region: drag;*/
+  -webkit-app-region: drag;
 }
 
-/*input[type="submit"],
+input[type="submit"],
 input[type="reset"],
 input[type="button"],
 input[type="text"],
@@ -12,7 +12,7 @@ button,
 textarea,
 .nodrag {
   -webkit-app-region: no-drag;
-}*/
+}
 button {color: inherit}
 .on {outline: none}
 .elip {
