@@ -7,7 +7,7 @@ require('electron-reload')(__dirname)
 var win
 
 function createWindow () {
-  win = new BrowserWindow({width: 1000, height: 610, backgroundColor: '#f5f5f5', resizable:true, autoHideMenuBar: true, frame: false})
+  win = new BrowserWindow({width: 1000, height: 610, backgroundColor: '#f5f5f5', resizable:true, autoHideMenuBar: true, frame: true})
 
   win.loadURL('file://' + __dirname + '/index.html')
 
