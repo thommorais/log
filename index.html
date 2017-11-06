@@ -174,7 +174,7 @@
     </div>
   </div>
 
-  <div id="vis" class="nodrag dn sect h9 r" title="Distribution of Time: Each row is a day and each bar is a log session."></div>
+  <div id="vis" class="nodrag dn sect h9 oya" title="Distribution of Time: Each row is a day and each bar is a log session."></div>
 
   <div id="tab" class="dn sect wf h9 oya">
     <table class="nodrag bn wf">
@@ -196,6 +196,7 @@
   <div id="set" class="dn sect wf r h9-l f6 lhc oya">
     <div class="nodrag mb5 mb0-l c6 pr4-l hf-l oya-l">
       <h2 class="mb3 f5">Guide</h2>
+
       <p class="mb4">The Log is designed for single-tasking. When you start a log, focus on your activity; when you feel like stopping, simply end the log.</p>
 
       <h3 class="mb3 f5">Stats</h3>
@@ -221,10 +222,12 @@
       <h3 class="mb3 f5">Console</h3>
       <p class="mb4 m">Use the console to enter commands. The console is summoned when you start typing. Here are a list of available commands:</p>
 
-      <p class="mb3 m">To start a log. Mind the quotes, please:</p>
+      <p class="mb3 m">To start a log, you may do so in several ways:</p>
       <div class="mb4 bl pl3 m">
-        <p class="mb2">set background #aabbcc</p>
-        <p>start "Sector or Category" "Title" "A description"</p>
+        <p class="mb2">start "Sector or Category" "Title" "A description"</p>
+        <p class="mb2">start Sector, Title, Description</p>
+        <p class="mb2">start Sector; Title; Description</p>
+        <p>start Sector | Title | Description</p>
       </div>
 
       <p class="mb3 m">To end a log:</p>
@@ -240,8 +243,19 @@
 
       <p class="mb3 m">To change the interface's text colour, set a hexadecimal colour of your choice. HTML-friendly colour names are also accepted:</p>
       <div class="mb4 bl pl3 m">
-        <p class="mb2 m">set color #112233</p>
+        <p class="mb2">set color #112233</p>
         <p>set color black</p>
+      </div>
+
+      <p class="mb3 m">To set your sectors' colour codes (for instance, if you would like entries under "Fishing" to appear green in charts):</p>
+      <div class="mb4 bl pl3 m">
+        <p class="mb2">set sector "Fishing" green</p>
+        <p>set sector "Productive Activities" #c0ffee</p>
+      </div>
+
+      <p class="mb3 m">The clockscreen appears when you have an active log session and is enabled by default. To disable it:</p>
+      <div class="mb4 bl pl3 m">
+        <p>enable/disable clockscreen</p>
       </div>
 
       <p class="mb3 m">Perhaps you don't find my arbitrary choice of icons to be useful. You may enable/disable them:</p>
@@ -268,25 +282,35 @@
         <p>set time 24</p>
       </div>
 
-      <p class="mb2 m">And lastly, if you have an existing log and/or config file, you may want to import them. You simply need to supply the location of the folder where your log.js and config.js is stored. You will also have to restart the Log.</p>
-      <p class="mb3 m">This will be the case for now but rest assured I will find a way to remedy this so you wouldn't have to import your data with every update.</p>
+      <p class="mb3 m">Your data is stored in JSON. It contains your configurations, sector colour codes, and your log entries. If you have an existing log file (JSON), you can import it:</p>
       <div class="bl pl3 m">
-        <p>import /home/folder/location</p>
+        <p>import /location/of/file.json</p>
+      </div>
+
+      <p class="f4 mb3 m">If you have been pre-0.1.3 versions of Log, your data will be stored in an old format &mdash; a .js file. Use this command in the console if you wish to import your existing data.</p>
+      <div class="mb4 bl pl3 m">
+        <p>update /location/of/log.js</p>
+      </div>
+
+      <p class="mb3 m">To export your data:</p>
+      <div class="bl pl3 m">
+        <p>export</p>
       </div>
 
     </div>
-    <div class="nodrag mb5 mb0-l c6 pl4-l">
-      <h2 class="mb3 f5">About</h2>
-      <p class="mb4 m">The Log is a log and time-tracking system created by Josh Avanier. Its primary purpose is to provide insight to how one's time is spent &mdash; insight that may then be used to optimise personal productivity and better manage time.</p>
+    <div class="nodrag mb5 mb0-l c6 pl4-l hf-l oya-l">
+      <h2 class="mb3 f5">Log v0.1.3</h2>
+      <p class="mb4 m">Log is a log and time-tracking system. Its primary purpose is to provide insight to how one's time is spent &mdash; insight that may then be used to optimise personal productivity and better manage time.</p>
 
       <h3 class="mb3 f5">Contribution</h3>
-      <p class="mb3 m">This project is open-source and the source code is available on GitHub under the MIT License. If you found any bugs or would like to contribute to the development of this project, be my guest:</p>
-      <p class="bl pl3 mb4 m">https://github.com/joshavanier/log/</p>
+      <p class="mb3 m">This project is open-source and its source code is available on GitHub under the MIT License. If you found any bugs or would like to contribute to the development of this project, be my guest:</p>
+      <p class="bl pl3 mb4 m">github.com/joshavanier/log</p>
 
       <p class="mb3 m">If you have any thoughts, comments, suggestions, questions, or if you simply want to say hello:</p>
       <p class="bl pl3 mb4 m">Twitter: @joshavanier</p>
 
-      <p>Thank you for taking the time to try this out.</p>
+      <p class="mb3">Thank you for taking the time to try this out.</p>
+      <p class="mb4">&mdash; Josh Avanier</p>
     </div>
   </div>
 
@@ -294,6 +318,7 @@
     <input type="text" class="wf bg-1 blanc on bn p4" id="console" autofocus="autofocus" placeholder="> Log.console" />
   </form>
 
+  <script src="data/user.js"></script>
   <script src="data/config.js"></script>
   <script src="data/palette.js"></script>
   <script src="data/log.js"></script>
@@ -306,6 +331,9 @@
   <script src="js/data.js"></script>
 
   <script>
+    const {dialog,app} = require('electron').remote
+    const fs = require('fs')
+
     Log.init(log)
   </script>
 
