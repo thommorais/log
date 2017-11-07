@@ -85,7 +85,7 @@
         <div id="dayChart" class="mb3 psr wf sh2" title="Today's Timeline"></div>
       </div>
 
-      <div id="weekChart" class="vh3 mb4"></div>
+      <div id="weekChart" class="nodrag vh3 mb4"></div>
 
       <ul class="lsn f6 lhc">
         <li class="mb4 w5 w2-m w2-l lf">
@@ -154,7 +154,7 @@
           <p class="f6" title="Smallest Log Session (History)">LShn</p>
         </li>
         <li class="mb4 w5 w2-m w2-l lf">
-          <p class="f3 fwb"<span id="LSXH">0.00</span> h</p>
+          <p class="f3 fwb"><span id="LSXH">0.00</span> h</p>
           <p class="f6" title="Longest Log Session (History)">LShx</p>
         </li>
         <li class="mb4 w5 w2-m w2-l lf">
@@ -310,11 +310,12 @@
   </div>
 
   <form id="cmd" class="dn psf b0 l0 wf f6 bst z9" action="#" onsubmit="return false;" autocomplete="off" spellcheck="false">
-    <input type="text" class="wf bg-1 blanc on bn p4" id="console" autofocus="autofocus" placeholder="> Log.console" />
+    <input type="text" class="wf bg-1 blanc on bn p3" id="console" autofocus="autofocus" placeholder="> Log.console" />
   </form>
 
   <script src="data/user.js"></script>
 
+  <script src="js/drop.js"></script>
   <script src="js/log.js"></script>
   <script src="js/options.js"></script>
   <script src="js/console.js"></script>
@@ -325,8 +326,9 @@
   <script>
     const {dialog,app} = require('electron').remote
     const fs = require('fs')
+    let log = user.log || []
 
-    Log.init()
+    Log.init(log)
   </script>
 
 </body>
