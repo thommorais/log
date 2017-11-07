@@ -45,6 +45,11 @@ Log.options = {
     Log.refresh()
   },
 
+  /**
+   * Set sector colour code
+   * @param {string} s - Input string
+   */
+
   setColourCode(s) {
     let ch = s.split(""),
         indices = [],
@@ -75,7 +80,7 @@ Log.options = {
 
   /**
    * Set icon view
-   * @param {boolean} a - True or false
+   * @param {string} a - True or false
    */
 
   setIcons(a) {
