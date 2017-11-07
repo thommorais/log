@@ -2,4 +2,3 @@ temp/
 node_modules/
 package-lock.json
 config.js
-data/log.js
