@@ -79,7 +79,7 @@ Log.options = {
    */
 
   setIcons(a) {
-    user.config.ui.icons = a
+    user.config.ui.icons = a == "true" ? true : false
     localStorage.setItem("user", JSON.stringify(user))
     Log.refresh()
   },

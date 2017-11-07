@@ -214,7 +214,7 @@ var Log = {
 
   build() {
 
-    let icon = Log.config.ui.icons,
+    let icon = user.config.ui.icons,
 
     ic = (a, b, c) => {
       document.getElementById(a).innerHTML = icon ? b : c
@@ -310,11 +310,11 @@ var Log = {
     Log.config = user.config
     Log.palette = user.palette
 
+    Log.build()
+
     document.getElementById("app").style.backgroundColor = Log.config.ui.bg
     document.getElementById("app").style.color = Log.config.ui.colour
     document.getElementById("app").style.fontFamily = Log.config.ui.font
-
-    Log.build()
 
     document.getElementById("cmd").addEventListener("submit", function() {
       Log.console.parse(document.getElementById("console").value)
