@@ -276,7 +276,7 @@ Log.vis = {
       v.id           = t
 
       n.className    = `sw1 hf cn`
-      n.style.backgroundColor = i == (new Date).getHours() ? Log.config.ui.accent : Log.config.ui.colour
+      n.style.backgroundColor = i == (new Date).getDay() ? Log.config.ui.accent : Log.config.ui.colour
 
       e.className    = "psa b0 wf"
       e.style.height = `${d[i] / m * 100}%`
