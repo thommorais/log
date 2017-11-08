@@ -111,19 +111,21 @@ var Log = {
         c5 = rw.insertCell(4),
         c6 = rw.insertCell(5),
         c7 = rw.insertCell(6),
+        c8 = rw.insertCell(7),
 
         es = Log.time.parse(e.s),
         ee = Log.time.parse(e.e)
 
       ee = e.e === 'undefined' ? '-' : Log.time.parse(e.e)
 
-      c1.innerHTML = Log.time.displayDate(es)
-      c2.innerHTML = Log.time.stamp(es)
-      c3.innerHTML = e.e === 'undefined' ? '-' : Log.time.stamp(ee)
-      c4.innerHTML = e.e === 'undefined' ? '-' : Log.time.duration(es, ee).toFixed(2)
-      c5.innerHTML = e.c
-      c6.innerHTML = e.t
-      c7.innerHTML = e.d
+      c1.innerHTML = `#${i + 1}`
+      c2.innerHTML = Log.time.displayDate(es)
+      c3.innerHTML = Log.time.stamp(es)
+      c4.innerHTML = e.e === 'undefined' ? '-' : Log.time.stamp(ee)
+      c5.innerHTML = e.e === 'undefined' ? '-' : Log.time.duration(es, ee).toFixed(2)
+      c6.innerHTML = e.c
+      c7.innerHTML = e.t
+      c8.innerHTML = e.d
     }
 
     // Display last {num} entries
@@ -382,7 +384,7 @@ var Log = {
     Log.vis.sectorBars(undefined, 'sectorsList', true)
     Log.vis.projectBars(undefined, 'projectsList', true)
 
-    Log.vis.line(mn, 'vis')
+    Log.vis.line(Log.data.parse(mn), 'vis')
     Log.display(Log.log, 50, 'logbook')
   }
 }
