@@ -118,11 +118,13 @@ var Log = {
 
       ee = e.e === 'undefined' ? '-' : Log.time.parse(e.e)
 
-      c1.innerHTML = `#${i + 1}`
+      c1.innerHTML = count--
+      c1.className = 'ar'
       c2.innerHTML = Log.time.displayDate(es)
       c3.innerHTML = Log.time.stamp(es)
       c4.innerHTML = e.e === 'undefined' ? '-' : Log.time.stamp(ee)
       c5.innerHTML = e.e === 'undefined' ? '-' : Log.time.duration(es, ee).toFixed(2)
+      c5.className = 'ar'
       c6.innerHTML = e.c
       c7.innerHTML = e.t
       c8.innerHTML = e.d
@@ -130,6 +132,7 @@ var Log = {
 
     // Display last {num} entries
     let b = takeRight(ent, num).reverse()
+    let count = Log.log.length
 
     for (let i = 0, l = b.length; i < l; i++) en(b[i], i)
   },
@@ -385,6 +388,6 @@ var Log = {
     Log.vis.projectBars(undefined, 'projectsList', true)
 
     Log.vis.line(Log.data.parse(mn), 'vis')
-    Log.display(Log.log, 50, 'logbook')
+    Log.display(Log.log, 1000, 'logbook')
   }
 }
