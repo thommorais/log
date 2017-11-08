@@ -230,10 +230,10 @@ Log.data = {
   listSectors(ent = Log.log) {
     let l = [],
 
-    check = ({e, s}) => {
+    check = ({e, c}) => {
       e !== 'undefined'
-      && l.indexOf(s) === -1
-      && l.push(s)
+      && l.indexOf(c) === -1
+      && l.push(c)
     }
 
     for (let i = 0, l = ent.length; i < l; i++) check(ent[i])
