@@ -228,17 +228,17 @@ Log.data = {
    */
 
   listSectors(ent = Log.log) {
-    let s = [],
+    let l = [],
 
     check = ({e, s}) => {
       e !== 'undefined'
-      && p.indexOf(s) === -1
-      && p.push(s)
+      && l.indexOf(s) === -1
+      && l.push(s)
     }
 
-    for (let i = 0, l = ent.length; i < l; i++) check(a[i])
+    for (let i = 0, l = ent.length; i < l; i++) check(ent[i])
 
-    return s
+    return l
   },
 
   /**
