@@ -28,16 +28,15 @@ Log.vis = {
      * @param {Object} r - The Log entry's attributes
      */
 
-    addEntry = (e, width, dp, margin) => {
-      let v = document.createElement("div")
+    addEntry = ({s, c}, width, dp, margin) => {
+      let v = document.createElement('div')
 
-      v.style.backgroundColor = Log.palette[e.c] || Log.config.ui.colour
-
-      v.className    = `psr t0 sh1 mb2 lf`
-      v.style.width  = `${width}%`
+      v.className = 'psr t0 sh1 mb2 lf'
+      v.style.width = `${width}%`
       v.style.margin = `0 0 0 ${margin}%`
+      v.style.backgroundColor = Log.palette[c] || Log.config.ui.colour
 
-      let id = con + Log.time.date(Log.time.parse(e.s))
+      let id = con + Log.time.date(Log.time.parse(s))
       document.getElementById(id).appendChild(v)
 
       lw = width
@@ -53,10 +52,10 @@ Log.vis = {
       lw = 0
       lp = 0
 
-      let e = document.createElement("div")
+      let e = document.createElement('div')
 
-      e.className = "db wf sh1 mt2 mb3"
-      e.id        = con + id
+      e.className = 'db wf sh1 mt2 mb3'
+      e.id = con + id
 
       document.getElementById(con).appendChild(e)
     },
@@ -70,15 +69,15 @@ Log.vis = {
     check = id => (document.getElementById(id) == null)
 
     for (let i = 0, l = ent.length; i < l; i++) {
-      if (ent[i].e == "undefined") continue
+      if (ent[i].e === 'undefined') continue
 
-      let es  = Log.time.parse(ent[i].s),
-          ee  = Log.time.parse(ent[i].e),
+      let es = Log.time.parse(ent[i].s),
+          ee = Log.time.parse(ent[i].e),
 
-          dt  = Log.time.date(es),
+          dt = Log.time.date(es),
           end = Log.time.date(ee),
 
-          id  = con + dt
+          id = con + dt
 
       // Split entries that span through midnight
       if (dt !== end) {
@@ -128,16 +127,15 @@ Log.vis = {
      * @param {Object} r - A width
      */
 
-    addEntry = (e, w) => {
-      let d = document.createElement("div")
+    addEntry = ({s, c}, w) => {
+      let d = document.createElement('div')
 
-      d.style.backgroundColor = Log.palette[e.c] || Log.config.ui.colour
-
-      d.className    = `psa sw1 bg-blanc`
+      d.className = 'psa sw1'
       d.style.height = `${w}%`
       d.style.bottom = `${lw}%`
+      d.style.backgroundColor = Log.palette[c] || Log.config.ui.colour
 
-      let id = Log.time.date(Log.time.parse(e.s))
+      let id = Log.time.date(Log.time.parse(s))
       document.getElementById(id).appendChild(d)
 
       lw += w
@@ -151,13 +149,13 @@ Log.vis = {
     nc = id => {
       lw = 0
 
-      let dy = document.createElement("div"),
-          e = document.createElement("div")
+      let dy = document.createElement('div'),
+          e = document.createElement('div')
 
-      dy.className   = "dib hf psr"
-      dy.style.width = `${100 / Log.config.ui.view}%` // 100 / 28
+      dy.className = 'dib hf psr'
+      dy.style.width = `${100 / Log.config.ui.view}%`
 
-      e.className = `sw1 hf cn`
+      e.className = 'sw1 hf cn'
       e.id = id
 
       dy.appendChild(e)
@@ -166,13 +164,13 @@ Log.vis = {
     }
 
     for (let i = 0, l = ent.length; i < l; i++) {
-      if (ent[i].e == "undefined") continue
+      if (ent[i].e === 'undefined') continue
 
       let s = Log.time.parse(ent[i].s),
           e = Log.time.parse(ent[i].e),
           d = Log.time.date(s)
 
-      document.getElementById(d) == null && nc(d)
+      document.getElementById(d) === null && nc(d)
 
       addEntry(ent[i], Log.utils.calcWidth(e, s))
     }
@@ -181,33 +179,32 @@ Log.vis = {
   /**
    * Display a day chart
    * @param {Object=} d - A date
+   * @param {string=} con - The container
    */
 
-  day(d = new Date(), con = "dayChart") {
+  day(d = new Date(), con = 'dayChart') {
     let en = Log.data.getEntries(d),
-
         lw = 0, // the width of the last data element
         lp = 0, // the percentage of the last data element
 
-    add = (e, width, dp, margin) => {
-      let d = document.createElement("div")
+    add = ({c, t, d}, width, dp, margin) => {
+      let div = document.createElement('div')
 
-      d.className    = `nodrag psr t0 hf mb2 lf`
-      d.style.width  = `${width}%`
-      d.style.margin = `0 0 0 ${margin}%`
+      div.className = 'nodrag psr t0 hf mb2 lf'
+      div.style.width = `${width}%`
+      div.style.marginLeft = `${margin}%`
+      div.style.backgroundColor = Log.palette[c] || Log.config.ui.colour
 
-      d.style.backgroundColor = Log.palette[e.c] || Log.config.ui.colour
+      div.setAttribute('title', `${c}: ${t} - ${d}`)
 
-      d.setAttribute("title", `${e.c}: ${e.t}`)
-
-      document.getElementById(con).appendChild(d)
+      document.getElementById(con).appendChild(div)
 
       lw = width
       lp = dp
     }
 
     for (let i = 0, l = en.length; i < l; i++) {
-      if (en[i].e == "undefined") continue
+      if (en[i].e === 'undefined') continue
 
       let es = Log.time.parse(en[i].s),
           ee = Log.time.parse(en[i].e),
@@ -226,24 +223,24 @@ Log.vis = {
    * @param {string=}   con - The container
    */
 
-  peakH(ent = Log.log, con = "phc") {
+  peakH(ent = Log.log, con = 'phc') {
     let h = Log.data.peakHours(ent),
         m = Log.utils.getMax(h),
 
     add = i => {
-      let d = document.createElement("div"),
-          e = document.createElement("div"),
-          n = document.createElement("div"),
+      let d = document.createElement('div'),
+          e = document.createElement('div'),
+          n = document.createElement('div'),
           t = `${con}-${i}`
 
-      d.className = "dib hf psr"
-      d.style.width = `4.166666666666667%`
+      d.className = 'dib hf psr'
+      d.style.width = '4.1667%'
       d.id = t
 
-      n.className = `sw1 hf cn`
-      n.style.backgroundColor = i == (new Date).getHours() ? Log.config.ui.accent : Log.config.ui.colour
+      n.className = 'sw1 hf cn'
+      n.style.backgroundColor = i === (new Date).getHours() ? Log.config.ui.accent : Log.config.ui.colour
 
-      e.className = "psa b0 wf"
+      e.className = 'psa b0 wf'
       e.style.height = `${h[i] / m * 100}%`
 
       e.appendChild(n)
@@ -261,24 +258,24 @@ Log.vis = {
    * @param {string=}   con - The container
    */
 
-  peakD(ent = Log.log, con = "pdc") {
+  peakD(ent = Log.log, con = 'pdc') {
     let d = Log.data.peakDays(ent),
         m = Log.utils.getMax(d),
 
     add = i => {
-      let v = document.createElement("div"),
-          e = document.createElement("div"),
-          n = document.createElement("div"),
+      let v = document.createElement('div'),
+          e = document.createElement('div'),
+          n = document.createElement('div'),
           t = `${con}-${i}`
 
-      v.className    = "dib hf psr"
-      v.style.width  = "14.285714285714286%" // 100 / 7
-      v.id           = t
+      v.className = 'dib hf psr'
+      v.style.width = '14.2857%' // 100 / 7
+      v.id = t
 
-      n.className    = `sw1 hf cn`
-      n.style.backgroundColor = i == (new Date).getDay() ? Log.config.ui.accent : Log.config.ui.colour
+      n.className = `sw1 hf cn`
+      n.style.backgroundColor = i === (new Date).getDay() ? Log.config.ui.accent : Log.config.ui.colour
 
-      e.className    = "psa b0 wf"
+      e.className = 'psa b0 wf'
       e.style.height = `${d[i] / m * 100}%`
 
       e.appendChild(n)
@@ -296,7 +293,7 @@ Log.vis = {
    * @param {string=}   con - The container
    */
 
-  sectorBar(ent = Log.log, con = "sectorBar") {
+  sectorBar(ent = Log.log, con = 'sectorBar') {
     let s = Log.data.listSectors(ent).sort(),
 
     /**
@@ -305,12 +302,12 @@ Log.vis = {
      */
 
     add = sec => {
-      let d = document.createElement("div"),
-          v = Log.data.sp(ent, sec)
+      let d = document.createElement('div'),
+          v = Log.data.sp(sec, ent)
 
-      d.className   = `psr t0 hf mb2 lf bg-blanc`
+      d.className = 'psr t0 hf mb2 lf bg-blanc'
       d.style.width = `${v}%`
-      d.title       = `${sec} (${v.toFixed(2)}%)`
+      d.title = `${sec} (${v.toFixed(2)}%)`
 
       document.getElementById(con).appendChild(d)
     }
@@ -324,7 +321,7 @@ Log.vis = {
    * @param {string=}   con - The container
    */
 
-  sectorBars(ent = Log.log, con = "sectorBars") {
+  sectorBars(ent = Log.log, con = 'sectorBars') {
     let s = Log.data.listSectors(ent).sort(),
 
     /**
@@ -333,32 +330,20 @@ Log.vis = {
      */
 
     add = sec => {
+      let sh = Log.data.sh(sec, ent),
+          li = document.createElement('li'),
+          tl = document.createElement('span'),
+          st = document.createElement('span'),
+          br = document.createElement('div'),
+          dt = document.createElement('div')
 
-      /*
-        ------------------------
-        SECTOR           LH 2.34
-        ++++++++++==============
-        ------------------------
-      */
-
-      let sh = Log.data.sh(ent, sec),
-
-          li = document.createElement("li"),
-          tl = document.createElement("span"),
-          st = document.createElement("span"),
-          br = document.createElement("div"),
-          dt = document.createElement("div")
-
-      li.className = "mb4 f6 lhc"
-
-      tl.className = "dib sw6 f6 mon upc tk elip"
-      st.className = "f6 rf"
-      br.className = "wf sh1"
-
-      dt.className   = "psr t0 hf lf"
+      li.className = 'mb4 f6 lhc'
+      tl.className = 'dib sw6 f6 mon upc tk elip'
+      st.className = 'f6 rf'
+      br.className = 'wf sh1'
+      dt.className = 'psr t0 hf lf'
       dt.style.backgroundColor = Log.config.ui.colour
-      dt.style.width = `${(Log.data.sp(ent, sec))}%`
-
+      dt.style.width = `${(Log.data.sp(sec, ent))}%`
       tl.innerHTML = sec
       st.innerHTML = `${sh.toFixed(2)} h`
 
@@ -379,7 +364,7 @@ Log.vis = {
    * @param {string=}   con - The container
    */
 
-  projectBars(ent = Log.log, con = "projectBars") {
+  projectBars(ent = Log.log, con = 'projectBars') {
     let s = Log.data.listProjects(ent).sort(),
 
     /**
@@ -388,32 +373,20 @@ Log.vis = {
      */
 
     add = pro => {
+      let sh = Log.data.ph(pro, ent),
+          li = document.createElement('li'),
+          tl = document.createElement('span'),
+          st = document.createElement('span'),
+          br = document.createElement('div'),
+          dt = document.createElement('div')
 
-      /*
-        ------------------------
-        PROJECT          LH 2.34
-        ++++++++++==============
-        ------------------------
-      */
-
-      let sh = Log.data.ph(ent, pro),
-
-          li = document.createElement("li"),
-          tl = document.createElement("span"),
-          st = document.createElement("span"),
-          br = document.createElement("div"),
-          dt = document.createElement("div")
-
-      li.className = "mb4 f6 lhc"
-
-      tl.className = "dib sw6 f6 mon upc tk elip"
-      st.className = "f6 rf"
-      br.className = "wf sh1"
-
-      dt.className   = "psr t0 hf lf"
+      li.className = 'mb4 f6 lhc'
+      tl.className = 'dib sw6 f6 mon upc tk elip'
+      st.className = 'f6 rf'
+      br.className = 'wf sh1'
+      dt.className = 'psr t0 hf lf'
       dt.style.backgroundColor = Log.config.ui.colour
-      dt.style.width = `${(Log.data.pp(ent, pro))}%`
-
+      dt.style.width = `${(Log.data.pp(pro, ent))}%`
       tl.innerHTML = pro
       st.innerHTML = `${sh.toFixed(2)} h`
 

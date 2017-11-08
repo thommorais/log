@@ -44,9 +44,9 @@ Log.time = {
         m = `0${d.getMinutes()}`,
         s = `0${d.getSeconds()}`
 
-    if (f == "24")
+    if (f === '24')
       return `${h.substr(-2)}:${m.substr(-2)}:${s.substr(-2)}`
-    else if (f == "12")
+    else if (f === '12')
       return Log.time.twelveHours(d)
   },
 
@@ -60,7 +60,7 @@ Log.time = {
     let h = d.getHours(),
         m = d.getMinutes(),
         s = d.getSeconds(),
-        x = h >= 12 ? "PM" : "AM"
+        x = h >= 12 ? 'PM' : 'AM'
 
     h = h % 12
     h = h ? h : 12
@@ -91,11 +91,11 @@ Log.time = {
     let a = Log.time.convert(t),
         f = Log.config.system.calendar
 
-    if (f == "gregorian")
+    if (f === 'gregorian')
       return `${a.getFullYear()} ${a.getMonth() + 1} ${a.getDate()}`
-    else if (f == "monocal")
+    else if (f === 'monocal')
       return MONO.short(MONO.convert(a))
-    else if (f == "aequirys")
+    else if (f === 'aequirys')
       return Aequirys.display(Aequirys.convert(a))
   },
 

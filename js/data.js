@@ -21,23 +21,44 @@ Log.data = {
     let p = []
 
     for (let i = 0, l = a.length; i < l; i++) {
-      let e = a[i]
-
-      let es = Log.time.parse(e.s),
+      let e = a[i],
+          es = Log.time.parse(e.s),
           ee = Log.time.parse(e.e),
           date = Log.time.date(es),
           end = Log.time.date(ee)
 
-      if (date !== end && e.e !== "undefined") {
-        let a = Log.time.convert(es),
-            ne = (+(new Date(a.getFullYear(), a.getMonth(), a.getDate(), 23, 59)).getTime() / 1E3).toString(16)
+      if (date !== end && e.e !== 'undefined') {
+        let a = Log.time.convert(es)
 
-        p.push({ s: e.s, e: ne, c: e.c, t: e.t, d: e.d })
+        p.push({
+          s: e.s,
+          e: (+(new Date(
+            a.getFullYear(),
+            a.getMonth(),
+            a.getDate(),
+            23,
+            59
+          )).getTime() / 1E3).toString(16),
+          c: e.c,
+          t: e.t,
+          d: e.d
+        })
 
-        let ea = Log.time.convert(ee),
-            ns = (+(new Date(ea.getFullYear(), ea.getMonth(), ea.getDate(), 0, 0)).getTime() / 1E3).toString(16)
+        let ea = Log.time.convert(ee)
 
-        p.push({ s: ns, e: e.e, c: e.c, t: e.t, d: e.d })
+        p.push({
+          s: (+(new Date(
+            ea.getFullYear(),
+            ea.getMonth(),
+            ea.getDate(),
+            0,
+            0)
+          ).getTime() / 1E3).toString(16),
+          e: e.e,
+          c: e.c,
+          t: e.t,
+          d: e.d
+        })
 
       } else {
         p.push(e)
@@ -56,17 +77,18 @@ Log.data = {
   getEntries(d) {
     let e = []
 
-    if (d == undefined) return Log.log
-    else {
+    if (d === undefined) {
+      return Log.log
+    } else {
       for (let i = 0, l = Log.log.length; i < l; i++) {
-        if (Log.log[i].e == "undefined") continue
+        if (Log.log[i].e === 'undefined') continue
 
         let a = Log.time.convert(Log.time.parse(Log.log[i].s))
 
-        a.getFullYear() == d.getFullYear() &&
-        a.getMonth() == d.getMonth() &&
-        a.getDate() == d.getDate() &&
-        e.push(Log.log[i])
+        a.getFullYear() === d.getFullYear()
+        && a.getMonth() === d.getMonth()
+        && a.getDate() === d.getDate()
+        && e.push(Log.log[i])
       }
 
       return e
@@ -87,7 +109,7 @@ Log.data = {
       return date
     }
 
-    function getDates(startDate, stopDate) {
+    let getDates = (startDate, stopDate) => {
       let dateArray = [],
           currentDate = startDate
 
@@ -123,10 +145,7 @@ Log.data = {
       return date
     }
 
-    let today = new Date(),
-        past = today.subtractDays(n)
-
-    return Log.data.getEntriesByPeriod(past)
+    return Log.data.getEntriesByPeriod((new Date()).subtractDays(n))
   },
 
   /**
@@ -138,10 +157,10 @@ Log.data = {
   getEntriesByDay(d) {
     let e = [],
 
-    g = e => Log.time.convert(Log.time.parse(e.s)).getDay()
+    g = ({s}) => Log.time.convert(Log.time.parse(s)).getDay()
 
     for (let i = 0, l = Log.log.length; i < l; i++)
-      Log.log[i].e != "undefined" && g(Log.log[i]) == d && e.push(Log.log[i])
+      Log.log[i].e !== 'undefined' && g(Log.log[i]) == d && e.push(Log.log[i])
 
     return e
   },
@@ -149,14 +168,17 @@ Log.data = {
   /**
    * Get entries of a specific project
    * @param {string} p - A project
+   * @param {Object[]} ent - Entries
    * @returns {Object[]} Log entries
    */
 
-  getEntriesByProject(p) {
+  getEntriesByProject(p, ent = Log.log) {
     let e = []
 
-    for (let i = 0, l = Log.log.length; i < l; i++)
-      Log.log[i].e != "undefined" && Log.log[i].t == p && e.push(Log.log[i])
+    for (let i = 0, l = ent.length; i < l; i++)
+      ent[i].e !== 'undefined'
+      && ent[i].t === p
+      && e.push(ent[i])
 
     return e
   },
@@ -164,14 +186,17 @@ Log.data = {
   /**
    * Get entries of a specific sector
    * @param {string} s - A sector
+   * @param {Object[]} ent - Entries
    * @returns {Object[]} Log entries
    */
 
-  getEntriesBySector(s) {
+  getEntriesBySector(s, ent = Log.log) {
     let e = []
 
-    for (let i = 0, l = Log.log.length; i < l; i++)
-      Log.log[i].e != "undefined" && Log.log[i].c == s && e.push(Log.log[i])
+    for (let i = 0, l = ent.length; i < l; i++)
+      ent[i].e !== 'undefined'
+      && ent[i].c === s
+      && e.push(ent[i])
 
     return e
   },
@@ -183,12 +208,15 @@ Log.data = {
    */
 
   listProjects(a = Log.log) {
-    let p = []
+    let p = [],
 
-    for (let i = 0, l = a.length; i < l; i++) {
-      let e = a[i], t = e.t
-      e.e != "undefined" && p.indexOf(t) == -1 && p.push(t)
+    check = ({e, t}) => {
+      e !== 'undefined'
+      && p.indexOf(t) === -1
+      && p.push(t)
     }
+
+    for (let i = 0, l = a.length; i < l; i++) check(a[i])
 
     return p
   },
@@ -200,12 +228,15 @@ Log.data = {
    */
 
   listSectors(ent = Log.log) {
-    let s = []
+    let s = [],
 
-    for (let i = 0, l = ent.length; i < l; i++) {
-      let e = ent[i], t = e.c
-      e.e != "undefined" && s.indexOf(t) == -1 && s.push(t)
+    check = ({e, s}) => {
+      e !== 'undefined'
+      && p.indexOf(s) === -1
+      && p.push(s)
     }
+
+    for (let i = 0, l = ent.length; i < l; i++) check(a[i])
 
     return s
   },
@@ -218,10 +249,11 @@ Log.data = {
 
   peakDays(a = Log.log) {
     let d = new Array(7).fill(0),
-    count = e => d[(Log.time.convert(Log.time.parse(e.s))).getDay()]++
+
+    count = ({s}) => d[(Log.time.convert(Log.time.parse(s))).getDay()]++
 
     for (let i = 0, l = a.length; i < l; i++)
-      a[i].e != "undefined" && count(a[i])
+      a[i].e !== 'undefined' && count(a[i])
 
     return d
   },
@@ -234,10 +266,11 @@ Log.data = {
 
   peakHours(a = Log.log) {
     let h = new Array(24).fill(0),
-    count = e => h[(Log.time.convert(Log.time.parse(e.s))).getHours()]++
+
+    count = ({s}) => h[(Log.time.convert(Log.time.parse(s))).getHours()]++
 
     for (let i = 0, l = a.length; i < l; i++)
-      a[i].e != "undefined" && count(a[i])
+      a[i].e !== 'undefined' && count(a[i])
 
     return h
   },
@@ -249,12 +282,12 @@ Log.data = {
    */
 
   lsmin(a = Log.log) {
-    if (a.length == 0) return 0
+    if (a.length === 0) return 0
 
     let m,
 
-    check = e => {
-      let n = Log.time.duration(Log.time.parse(e.s), Log.time.parse(e.e))
+    check = ({s, e}) => {
+      let n = Log.time.duration(Log.time.parse(s), Log.time.parse(e))
       if (n < m || m == undefined) m = n
     }
 
@@ -270,16 +303,16 @@ Log.data = {
    */
 
   lsmax(ent = Log.log) {
-    if (ent.length == 0) return 0
+    if (ent.length === 0) return 0
 
-    let m,
+    let m = 0
 
-    check = e => {
-      let n = Number(Log.time.duration(Log.time.parse(e.s), Log.time.parse(e.e)))
-      if (n > m || m == undefined) m = n
+    let c = ({s, e}) => {
+      let n = Number(Log.time.duration(Log.time.parse(s), Log.time.parse(e)))
+      if (n > m) m = n
     }
 
-    for (let i = 0, l = ent.length; i < l; i++) check(ent[i])
+    for (let i = 0, l = ent.length; i < l; i++) c(ent[i])
 
     return m
   },
@@ -291,17 +324,18 @@ Log.data = {
    */
 
   asd(ent = Log.log) {
-    if (ent.length == 0) return 0
+    if (ent.length === 0) return 0
 
-    let avg = 0, c = 0,
+    let avg = 0,
+        c = 0,
 
-    count = e => {
-      avg += Number(Log.time.duration(Log.time.parse(e.s), Log.time.parse(e.e)))
+    count = ({s, e}) => {
+      avg += Number(Log.time.duration(Log.time.parse(s), Log.time.parse(e)))
       c++
     }
 
     for (let i = 0, l = ent.length; i < l; i++)
-      ent[i].e != "undefined" && count(ent[i])
+      ent[i].e !== 'undefined' && count(ent[i])
 
     return avg / c
   },
@@ -313,16 +347,16 @@ Log.data = {
    */
 
   lh(ent = Log.log) {
-    if (ent.length == 0) return 0
+    if (ent.length === 0) return 0
 
     let h = 0,
 
-    count = e => {
-      h += Number(Log.time.duration(Log.time.parse(e.s), Log.time.parse(e.e)))
+    count = ({s, e}) => {
+      h += Number(Log.time.duration(Log.time.parse(s), Log.time.parse(e)))
     }
 
     for (let i = 0, l = ent.length; i < l; i++)
-      ent[i].e != "undefined" && count(ent[i])
+      ent[i].e !== 'undefined' && count(ent[i])
 
     return h
   },
@@ -334,7 +368,7 @@ Log.data = {
    */
 
   lp(ent = Log.log) {
-    if (ent.length == 0) return 0
+    if (ent.length === 0) return 0
 
     let e = Log.time.convert(Log.time.parse(ent[0].s)),
         d = Log.time.convert(Log.time.parse(ent[ent.length - 1].s)),
@@ -354,15 +388,17 @@ Log.data = {
    * @returns {number} Sector hours
    */
 
-  sh(ent = Log.log, sec) {
+  sh(sec, ent = Log.log) {
     let h = 0,
 
-    count = e => {
-      h += Number(Log.time.duration(Log.time.parse(e.s), Log.time.parse(e.e)))
+    count = ({s, e}) => {
+      h += Number(Log.time.duration(Log.time.parse(s), Log.time.parse(e)))
     }
 
     for (let i = 0, l = ent.length; i < l; i++)
-      ent[i].e != "undefined" && ent[i].c == sec && count(ent[i])
+      ent[i].e !== 'undefined'
+      && ent[i].c === sec
+      && count(ent[i])
 
     return h
   },
@@ -374,8 +410,8 @@ Log.data = {
    * @returns {number} Sector percentage
    */
 
-  sp(ent = Log.log, sec) {
-    return Log.data.sh(ent, sec) / Log.data.lh(ent) * 100
+  sp(sec, ent = Log.log) {
+    return Log.data.sh(sec, ent) / Log.data.lh(ent) * 100
   },
 
   /**
@@ -385,13 +421,13 @@ Log.data = {
    * @returns {number} Project hours
    */
 
-  ph(ent, pro) {
+  ph(pro, ent = Log.log) {
     let h = 0,
 
-    duration = e => Number(Log.time.duration(Log.time.parse(e.s), Log.time.parse(e.e)))
+    duration = ({s, e}) => Number(Log.time.duration(Log.time.parse(s), Log.time.parse(e)))
 
     for (let i = 0, l = ent.length; i < l; i++)
-      ent[i].e != "undefined" && ent[i].t == pro && (h += duration(ent[i]))
+      ent[i].e !== 'undefined' && ent[i].t == pro && (h += duration(ent[i]))
 
     return h
   },
@@ -403,8 +439,8 @@ Log.data = {
    * @returns {number} Project percentage
    */
 
-  pp(ent = Log.log, pro) {
-    return Log.data.ph(ent, pro) / Log.data.lh(ent) * 100
+  pp(pro, ent = Log.log) {
+    return Log.data.ph(pro, ent) / Log.data.lh(ent) * 100
   },
 
   /**
@@ -426,28 +462,28 @@ Log.data = {
   forecast() {
     let ent = Log.data.getEntriesByDay(new Date().getDay())
 
-    // Sector Focus
-
-    let s = Log.data.listSectors(ent), sf = 0, sfs = ""
+    let s = Log.data.listSectors(ent),
+        sf = 0,
+        sfs = ''
 
     for (let i = 0, l = s.length; i < l; i++) {
-      let x = Log.data.sp(ent, s[i])
+      let x = Log.data.sp(s[i], ent)
       x > sf && (sf = x, sfs = s[i])
     }
 
-    // Peak Time
-
-    let eph = Log.data.peakHours(ent), mph = 0, mpht = 0
+    let eph = Log.data.peakHours(ent),
+        mph = 0,
+        mpht = 0
 
     for (let i = 0, l = eph.length; i < l; i++)
       eph[i] > mph && (mph = eph[i], mpht = i)
 
-    // Project Focus
-
-    let p = Log.data.listProjects(ent), pf = 0, pfp = ""
+    let p = Log.data.listProjects(ent),
+        pf = 0,
+        pfp = ''
 
     for (let i = 0, l = p.length; i < l; i++) {
-      let x = Log.data.pp(ent, p[i])
+      let x = Log.data.pp(p[i], ent)
       x > pf && (pf = x, pfp = p[i])
     }
 

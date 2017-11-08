@@ -12,6 +12,11 @@
 Log = window.Log || {}
 Log.options = {
 
+  update() {
+    localStorage.setItem('user', JSON.stringify(user))
+    Log.refresh()
+  },
+
   /**
    * Set background colour
    * @param {string} c - The colour
@@ -19,8 +24,7 @@ Log.options = {
 
   setBG(c) {
     user.config.ui.bg = c
-    localStorage.setItem("user", JSON.stringify(user))
-    Log.refresh()
+    Log.options.update()
   },
 
   /**
@@ -30,8 +34,7 @@ Log.options = {
 
   setColour(c) {
     user.config.ui.colour = c
-    localStorage.setItem("user", JSON.stringify(user))
-    Log.refresh()
+    Log.options.update()
   },
 
   /**
@@ -41,8 +44,7 @@ Log.options = {
 
   setAccent(c) {
     user.config.ui.accent = c
-    localStorage.setItem("user", JSON.stringify(user))
-    Log.refresh()
+    Log.options.update()
   },
 
   /**
@@ -51,20 +53,19 @@ Log.options = {
    */
 
   setColourCode(s) {
-    let ch = s.split(""),
+    let ch = s.split(''),
         indices = [],
-        sec = ""
+        sec = ''
 
     for (let i = 0, l = ch.length; i < l; i++)
-      ch[i] === "\"" && indices.push(i)
+      ch[i] === '"' && indices.push(i)
 
     for (let i = indices[0] + 1; i < indices[1]; i++) sec += ch[i]
 
     let col = s.substring(indices[1] + 1, s.length).trim()
 
     user.palette[sec] = col
-    localStorage.setItem("user", JSON.stringify(user))
-    Log.refresh()
+    Log.options.update()
   },
 
   /**
@@ -74,8 +75,7 @@ Log.options = {
 
   setFont(f) {
     user.config.ui.font = f
-    localStorage.setItem("user", JSON.stringify(user))
-    Log.refresh()
+    Log.options.update()
   },
 
   /**
@@ -84,9 +84,10 @@ Log.options = {
    */
 
   setIcons(a) {
-    user.config.ui.icons = a == "true" ? true : false
-    localStorage.setItem("user", JSON.stringify(user))
-    Log.refresh()
+    if (a == 'true' || a == 'false') {
+      user.config.ui.icons = a === 'true' ? true : false
+      Log.options.update()
+    }
   },
 
   /**
@@ -96,8 +97,7 @@ Log.options = {
 
   setView(n) {
     user.config.ui.view = n
-    localStorage.setItem("user", JSON.stringify(user))
-    Log.refresh()
+    Log.options.update()
   },
 
   /**
@@ -106,9 +106,10 @@ Log.options = {
    */
 
   setCalendar(c) {
-    user.config.system.calendar = c
-    localStorage.setItem("user", JSON.stringify(user))
-    Log.refresh()
+    if (c === 'aequirys' || c === 'monocal' || c === 'gregorian') {
+      user.config.system.calendar = c
+      Log.options.update()
+    }
   },
 
   /**
@@ -117,9 +118,10 @@ Log.options = {
    */
 
   setTimeFormat(f) {
-    user.config.system.timeFormat = f
-    localStorage.setItem("user", JSON.stringify(user))
-    Log.refresh()
+    if (f === '24' || f === '12') {
+      user.config.system.timeFormat = f
+      Log.options.update()
+    }
   },
 
   /**
@@ -129,7 +131,6 @@ Log.options = {
 
   setWeekStart(d) {
     user.config.system.weekStart = d
-    localStorage.setItem("user", JSON.stringify(user))
-    Log.refresh()
+    Log.options.update()
   }
 }
