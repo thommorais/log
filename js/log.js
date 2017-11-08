@@ -24,7 +24,7 @@ var Log = {
    */
 
   status() {
-    if (Log.log.length == 0) return
+    if (Log.log.length === 0) return
     return Log.log[Log.log.length - 1].e === 'undefined' ? true : false
   },
 
@@ -267,12 +267,17 @@ var Log = {
    */
 
   init(log) {
+    try {
+      JSON.parse(localStorage.getItem('user'))
 
-    if (localStorage.hasOwnProperty('user')) {
-      user = JSON.parse(localStorage.getItem('user'))
-    } else {
-      user.log = Log.data.parse(log)
-      localStorage.setItem('user', JSON.stringify(user))
+      if (localStorage.hasOwnProperty('user')) {
+        user = JSON.parse(localStorage.getItem('user'))
+      } else {
+        user.log = Log.data.parse(log)
+        localStorage.setItem('user', JSON.stringify(user))
+      }
+    } catch(e) {
+      localStorage.clear()
     }
 
     Log.log = user.log
