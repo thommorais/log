@@ -1,14 +1,3 @@
-/**
- * Log
- * A log and time-tracking system
- *
- * Options and preferences
- *
- * @author Josh Avanier
- * @version 0.1.1
- * @license MIT
- */
-
 Log = window.Log || {}
 Log.options = {
 
@@ -53,18 +42,17 @@ Log.options = {
    */
 
   setColourCode(s) {
-    let ch = s.split(''),
-        indices = [],
-        sec = ''
+    let ch = s.split('')
+    let indices = []
+    let sec = ''
 
-    for (let i = 0, l = ch.length; i < l; i++)
+    for (let i = 0, l = ch.length; i < l; i++) {
       ch[i] === '"' && indices.push(i)
+    }
 
     for (let i = indices[0] + 1; i < indices[1]; i++) sec += ch[i]
 
-    let col = s.substring(indices[1] + 1, s.length).trim()
-
-    user.palette[sec] = col
+    user.palette[sec] = s.substring(indices[1] + 1, s.length).trim()
     Log.options.update()
   },
 
@@ -84,7 +72,7 @@ Log.options = {
    */
 
   setIcons(a) {
-    if (a == 'true' || a == 'false') {
+    if (a === 'true' || a === 'false') {
       user.config.ui.icons = a === 'true' ? true : false
       Log.options.update()
     }

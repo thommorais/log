@@ -1,26 +1,15 @@
-/**
- * Log
- * A log and time-tracking system
- *
- * Visualisations
- *
- * @author Josh Avanier
- * @version 0.1.1
- * @license MIT
- */
-
 Log = window.Log || {}
 Log.vis = {
 
   /**
    * Display a line visualisation
-   * @param {Object[]=} ent - The Log entries
-   * @param {string}    con - The container
+   * @param {string} con - Container
+   * @param {Object[]=} ent - Entries
    */
 
-  line(ent = Log.log, con) {
-    let lw = 0, // the width of the last data element
-        lp = 0, // the percentage of the last data element
+  line(con, ent = Log.log) {
+    let lw = 0 // the width of the last data element
+    let lp = 0 // the percentage of the last data element
 
     /**
      * Add a data element to the chart
@@ -28,7 +17,7 @@ Log.vis = {
      * @param {Object} r - The Log entry's attributes
      */
 
-    addEntry = ({s, c}, width, dp, margin) => {
+    let addEntry = ({s, c}, width, dp, margin) => {
       let v = document.createElement('div')
 
       v.className = 'psr t0 sh1 mb2 lf'
@@ -41,14 +30,14 @@ Log.vis = {
 
       lw = width
       lp = dp
-    },
+    }
 
     /**
      * Create a new row
      * @param {string} id - The new row's ID
      */
 
-    nr = id => {
+    let nr = id => {
       lw = 0
       lp = 0
 
@@ -58,7 +47,7 @@ Log.vis = {
       e.id = con + id
 
       document.getElementById(con).appendChild(e)
-    },
+    }
 
     /**
      * Check if column exists
@@ -66,60 +55,35 @@ Log.vis = {
      * @returns {boolean} Column existence status
      */
 
-    check = id => (document.getElementById(id) == null)
+    let check = id => (document.getElementById(id) == null)
 
     for (let i = 0, l = ent.length; i < l; i++) {
       if (ent[i].e === 'undefined') continue
 
-      let es = Log.time.parse(ent[i].s),
-          ee = Log.time.parse(ent[i].e),
+      let es = Log.time.parse(ent[i].s)
+      let ee = Log.time.parse(ent[i].e)
+      let dt = Log.time.date(es)
+      let end = Log.time.date(ee)
+      let id = con + dt
 
-          dt = Log.time.date(es),
-          end = Log.time.date(ee),
+      check(id) && nr(dt)
 
-          id = con + dt
+      let wi = Log.utils.calcWidth(ee, es)
+      let dp = Log.utils.calcDP(es)
+      let mr = Log.utils.calcMargin(dp, lw, lp)
 
-      // Split entries that span through midnight
-      if (dt !== end) {
-        check(id) && nr(dt)
-
-        let aa = Log.time.convert(es),
-            aae = Log.time.parse((+new Date(aa.getFullYear(), aa.getMonth(), aa.getDate(), 23, 59).getTime() / 1E3).toString(16)),
-            awi = Log.utils.calcWidth(aae, es),
-            adp = Log.utils.calcDP(es),
-            amr = Log.utils.calcMargin(adp, lw, lp)
-
-        addEntry(ent[i], awi, adp, amr)
-
-        check(con + end) && nr(end)
-
-        let ea = Log.time.convert(ee),
-            eas = Log.time.parse((+new Date(ea.getFullYear(), ea.getMonth(), ea.getDate(), 0, 0).getTime() / 1E3).toString(16)),
-            ewi = Log.utils.calcWidth(ee, eas),
-            edp = Log.utils.calcDP(eas),
-            emr = Log.utils.calcMargin(edp, lw, lp)
-
-        addEntry(ent[i], ewi, edp, emr)
-      } else {
-        check(id) && nr(dt)
-
-        let wi = Log.utils.calcWidth(ee, es),
-            dp = Log.utils.calcDP(es),
-            mr = Log.utils.calcMargin(dp, lw, lp)
-
-        addEntry(ent[i], wi, dp, mr)
-      }
+      addEntry(ent[i], wi, dp, mr)
     }
   },
 
   /**
    * Display a bar visualisation
-   * @param {Object[]=} ent - Log entries
-   * @param {string}    con - The container
+   * @param {string} con - Container
+   * @param {Object[]=} ent - Entries
    */
 
-  bar(ent = Log.log, con) {
-    let lw = 0, // the width of the last data element
+  bar(con, ent = Log.log) {
+    let lw = 0 // the width of the last data element
 
     /**
      * Add a data element to the chart
@@ -127,30 +91,30 @@ Log.vis = {
      * @param {Object} r - A width
      */
 
-    addEntry = ({s, c}, w) => {
+    let addEntry = ({s, c}, w) => {
       let d = document.createElement('div')
+      let id = Log.time.date(Log.time.parse(s))
 
       d.className = 'psa sw1'
       d.style.height = `${w}%`
       d.style.bottom = `${lw}%`
       d.style.backgroundColor = Log.palette[c] || Log.config.ui.colour
 
-      let id = Log.time.date(Log.time.parse(s))
       document.getElementById(id).appendChild(d)
 
       lw += w
-    },
+    }
 
     /**
      * Create a new column
      * @param {string} id - The new column's ID
      */
 
-    nc = id => {
+    let nc = id => {
       lw = 0
 
-      let dy = document.createElement('div'),
-          e = document.createElement('div')
+      let dy = document.createElement('div')
+      let e = document.createElement('div')
 
       dy.className = 'dib hf psr'
       dy.style.width = `${100 / Log.config.ui.view}%`
@@ -166,9 +130,9 @@ Log.vis = {
     for (let i = 0, l = ent.length; i < l; i++) {
       if (ent[i].e === 'undefined') continue
 
-      let s = Log.time.parse(ent[i].s),
-          e = Log.time.parse(ent[i].e),
-          d = Log.time.date(s)
+      let s = Log.time.parse(ent[i].s)
+      let e = Log.time.parse(ent[i].e)
+      let d = Log.time.date(s)
 
       document.getElementById(d) === null && nc(d)
 
@@ -178,16 +142,16 @@ Log.vis = {
 
   /**
    * Display a day chart
-   * @param {Object=} d - A date
-   * @param {string=} con - The container
+   * @param {Object=} d - Date
+   * @param {string=} con - Container
    */
 
   day(d = new Date(), con = 'dayChart') {
-    let en = Log.data.getEntries(d),
-        lw = 0, // the width of the last data element
-        lp = 0, // the percentage of the last data element
+    let en = Log.data.getEntries(d)
+    let lw = 0 // the width of the last data element
+    let lp = 0 // the percentage of the last data element
 
-    add = ({c, t, d}, width, dp, margin) => {
+    let add = ({c, t, d}, width, dp, margin) => {
       let div = document.createElement('div')
 
       div.className = 'nodrag psr t0 hf mb2 lf'
@@ -206,12 +170,11 @@ Log.vis = {
     for (let i = 0, l = en.length; i < l; i++) {
       if (en[i].e === 'undefined') continue
 
-      let es = Log.time.parse(en[i].s),
-          ee = Log.time.parse(en[i].e),
-
-          wd = Log.utils.calcWidth(ee, es),
-          dp = Log.utils.calcDP(es),
-          mr = Log.utils.calcMargin(dp, lw, lp)
+      let es = Log.time.parse(en[i].s)
+      let ee = Log.time.parse(en[i].e)
+      let wd = Log.utils.calcWidth(ee, es)
+      let dp = Log.utils.calcDP(es)
+      let mr = Log.utils.calcMargin(dp, lw, lp)
 
       add(en[i], wd, dp, mr)
     }
@@ -219,19 +182,19 @@ Log.vis = {
 
   /**
    * Display peak hours chart
-   * @param {Object[]=} ent - Log entries
-   * @param {string=}   con - The container
+   * @param {Object[]=} ent - Entries
+   * @param {string=} con - Container
    */
 
   peakH(ent = Log.log, con = 'phc') {
-    let h = Log.data.peakHours(ent),
-        m = Log.utils.getMax(h),
+    let h = Log.data.peakHours(ent)
+    let m = Log.utils.getMax(h)
 
-    add = i => {
-      let d = document.createElement('div'),
-          e = document.createElement('div'),
-          n = document.createElement('div'),
-          t = `${con}-${i}`
+    let add = i => {
+      let d = document.createElement('div')
+      let e = document.createElement('div')
+      let n = document.createElement('div')
+      let t = `${con}-${i}`
 
       d.className = 'dib hf psr'
       d.style.width = '4.1667%'
@@ -249,24 +212,26 @@ Log.vis = {
       document.getElementById(t).appendChild(e)
     }
 
-    for (let i = 0, l = h.length; i < l; i++) add(i)
+    for (let i = 0, l = h.length; i < l; i++) {
+      add(i)
+    }
   },
 
   /**
    * Display peak days chart
-   * @param {Object[]=} ent - Log entries
-   * @param {string=}   con - The container
+   * @param {Object[]=} ent - Entries
+   * @param {string=} con - Container
    */
 
   peakD(ent = Log.log, con = 'pdc') {
-    let d = Log.data.peakDays(ent),
-        m = Log.utils.getMax(d),
+    let d = Log.data.peakDays(ent)
+    let m = Log.utils.getMax(d)
 
     add = i => {
-      let v = document.createElement('div'),
-          e = document.createElement('div'),
-          n = document.createElement('div'),
-          t = `${con}-${i}`
+      let v = document.createElement('div')
+      let e = document.createElement('div')
+      let n = document.createElement('div')
+      let t = `${con}-${i}`
 
       v.className = 'dib hf psr'
       v.style.width = '14.2857%' // 100 / 7
@@ -284,26 +249,28 @@ Log.vis = {
       document.getElementById(t).appendChild(e)
     }
 
-    for (let i = 0, l = d.length; i < l; i++) add(i)
+    for (let i = 0, l = d.length; i < l; i++) {
+      add(i)
+    }
   },
 
   /**
    * Display sector bar
-   * @param {Object[]=} ent - Log entries
-   * @param {string=}   con - The container
+   * @param {Object[]=} ent - Entries
+   * @param {string=} con - Container
    */
 
   sectorBar(ent = Log.log, con = 'sectorBar') {
-    let s = Log.data.listSectors(ent).sort(),
+    let s = Log.data.listSectors(ent).sort()
 
     /**
      * Add a partition to the sector bar
      * @param {Object} sec - A sector
      */
 
-    add = sec => {
-      let d = document.createElement('div'),
-          v = Log.data.sp(sec, ent)
+    let add = sec => {
+      let d = document.createElement('div')
+      let v = Log.data.sp(sec, ent)
 
       d.className = 'psr t0 hf mb2 lf bg-blanc'
       d.style.width = `${v}%`
@@ -312,30 +279,32 @@ Log.vis = {
       document.getElementById(con).appendChild(d)
     }
 
-    for (let i = 0, l = s.length; i < l; i++) add(s[i])
+    for (let i = 0, l = s.length; i < l; i++) {
+      add(s[i])
+    }
   },
 
   /**
    * Display sector bars
-   * @param {Object[]=} ent - Log entries
-   * @param {string=}   con - The container
+   * @param {Object[]=} ent - Entries
+   * @param {string=} con - Container
    */
 
   sectorBars(ent = Log.log, con = 'sectorBars') {
-    let s = Log.data.listSectors(ent).sort(),
+    let s = Log.data.listSectors(ent).sort()
 
     /**
      * Add an item to the sector bar list
      * @param {string} sec - A sector
      */
 
-    add = sec => {
-      let sh = Log.data.sh(sec, ent),
-          li = document.createElement('li'),
-          tl = document.createElement('span'),
-          st = document.createElement('span'),
-          br = document.createElement('div'),
-          dt = document.createElement('div')
+    let add = sec => {
+      let sh = Log.data.sh(sec, ent)
+      let li = document.createElement('li')
+      let tl = document.createElement('span')
+      let st = document.createElement('span')
+      let br = document.createElement('div')
+      let dt = document.createElement('div')
 
       li.className = 'mb4 f6 lhc'
       tl.className = 'dib sw6 f6 mon upc tk elip'
@@ -355,30 +324,32 @@ Log.vis = {
       document.getElementById(con).appendChild(li)
     }
 
-    for (let i = 0, l = s.length; i < l; i++) add(s[i])
+    for (let i = 0, l = s.length; i < l; i++) {
+      add(s[i])
+    }
   },
 
   /**
    * Display project bars
-   * @param {Object[]=} ent - Log entries
-   * @param {string=}   con - The container
+   * @param {Object[]=} ent - Entries
+   * @param {string=} con - Container
    */
 
   projectBars(ent = Log.log, con = 'projectBars') {
-    let s = Log.data.listProjects(ent).sort(),
+    let s = Log.data.listProjects(ent).sort()
 
     /**
      * Add an item to the project bars list
      * @param {string} pro - A project
      */
 
-    add = pro => {
-      let sh = Log.data.ph(pro, ent),
-          li = document.createElement('li'),
-          tl = document.createElement('span'),
-          st = document.createElement('span'),
-          br = document.createElement('div'),
-          dt = document.createElement('div')
+    let add = pro => {
+      let sh = Log.data.ph(pro, ent)
+      let li = document.createElement('li')
+      let tl = document.createElement('span')
+      let st = document.createElement('span')
+      let br = document.createElement('div')
+      let dt = document.createElement('div')
 
       li.className = 'mb4 f6 lhc'
       tl.className = 'dib sw6 f6 mon upc tk elip'
@@ -398,6 +369,8 @@ Log.vis = {
       document.getElementById(con).appendChild(li)
     }
 
-    for (let i = 0, l = s.length; i < l; i++) add(s[i])
+    for (let i = 0, l = s.length; i < l; i++) {
+      add(s[i])
+    }
   }
 }

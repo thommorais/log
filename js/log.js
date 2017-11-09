@@ -9,7 +9,7 @@
 
 'use strict';
 
-const shell = require('shelljs')
+const SHELL = require('shelljs')
 
 var Log = {
 
@@ -37,19 +37,19 @@ var Log = {
     if (status) {
       let l = Log.time.convert(
           Log.time.parse(Log.log[Log.log.length - 1].s)
-        ).getTime(),
+        ).getTime()
 
-        tick = _ => {
-          let s = Math.floor((new Date().getTime() - l) / 1E3),
-              m = Math.floor(s / 60),
-              h = Math.floor(m / 60)
+      let tick = _ => {
+        let s = Math.floor((new Date().getTime() - l) / 1E3)
+        let m = Math.floor(s / 60)
+        let h = Math.floor(m / 60)
 
-          h %= 24
-          m %= 60
-          s %= 60
+        h %= 24
+        m %= 60
+        s %= 60
 
-          document.getElementById(con).innerHTML = `${`0${h}`.substr(-2)}:${`0${m}`.substr(-2)}:${`0${s}`.substr(-2)}`
-        }
+        document.getElementById(con).innerHTML = `${`0${h}`.substr(-2)}:${`0${m}`.substr(-2)}:${`0${s}`.substr(-2)}`
+      }
 
       Log.clock = setInterval(function() {
         tick()
@@ -60,8 +60,8 @@ var Log = {
   /**
    * Display a log table
    * @param {Object[]=} ent - The log entries
-   * @param {number=}   num - The number of entries to show
-   * @param {string=}   con - The container
+   * @param {number=} num - The number of entries to show
+   * @param {string=} con - The container
    */
 
   display(ent = Log.log, num = 50, con = 'logTable') {
@@ -102,19 +102,17 @@ var Log = {
      */
 
     en = (e, i) => {
-      let rw = document.getElementById(con).insertRow(i),
-
-        c1 = rw.insertCell(0),
-        c2 = rw.insertCell(1),
-        c3 = rw.insertCell(2),
-        c4 = rw.insertCell(3),
-        c5 = rw.insertCell(4),
-        c6 = rw.insertCell(5),
-        c7 = rw.insertCell(6),
-        c8 = rw.insertCell(7),
-
-        es = Log.time.parse(e.s),
-        ee = Log.time.parse(e.e)
+      let rw = document.getElementById(con).insertRow(i)
+      let c1 = rw.insertCell(0)
+      let c2 = rw.insertCell(1)
+      let c3 = rw.insertCell(2)
+      let c4 = rw.insertCell(3)
+      let c5 = rw.insertCell(4)
+      let c6 = rw.insertCell(5)
+      let c7 = rw.insertCell(6)
+      let c8 = rw.insertCell(7)
+      let es = Log.time.parse(e.s)
+      let ee = Log.time.parse(e.e)
 
       ee = e.e === 'undefined' ? '-' : Log.time.parse(e.e)
 
@@ -156,10 +154,10 @@ var Log = {
     },
 
     calcDP(a) {
-      let s = Log.time.convert(a),
-          y = s.getFullYear(),
-          m = s.getMonth(),
-          d = s.getDate()
+      let s = Log.time.convert(a)
+      let y = s.getFullYear()
+      let m = s.getMonth()
+      let d = s.getDate()
 
       return (new Date(y, m, d, s.getHours(), s.getMinutes(), s.getSeconds()).getTime() / 1E3 - (new Date(y, m, d).getTime() / 1E3)) / 86400 * 100
     },
@@ -174,47 +172,19 @@ var Log = {
    */
 
   tab(s) {
-    let x = document.getElementsByClassName('sect'),
-        b = document.getElementsByClassName('tab')
+    let x = document.getElementsByClassName('sect')
+    let b = document.getElementsByClassName('tab')
 
-    for (let i = 0, l = x.length; i < l; i++)
+    for (let i = 0, l = x.length; i < l; i++) {
       x[i].style.display = 'none'
+    }
 
-    for (let i = 0, l = b.length; i < l; i++)
+    for (let i = 0, l = b.length; i < l; i++) {
       b[i].className = 'pv1 tab on bg-cl o5 mr3'
+    }
 
     document.getElementById(s).style.display = 'block'
     document.getElementById(`b-${s}`).className = 'pv1 tab on bg-cl of mr3'
-  },
-
-  build() {
-    let icon = user.config.ui.icons,
-
-    ic = (a, b, c) => {
-      document.getElementById(a).innerHTML = icon ? b : c
-    }
-
-    ic('b-ovw', '&#128902;', 'Overview')
-    ic('b-lis', '&#9783;', 'Details')
-    ic('b-vis', '&#9781;', 'Visualisation')
-    ic('b-tab', '&#128911;', 'Table')
-    ic('b-set', '?', 'Guide')
-
-    ic('peakTimesTitle', '&#9650;', 'Peak Times')
-    ic('forecastTitle', '&#9670;', 'Forecast')
-    ic('overviewTitle', '&#128902;', 'Overview')
-    ic('sectorsTodayTitle', '&#11206;', 'Sectors')
-    ic('sectorsTitle', '&#11206;', 'Sectors')
-    ic('statsTitle', '&#9650;', 'Statistics')
-    ic('projectsTitle', '&#9964;', 'Projects')
-
-    ic('tableDate', '&#128710;', 'Date')
-    ic('tableStart', '&#9210;', 'Start')
-    ic('tableEnd', '&#9209;', 'End')
-    ic('tableDuration', '&#11118;', 'Duration')
-    ic('tableSector', '&#11206;', 'Sector')
-    ic('tableProject', '&#9964;', 'Project')
-    ic('tableActivity', '&#11042;', 'Activity')
   },
 
   refresh() {
@@ -237,9 +207,8 @@ var Log = {
     },
 
     stats() {
-      let e = 'LHH LHT LPH LPT ASD ASDT LSN LSX LSNH LSXH'.split(' '),
-        r = e => document.getElementById(e).innerHTML = '0.00'
-
+      let e = 'LHH LHT LPH LPT ASD ASDT LSN LSX LSNH LSXH'.split(' ')
+      let r = e => document.getElementById(e).innerHTML = '0.00'
       for (let i = 0, l = e.length; i < l; i++) r(e[i])
     },
 
@@ -289,7 +258,33 @@ var Log = {
     Log.config = user.config
     Log.palette = user.palette
 
-    Log.build()
+    let icon = user.config.ui.icons
+
+    let ic = (a, b, c) => {
+      document.getElementById(a).innerHTML = icon ? b : c
+    }
+
+    ic('b-ovw', '&#128902;', 'Overview')
+    ic('b-lis', '&#9783;', 'Details')
+    ic('b-vis', '&#9781;', 'Visualisation')
+    ic('b-tab', '&#128911;', 'Table')
+    ic('b-set', '?', 'Guide')
+
+    ic('peakTimesTitle', '&#9650;', 'Peak Times')
+    ic('forecastTitle', '&#9670;', 'Forecast')
+    ic('overviewTitle', '&#128902;', 'Overview')
+    ic('sectorsTodayTitle', '&#11206;', 'Sectors')
+    ic('sectorsTitle', '&#11206;', 'Sectors')
+    ic('statsTitle', '&#9650;', 'Statistics')
+    ic('projectsTitle', '&#9964;', 'Projects')
+
+    ic('tableDate', '&#128710;', 'Date')
+    ic('tableStart', '&#9210;', 'Start')
+    ic('tableEnd', '&#9209;', 'End')
+    ic('tableDuration', '&#11118;', 'Duration')
+    ic('tableSector', '&#11206;', 'Sector')
+    ic('tableProject', '&#9964;', 'Project')
+    ic('tableActivity', '&#11042;', 'Activity')
 
     document.getElementById('app').style.backgroundColor = Log.config.ui.bg
     document.getElementById('app').style.color = Log.config.ui.colour
@@ -312,33 +307,35 @@ var Log = {
 
     if (Log.log.length === 0) return
 
-    let ld = Log.data,
-      n = new Date(),
-      y = new Date(n),
+    let ld = Log.data
+    let n = new Date()
+    let y = new Date(n)
 
-      d = (e, m) => {
-        document.getElementById(e).innerHTML = m.toFixed(2)
-      },
+    let d = (e, m) => {
+      document.getElementById(e).innerHTML = m.toFixed(2)
+    }
 
-      s = (e, c) => {
-        document.getElementById(e).className = c
-      },
+    let s = (e, c) => {
+      document.getElementById(e).className = c
+    }
 
-      t = (e, c) => {
-        let s = '', r, d = document.getElementById(e)
+    let t = (e, c) => {
+      let s = ''
+      let r
+      let d = document.getElementById(e)
 
-        c > 0 ? (s = `+${c.toFixed(2)}%`) : (s = `${c.toFixed(2)}%`)
+      c > 0 ? (s = `+${c.toFixed(2)}%`) : (s = `${c.toFixed(2)}%`)
 
-        d.innerHTML = s
-      }
+      d.innerHTML = s
+    }
 
     y.setDate(n.getDate() - 1)
 
-    let en = Log.data.getEntries(n),
-      ey = Log.data.getEntries(y),
-      mn = Log.data.getRecentEntries(Log.config.ui.view - 1)
+    let en = Log.data.getEntries(n)
+    let ey = Log.data.getEntries(y)
+    let mn = Log.data.getRecentEntries(Log.config.ui.view - 1)
 
-    Log.vis.bar(mn, 'weekChart')
+    Log.vis.bar('weekChart', Log.data.parse(mn))
     Log.vis.peakH(Log.data.getEntriesByDay(n.getDay()))
     Log.vis.peakD()
     Log.vis.day()
@@ -352,33 +349,35 @@ var Log = {
 
     Log.timer(Log.status())
 
-    let lhh = ld.lh(),
-        lht = ld.lh(en),
-        lph = ld.lp(),
-        lpt = ld.lp(en),
-        asd = ld.asd(),
-        asdt = ld.asd(en),
-        lsn = ld.lsmin(en),
-        lsx = ld.lsmax(en),
-        lsnh = ld.lsmin(),
-        lsxh = ld.lsmax(),
+    let lhh = ld.lh()
+    let lht = ld.lh(en)
+    let lph = ld.lp()
+    let lpt = ld.lp(en)
+    let asd = ld.asd()
+    let asdt = ld.asd(en)
+    let lsn = ld.lsmin(en)
+    let lsx = ld.lsmax(en)
+    let lsnh = ld.lsmin()
+    let lsxh = ld.lsmax()
 
-        lhtt = ld.trend(lht, ld.lh(ey)),
-        asdtt = ld.trend(asdt, ld.asd(ey)),
-        lptt = ld.trend(lpt, ld.lp(ey)),
-        lsnt = ld.trend(lsn, ld.lsmin(ey)),
-        lsxt = ld.trend(lsx, ld.lsmax(ey))
+    let lhtt = ld.trend(lht, ld.lh(ey))
+    let asdtt = ld.trend(asdt, ld.asd(ey))
+    let lptt = ld.trend(lpt, ld.lp(ey))
+    let lsnt = ld.trend(lsn, ld.lsmin(ey))
+    let lsxt = ld.trend(lsx, ld.lsmax(ey))
 
-    let els = ['LHH', 'LHT', 'LPH', 'LPT', 'ASD', 'ASDT', 'LSN', 'LSX', 'LSNH', 'LSXH'],
-        val = [lhh, lht, lph, lpt, asd, asdt, lsn, lsx, lsnh, lsxh],
-        tels = ['lhtt', 'asdtt', 'lptt', 'lsnt', 'lsxt'],
-        tval = [lhtt, asdtt, lptt, lsnt, lsxt]
+    let els = ['LHH', 'LHT', 'LPH', 'LPT', 'ASD', 'ASDT', 'LSN', 'LSX', 'LSNH', 'LSXH']
+    let val = [lhh, lht, lph, lpt, asd, asdt, lsn, lsx, lsnh, lsxh]
+    let tels = ['lhtt', 'asdtt', 'lptt', 'lsnt', 'lsxt']
+    let tval = [lhtt, asdtt, lptt, lsnt, lsxt]
 
-    for (let i = 0, l = els.length; i < l; i++)
+    for (let i = 0, l = els.length; i < l; i++) {
       document.getElementById(els[i]).innerHTML = val[i].toFixed(2)
+    }
 
-    for (let i = 0, l = tels.length; i < l; i++)
+    for (let i = 0, l = tels.length; i < l; i++) {
       t(tels[i], tval[i])
+    }
 
     Log.vis.peakH(undefined, 'peakTimesHistory')
     Log.vis.sectorBars(en)
@@ -387,7 +386,7 @@ var Log = {
     Log.vis.sectorBars(undefined, 'sectorsList', true)
     Log.vis.projectBars(undefined, 'projectsList', true)
 
-    Log.vis.line(Log.data.parse(mn), 'vis')
+    Log.vis.line('vis', Log.data.parse(mn))
     Log.display(Log.log, 1000, 'logbook')
   }
 }

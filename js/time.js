@@ -1,20 +1,9 @@
-/**
- * Log
- * A log and time-tracking system
- *
- * Time functions
- *
- * @author Josh Avanier
- * @version 0.1.1
- * @license MIT
- */
-
 Log = window.Log || {}
 Log.time = {
 
   /**
    * Convert hexadecimal into decimal
-   * @param {string} s - A hexadecimal string
+   * @param {string} s - Hexadecimal string
    * @returns {number} Decimal conversion
    */
 
@@ -23,8 +12,18 @@ Log.time = {
   },
 
   /**
+   * Convert to hexadecimal format
+   * @param {number} t - Unix time
+   */
+
+  toHex(t) {
+    return (new Date(t.getFullYear(), t.getMonth(), t.getDate(), t.getHours(), t.getMinutes(), t.getSeconds()).getTime() / 1E3).toString(16)
+  },
+
+  /**
    * Convert Unix time
    * @param {number} t - Unix time
+   * @returns {Object} Date
    */
 
   convert(t) {
@@ -38,11 +37,11 @@ Log.time = {
    */
 
   stamp(t) {
-    let d = Log.time.convert(t),
-        f = Log.config.system.timeFormat,
-        h = `0${d.getHours()}`,
-        m = `0${d.getMinutes()}`,
-        s = `0${d.getSeconds()}`
+    let d = Log.time.convert(t)
+    let f = Log.config.system.timeFormat
+    let h = `0${d.getHours()}`
+    let m = `0${d.getMinutes()}`
+    let s = `0${d.getSeconds()}`
 
     if (f === '24')
       return `${h.substr(-2)}:${m.substr(-2)}:${s.substr(-2)}`
@@ -57,10 +56,10 @@ Log.time = {
    */
 
   twelveHours(d) {
-    let h = d.getHours(),
-        m = d.getMinutes(),
-        s = d.getSeconds(),
-        x = h >= 12 ? 'PM' : 'AM'
+    let h = d.getHours()
+    let m = d.getMinutes()
+    let s = d.getSeconds()
+    let x = h >= 12 ? 'PM' : 'AM'
 
     h = h % 12
     h = h ? h : 12
@@ -88,8 +87,8 @@ Log.time = {
    */
 
   displayDate(t) {
-    let a = Log.time.convert(t),
-        f = Log.config.system.calendar
+    let a = Log.time.convert(t)
+    let f = Log.config.system.calendar
 
     if (f === 'gregorian')
       return `${a.getFullYear()} ${a.getMonth() + 1} ${a.getDate()}`

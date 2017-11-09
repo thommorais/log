@@ -1,14 +1,3 @@
-/**
- * Log
- * A log and time-tracking system
- *
- * Console functions
- *
- * @author Josh Avanier
- * @version 0.1.1
- * @license MIT
- */
-
 Log = window.Log || {}
 Log.console = {
   commands: [
@@ -56,14 +45,14 @@ Log.console = {
    */
 
   importUser(i) {
-    let s = i.split(' '),
-        file = ''
+    let s = i.split(' ')
+    let f = ''
 
     if (s[1].substr(-1) === '/') s[1].substr(0, s[1].length - 1)
 
-    if (shell.test("-f", `${s[1]}`)) file = shell.cat(`${s[1]}`)
+    if (SHELL.test("-f", s[1])) f = SHELL.cat(s[1])
 
-    localStorage.setItem('user', file)
+    localStorage.setItem('user', f)
     user = JSON.parse(localStorage.getItem('user'))
 
     Log.refresh()
@@ -93,46 +82,35 @@ Log.console = {
    */
 
   startLog(s) {
-    let ch = s.split(''),
-        indices = [],
-        sect = '',
-        proj = '',
-        desc = ''
+    let start = Log.time.toHex(new Date())
+    let p = []
+    let indices = []
+    let sect = ''
+    let proj = ''
+    let desc = ''
 
     if (s.indexOf('"') >= 0) {
-      for (let i = 0, l = ch.length; i < l; i++)
-        ch[i] === '"' && indices.push(i)
-
-      for (let i = indices[0] + 1; i < indices[1]; i++) sect += ch[i]
-      for (let i = indices[2] + 1; i < indices[3]; i++) proj += ch[i]
-      for (let i = indices[4] + 1; i < indices[5]; i++) desc += ch[i]
-    } else if (s.indexOf(`;`) >= 0) {
-      let p = s.split(`;`)
+      p = s.split('')
+      for (let i = 0, l = p.length; i < l; i++) p[i] === '"' && indices.push(i)
+      for (let i = indices[0] + 1; i < indices[1]; i++) sect += p[i]
+      for (let i = indices[2] + 1; i < indices[3]; i++) proj += p[i]
+      for (let i = indices[4] + 1; i < indices[5]; i++) desc += p[i]
+    } else if (s.indexOf(';') >= 0) {
+      p = s.split(';')
       sect = p[0].substring(6, p[0].length).trim()
       proj = p[1].trim()
       desc = p[2].trim()
-    } else if (s.indexOf(`|`) >= 0) {
-      let p = s.split(`|`)
+    } else if (s.indexOf('|') >= 0) {
+      p = s.split('|')
       sect = p[0].substring(6, p[0].length).trim()
       proj = p[1].trim()
       desc = p[2].trim()
-    } else if (s.indexOf(`,`) >= 0) {
-      let p = s.split(`,`)
+    } else if (s.indexOf(',') >= 0) {
+      p = s.split(',')
       sect = p[0].substring(6, p[0].length).trim()
       proj = p[1].trim()
       desc = p[2].trim()
     }
-
-    let time = new Date(),
-        start = (
-          new Date(
-            time.getFullYear(),
-            time.getMonth(),
-            time.getDate(),
-            time.getHours(),
-            time.getMinutes(),
-            time.getSeconds()).getTime() / 1E3
-          ).toString(16)
 
     user.log.push({
       s: start,
@@ -142,9 +120,7 @@ Log.console = {
       d: desc
     })
 
-    localStorage.setItem('user', JSON.stringify(user))
-
-    Log.refresh()
+    Log.options.update()
   },
 
   /**
@@ -152,23 +128,9 @@ Log.console = {
    */
 
   endLog() {
-    let t = new Date()
-
-    user.log[user.log.length - 1].e = (
-      new Date(
-        t.getFullYear(),
-        t.getMonth(),
-        t.getDate(),
-        t.getHours(),
-        t.getMinutes(),
-        t.getSeconds()
-      ).getTime() / 1E3
-    ).toString(16)
-
-    localStorage.setItem('user', JSON.stringify(user))
-
+    user.log[user.log.length - 1].e = Log.time.toHex(new Date())
     clearInterval(timer)
-    Log.refresh()
+    Log.options.update()
   },
 
   /**
@@ -177,8 +139,8 @@ Log.console = {
    */
 
   set(i) {
-    let c = i.split(' '),
-        a = c[1].toLowerCase()
+    let c = i.split(' ')
+    let a = c[1].toLowerCase()
 
     if (a === 'background' || a === 'bg') {
       Log.options.setBG(c[2])
@@ -210,17 +172,19 @@ Log.console = {
    */
 
   filter(s) {
-    let c = s.split(' '),
-        a = c[1].toLowerCase(),
-        indices = [],
-        f = '',
-        h = s.split('')
+    let c = s.split(' ')
+    let a = c[1].toLowerCase()
+    let indices = []
+    let f = ''
+    let h = s.split('')
 
-    for (let i = 0, l = h.length; i < l; i++)
+    for (let i = 0, l = h.length; i < l; i++) {
       h[i] === '"' && indices.push(i)
+    }
 
-    for (let i = indices[0] + 1, l = indices[1]; i < l; i++)
+    for (let i = indices[0] + 1, l = indices[1]; i < l; i++) {
       f += h[i]
+    }
 
     if (a === 'category' || a === 'sector') {
       Log.reset()
