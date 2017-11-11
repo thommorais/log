@@ -274,6 +274,7 @@ var Log = {
     ic('forecastTitle', '&#9670;&#xFE0E;', 'Forecast')
     ic('overviewTitle', '&#128902;&#xFE0E;', 'Overview')
     ic('sectorsTodayTitle', '&#11206;&#xFE0E;', 'Sectors')
+    ic('projectsTodayTitle', '&#9964;&#xFE0E;', 'Projects')
     ic('sectorsTitle', '&#11206;&#xFE0E;', 'Sectors')
     ic('statsTitle', '&#9650;&#xFE0E;', 'Statistics')
     ic('projectsTitle', '&#9964;&#xFE0E;', 'Projects')

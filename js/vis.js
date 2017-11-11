@@ -307,7 +307,7 @@ Log.vis = {
       let dt = document.createElement('div')
 
       li.className = 'mb4 f6 lhc'
-      tl.className = 'dib sw6 f6 mon upc tk elip'
+      tl.className = 'dib sw6 f6 elip'
       st.className = 'f6 rf'
       br.className = 'wf sh1'
       dt.className = 'psr t0 hf lf'
@@ -352,7 +352,7 @@ Log.vis = {
       let dt = document.createElement('div')
 
       li.className = 'mb4 f6 lhc'
-      tl.className = 'dib sw6 f6 mon upc tk elip'
+      tl.className = 'dib sw6 f6 elip'
       st.className = 'f6 rf'
       br.className = 'wf sh1'
       dt.className = 'psr t0 hf lf'
