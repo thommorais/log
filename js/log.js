@@ -264,27 +264,27 @@ var Log = {
       document.getElementById(a).innerHTML = icon ? b : c
     }
 
-    ic('b-ovw', '&#128902;', 'Overview')
-    ic('b-lis', '&#9783;', 'Details')
-    ic('b-vis', '&#9781;', 'Visualisation')
-    ic('b-tab', '&#128911;', 'Table')
+    ic('b-ovw', '&#128902;&#xFE0E;', 'Overview')
+    ic('b-lis', '&#9783;&#xFE0E;', 'Details')
+    ic('b-vis', '&#9781;&#xFE0E;', 'Visualisation')
+    ic('b-tab', '&#128911;&#xFE0E;', 'Table')
     ic('b-set', '?', 'Guide')
 
-    ic('peakTimesTitle', '&#9650;', 'Peak Times')
-    ic('forecastTitle', '&#9670;', 'Forecast')
-    ic('overviewTitle', '&#128902;', 'Overview')
-    ic('sectorsTodayTitle', '&#11206;', 'Sectors')
-    ic('sectorsTitle', '&#11206;', 'Sectors')
-    ic('statsTitle', '&#9650;', 'Statistics')
-    ic('projectsTitle', '&#9964;', 'Projects')
+    ic('peakTimesTitle', '&#9650;&#xFE0E;', 'Peak Times')
+    ic('forecastTitle', '&#9670;&#xFE0E;', 'Forecast')
+    ic('overviewTitle', '&#128902;&#xFE0E;', 'Overview')
+    ic('sectorsTodayTitle', '&#11206;&#xFE0E;', 'Sectors')
+    ic('sectorsTitle', '&#11206;&#xFE0E;', 'Sectors')
+    ic('statsTitle', '&#9650;&#xFE0E;', 'Statistics')
+    ic('projectsTitle', '&#9964;&#xFE0E;', 'Projects')
 
-    ic('tableDate', '&#128710;', 'Date')
-    ic('tableStart', '&#9210;', 'Start')
-    ic('tableEnd', '&#9209;', 'End')
-    ic('tableDuration', '&#11118;', 'Duration')
-    ic('tableSector', '&#11206;', 'Sector')
-    ic('tableProject', '&#9964;', 'Project')
-    ic('tableActivity', '&#11042;', 'Activity')
+    ic('tableDate', '&#128710;&#xFE0E;', 'Date')
+    ic('tableStart', '&#9210;&#xFE0E;', 'Start')
+    ic('tableEnd', '&#9209;&#xFE0E;', 'End')
+    ic('tableDuration', '&#11118;&#xFE0E;', 'Duration')
+    ic('tableSector', '&#11206;&#xFE0E;', 'Sector')
+    ic('tableProject', '&#9964;&#xFE0E;', 'Project')
+    ic('tableActivity', '&#11042;&#xFE0E;', 'Activity')
 
     document.getElementById('app').style.backgroundColor = Log.config.ui.bg
     document.getElementById('app').style.color = Log.config.ui.colour
