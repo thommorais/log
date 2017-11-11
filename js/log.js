@@ -187,6 +187,26 @@ var Log = {
     document.getElementById(`b-${s}`).className = 'pv1 tab on bg-cl of mr3'
   },
 
+  /**
+   * Open a subtab
+   */
+
+  subtab(s) {
+    let x = document.getElementsByClassName('subsect')
+    let b = document.getElementsByClassName('subtab')
+
+    for (let i = 0, l = x.length; i < l; i++) {
+      x[i].style.display = 'none'
+    }
+
+    for (let i = 0, l = b.length; i < l; i++) {
+      b[i].className = 'pv1 subtab on bg-cl o5 mr3'
+    }
+
+    document.getElementById(s).style.display = 'block'
+    document.getElementById(`b-${s}`).className = 'pv1 subtab on bg-cl of mr3'
+  },
+
   refresh() {
     Log.reset()
     Log.init()
