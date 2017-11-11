@@ -383,8 +383,13 @@ var Log = {
     Log.vis.sectorBars(en)
     Log.vis.projectBars(en)
 
-    Log.vis.sectorBars(undefined, 'sectorsList', true)
-    Log.vis.projectBars(undefined, 'projectsList', true)
+    Log.vis.sectorBars(undefined, 'sectorsList')
+
+    document.getElementById('sectorsListCount').innerHTML = `(${Log.data.listSectors().length})`
+
+    Log.vis.projectBars(undefined, 'projectsList')
+
+    document.getElementById('projectsListCount').innerHTML = `(${Log.data.listProjects().length})`
 
     Log.vis.line('vis', Log.data.parse(mn))
     Log.display(Log.log, 1000, 'logbook')
