@@ -98,6 +98,47 @@ Log.time = {
       return Aequirys.display(Aequirys.convert(a))
   },
 
+  timeago(t) {
+    let seconds = ((new Date()) - t) / 1E3
+    let minutes = Math.floor(seconds / 60)
+
+    minutes = Math.abs(minutes)
+
+    if (minutes === 0) {
+      return 'less than a minute ago'
+    }
+
+    if (minutes === 1) {
+      return 'a minute ago'
+    }
+
+    if (minutes < 59) {
+      return minutes + ' minutes ago'
+    }
+
+    if (minutes < 90) {
+      return 'about an hour ago'
+    }
+
+    if (minutes < 1440) {
+      return Math.floor(minutes / 60) + ' hours ago'
+    }
+
+    if (minutes < 2880) {
+      return 'yesterday'
+    }
+
+    if (minutes < 86400) {
+      return Math.floor(minutes / 1440) + ' days ago'
+    }
+
+    if (minutes < 1051199) {
+      return Math.floor(minutes / 43200) + ' months ago'
+    }
+
+    return `over ${Math.floor(minutes / 525960)} years ago`
+  },
+
   /**
    * Calculate duration
    * @param {number} a - Start (Unix time)
