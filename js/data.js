@@ -71,6 +71,33 @@ Log.data = {
     }
   },
 
+  sortEntries(a = Log.log) {
+    let days = Log.time.listDates(
+      Log.time.convert(Log.time.parse(a[0].s)),
+      Log.time.convert(Log.time.parse(a[a.length - 1].s))
+    )
+    let list = []
+    let slots = []
+
+    for (let i = 0, l = days.length; i < l; i++) {
+      list.push(
+        Log.time.date(Log.time.parse(Log.time.toHex(
+          new Date(days[i].getFullYear(), days[i].getMonth(), days[i].getDate(), 0, 0, 0)
+        )))
+      )
+
+      slots.push([])
+    }
+
+    for (let o = 0, l = a.length; o < l; o++) {
+      let index = list.indexOf(Log.time.date(Log.time.parse(a[o].s)))
+
+      if (index > -1) slots[index].push(a[o])
+    }
+
+    return slots
+  },
+
   /**
    * Get entries from a certain period
    * @param {Object} ps - Period start
@@ -254,8 +281,6 @@ Log.data = {
     for (let i = 0, l = eph.length; i < l; i++) {
       eph[i] > mph && (mph = eph[i], mpht = i)
     }
-
-    console.log(mpht)
 
     return ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][mpht]
   },
