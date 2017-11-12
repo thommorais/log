@@ -241,6 +241,26 @@ Log.data = {
   },
 
   /**
+   * Get peak day
+   * @param {Object[]=} a - Entries
+   * @returns {string} Peak day
+   */
+
+  peakDay(a = Log.log) {
+    let eph = Log.data.peakDays(a)
+    let mph = 0
+    let mpht = 0
+
+    for (let i = 0, l = eph.length; i < l; i++) {
+      eph[i] > mph && (mph = eph[i], mpht = i)
+    }
+
+    console.log(mpht)
+
+    return ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][mpht]
+  },
+
+  /**
    * Get peak hours
    * @param {Object[]=} a - Log entries
    * @returns {Object[]} Peak hours
@@ -255,6 +275,24 @@ Log.data = {
     }
 
     return h
+  },
+
+  /**
+   * Get peak hour
+   * @param {Object[]=} a - Entries
+   * @returns {string} Peak hour
+   */
+
+  peakHour(a = Log.log) {
+    let eph = Log.data.peakHours(a)
+    let mph = 0
+    let mpht = 0
+
+    for (let i = 0, l = eph.length; i < l; i++) {
+      eph[i] > mph && (mph = eph[i], mpht = i)
+    }
+
+    return `${mpht}:00`
   },
 
   /**
