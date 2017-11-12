@@ -449,37 +449,67 @@ Log.data = {
    * @returns {Object} Forecasts
    */
 
-  forecast() {
-    let ent = Log.data.getEntriesByDay(new Date().getDay())
-    let s = Log.data.listSectors(ent)
-    let sf = 0
-    let sfs = ''
-    let eph = Log.data.peakHours(ent)
-    let mph = 0
-    let mpht = 0
-    let p = Log.data.listProjects(ent)
-    let pf = 0
-    let pfp = ''
+  forecast: {
 
-    for (let i = 0, l = s.length; i < l; i++) {
-      let x = Log.data.sp(s[i], ent)
-      x > sf && (sf = x, sfs = s[i])
-    }
+    /**
+     * Forecast sector focus
+     */
 
-    for (let i = 0, l = eph.length; i < l; i++) {
-      eph[i] > mph && (mph = eph[i], mpht = i)
-    }
+    sf() {
+      let ent = Log.data.getEntriesByDay(new Date().getDay())
+      let s = Log.data.listSectors(ent)
+      let sf = 0
+      let sfs = ''
 
-    for (let i = 0, l = p.length; i < l; i++) {
-      let x = Log.data.pp(p[i], ent)
-      x > pf && (pf = x, pfp = p[i])
-    }
+      for (let i = 0, l = s.length; i < l; i++) {
+        let x = Log.data.sp(s[i], ent)
+        x > sf && (sf = x, sfs = s[i])
+      }
 
-    return {
-      sf: sfs,
-      pf: pfp,
-      pt: `${mpht}:00`,
-      sd: Log.data.asd(ent)
+      return sfs
+    },
+
+    /**
+     * Forecast project focus
+     */
+
+    pf() {
+      let ent = Log.data.getEntriesByDay(new Date().getDay())
+      let p = Log.data.listProjects(ent)
+      let pf = 0
+      let pfp = ''
+
+      for (let i = 0, l = p.length; i < l; i++) {
+        let x = Log.data.pp(p[i], ent)
+        x > pf && (pf = x, pfp = p[i])
+      }
+
+      return pfp
+    },
+
+    /**
+     * Forecast peak times
+     */
+
+    pt() {
+      let ent = Log.data.getEntriesByDay(new Date().getDay())
+      let eph = Log.data.peakHours(ent)
+      let mph = 0
+      let mpht = 0
+
+      for (let i = 0, l = eph.length; i < l; i++) {
+        eph[i] > mph && (mph = eph[i], mpht = i)
+      }
+
+      return `${mpht}:00`
+    },
+
+    /**
+     * Forecast session duration
+     */
+
+    sd() {
+      return Log.data.asd(Log.data.getEntriesByDay(new Date().getDay()))
     }
   }
 }
