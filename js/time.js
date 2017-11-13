@@ -139,6 +139,19 @@ Log.time = {
     return `over ${Math.floor(minutes / 525960)} years ago`
   },
 
+  listDates(start, end) {
+    let interval = 1
+    let list = []
+    let current = new Date(start.getFullYear(), start.getMonth(), start.getDate(), 0, 0, 0)
+
+    while (current <= end) {
+      list.push(new Date(current))
+      current = Date.prototype.addDays.call(current, 1)
+    }
+
+     return list
+  },
+
   /**
    * Calculate duration
    * @param {number} a - Start (Unix time)
