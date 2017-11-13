@@ -17,7 +17,7 @@ Log.vis = {
      * @param {Object} r - The Log entry's attributes
      */
 
-    let addEntry = ({s, c}, width, dp, margin) => {
+    let addEntry = ({s, c}, width, dp, margin, id) => {
       let v = document.createElement('div')
 
       v.className = 'psr t0 sh1 mb2 lf'
@@ -25,7 +25,7 @@ Log.vis = {
       v.style.margin = `0 0 0 ${margin}%`
       v.style.backgroundColor = Log.palette[c] || Log.config.ui.colour
 
-      let id = con + Log.time.date(Log.time.parse(s))
+      // let id = con + Log.time.date(Log.time.parse(s))
       document.getElementById(id).appendChild(v)
 
       lw = width
@@ -44,7 +44,7 @@ Log.vis = {
       let e = document.createElement('div')
 
       e.className = 'db wf sh1 mt2 mb3'
-      e.id = con + id
+      e.id = id
 
       document.getElementById(con).appendChild(e)
     }
@@ -66,13 +66,13 @@ Log.vis = {
       let end = Log.time.date(ee)
       let id = con + dt
 
-      check(id) && nr(dt)
+      check(id) && nr(id)
 
       let wi = Log.utils.calcWidth(ee, es)
       let dp = Log.utils.calcDP(es)
       let mr = Log.utils.calcMargin(dp, lw, lp)
 
-      addEntry(ent[i], wi, dp, mr)
+      addEntry(ent[i], wi, dp, mr, id)
     }
   },
 
@@ -91,9 +91,8 @@ Log.vis = {
      * @param {Object} r - A width
      */
 
-    let addEntry = ({s, c}, w) => {
+    let addEntry = ({s, c}, w, id) => {
       let d = document.createElement('div')
-      let id = Log.time.date(Log.time.parse(s))
 
       d.className = 'psa sw1'
       d.style.height = `${w}%`
@@ -127,16 +126,24 @@ Log.vis = {
       document.getElementById(con).appendChild(dy)
     }
 
-    for (let i = 0, l = ent.length; i < l; i++) {
-      if (ent[i].e === 'undefined') continue
+    let sort = Log.data.sortEntries(ent)
 
-      let s = Log.time.parse(ent[i].s)
-      let e = Log.time.parse(ent[i].e)
-      let d = Log.time.date(s)
+    for (let i = 0, l = sort.length; i < l; i++) {
+      let id = `${con}-${i}`
 
-      document.getElementById(d) === null && nc(d)
+      document.getElementById(id) === null && nc(id)
 
-      addEntry(ent[i], Log.utils.calcWidth(e, s))
+      for (let o = 0, l = sort[i].length; o < l; o++) {
+        if (sort[i][o].e === 'undefined') continue
+
+        if (o === 0) lw = 0
+
+        let s = Log.time.parse(sort[i][o].s)
+        let e = Log.time.parse(sort[i][o].e)
+        // let d = Log.time.date(s)
+
+        addEntry(sort[i][o], Log.utils.calcWidth(e, s), id)
+      }
     }
   },
 
@@ -311,10 +318,12 @@ Log.vis = {
       st.className = 'f6 rf'
       br.className = 'wf sh1'
       dt.className = 'psr t0 hf lf'
-      dt.style.backgroundColor = Log.config.ui.colour
+      dt.style.backgroundColor = Log.palette[sec] || Log.config.ui.colour
       dt.style.width = `${(Log.data.sp(sec, ent))}%`
       tl.innerHTML = sec
       st.innerHTML = `${sh.toFixed(2)} h`
+
+      li.setAttribute('onclick', `Log.detail.sector('${sec}')`)
 
       br.appendChild(dt)
       li.appendChild(tl)
@@ -360,6 +369,8 @@ Log.vis = {
       dt.style.width = `${(Log.data.pp(pro, ent))}%`
       tl.innerHTML = pro
       st.innerHTML = `${sh.toFixed(2)} h`
+
+      li.setAttribute('onclick', `Log.detail.project('${pro}')`)
 
       br.appendChild(dt)
       li.appendChild(tl)
