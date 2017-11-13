@@ -12,7 +12,7 @@
 </head>
 <body id="app" class="noselect r p4 p5-m p5-l hf cn">
 
-  <header class="mb4 f6">
+  <header class="mb4 f6 lhc">
     <h1 class="dib mr4 f5 upc tk">Log</h1>
 
     <button id="b-ovw" class="pv1 tab on bg-cl of mr3" onclick="Log.tab('ovw')" title="Overview">&#128902;</button>
@@ -85,7 +85,7 @@
         <div id="dayChart" class="mb3 psr wf sh2" title="Today's Timeline"></div>
       </div>
 
-      <div id="weekChart" class="nodrag vh3 mb4"></div>
+      <div id="weekChart" class="nodrag h5 mb4"></div>
 
       <ul class="lsn f6 lhc">
         <li class="mb4 w5 w2-m w2-l lf">
@@ -135,43 +135,168 @@
 
   <div id="lis" class="dn sect h9 r">
 
-    <div class="c2 hf-l">
-      <h3 id="sectorsTitle" class="dib mb3 f6 fwn"></h3> <span id="sectorsListCount" class="f6">0</span>
-      <ul id="sectorsList" class="nodrag lsn h9-l oya-l pr3"></ul>
+    <div class="mb3">
+      <button id="b-sum" class="pv1 subtab on bg-cl of mr3" onclick="Log.subtab('sum')" title="Summary">Summary</button>
+      <button id="b-sec" class="pv1 subtab on bg-cl o5 mr3" onclick="Log.subtab('sec')" title="Sectors">Sectors</button>
+      <button id="b-pro" class="pv1 subtab on bg-cl o5 mr3" onclick="Log.subtab('pro')" title="Projects">Projects</button>
     </div>
 
-    <div class="c8 ph4-l">
-      <h3 id="statsTitle" class="mb4 f6 fwn"></h3>
+    <div id="sum" class="subsect h8 r">
+      <div class="c7 pr4-l hf-l oya-l">
+        <h3 id="statsTitle" class="dn mb4 f6 fwn"></h3>
 
-      <div class="mb4 vh3 wf" id="peakTimesHistory" title="Peak Times: What your average day looks like"></div>
+        <h3 class="mb4 f6 fwn">Average Day</h3>
 
-      <ul class="lsn f6 lhc">
-        <li class="mb4 w5 w2-m w2-l lf">
-          <p class="f3 fwb"><span id="LHH">0.00</span> h</p>
-          <p class="f6" title="Logged Hours (History)">LHh</p>
-        </li>
-        <li class="mb4 w5 w2-m w2-l lf">
-          <p class="f3 fwb"><span id="LSNH">0.00</span> h</p>
-          <p class="f6" title="Smallest Log Session (History)">LShn</p>
-        </li>
-        <li class="mb4 w5 w2-m w2-l lf">
-          <p class="f3 fwb"><span id="LSXH">0.00</span> h</p>
-          <p class="f6" title="Longest Log Session (History)">LShx</p>
-        </li>
-        <li class="mb4 w5 w2-m w2-l lf">
-          <p class="f3 fwb"><span id="LPH">0.00</span>%</p>
-          <p class="f6" title="Log Percentage (History)">LPh</p>
-        </li>
-        <li class="mb4 w5 w2-m w2-l lf">
-          <p class="f3 fwb"><span id="ASD">0.00</span> h</p>
-          <p class="f6" title="Average Session Duration (History)">ASD</p>
-        </li>
-      </ul>
+        <div class="mb4 h4 wf" id="peakTimesHistory" title="Peak Times: What your average day looks like"></div>
+
+        <ul class="lsn f6 lhc">
+          <li class="mb4 w5 w2-m w2-l lf">
+            <p class="f3 fwb"><span id="LHH">0.00</span> h</p>
+            <p class="f6" title="Logged Hours (History)">LHh</p>
+          </li>
+          <li class="mb4 w5 w2-m w2-l lf">
+            <p class="f3 fwb"><span id="LSNH">0.00</span> h</p>
+            <p class="f6" title="Smallest Log Session (History)">LShn</p>
+          </li>
+          <li class="mb4 w5 w2-m w2-l lf">
+            <p class="f3 fwb"><span id="LSXH">0.00</span> h</p>
+            <p class="f6" title="Longest Log Session (History)">LShx</p>
+          </li>
+          <li class="mb4 w5 w2-m w2-l lf">
+            <p class="f3 fwb"><span id="LPH">0.00</span>%</p>
+            <p class="f6" title="Log Percentage (History)">LPh</p>
+          </li>
+          <li class="mb4 w5 w2-m w2-l lf">
+            <p class="f3 fwb"><span id="ASD">0.00</span> h</p>
+            <p class="f6" title="Average Session Duration (History)">ASD</p>
+          </li>
+          <li class="mb4 w5 w2-m w2-l lf">
+            <p class="f3 fwb"><span id="PHH">0:00</span></p>
+            <p class="f6" title="Peak Hour (History)">PHh</p>
+          </li>
+          <li class="mb4 w5 w2-m w2-l lf">
+            <p class="f3 fwb"><span id="PDH">0.00</span></p>
+            <p class="f6" title="Peak Day (History)">PDh</p>
+          </li>
+        </ul>
+      </div>
+
+      <div class="nodrag c5 pl4-l hf-l oya-l">
+
+        <p class="f6 lhc">Sun</p>
+        <div id="sunPeakTimes" class="mb3 vh1 wf bb"></div>
+        <p class="f6 lhc">Mon</p>
+        <div id="monPeakTimes" class="mb3 vh1 wf bb"></div>
+        <p class="f6 lhc">Tue</p>
+        <div id="tuePeakTimes" class="mb3 vh1 wf bb"></div>
+        <p class="f6 lhc">Wed</p>
+        <div id="wedPeakTimes" class="mb3 vh1 wf bb"></div>
+        <p class="f6 lhc">Thu</p>
+        <div id="thuPeakTimes" class="mb3 vh1 wf bb"></div>
+        <p class="f6 lhc">Fri</p>
+        <div id="friPeakTimes" class="mb3 vh1 wf bb"></div>
+        <p class="f6 lhc">Sat</p>
+        <div id="satPeakTimes" class="vh1 wf bb"></div>
+
+      </div>
     </div>
 
-    <div class="c2 hf-l">
-      <h3 id="projectsTitle" class="dib mb3 f6 fwn"></h3>  <span id="projectsListCount" class="f6">0</span>
-      <ul id="projectsList" class="nodrag lsn h9-l oya-l pr3"></ul>
+    <div id="sec" class="dn subsect h9 r">
+      <div class="c2 hf-l">
+        <!-- <h3 id="sectorsTitle" class="dn dib mb3 f6 fwn"></h3> <span id="sectorsListCount" class="dn f6">0</span> -->
+        <ul id="sectorsList" class="nodrag lsn hf-l oya-l pr3"></ul>
+      </div>
+
+      <div class="ca pl4-l hf-l oya-l">
+        <h2 id="sectorTitle" class="mb1 f4 lht">Sector</h2>
+        <p class="mb3 f6">Last Activity: <span id="sectorLastUpdate"></span></p>
+
+        <div id="sectorChart" class="vh3 mb4"></div>
+
+        <ul class="lsn f6 lhc">
+          <li class="mb4 w5 w2-m w2-l lf">
+            <p class="f3 fwb"><span id="secLHH">0.00</span> h</p>
+            <p class="f6" title="Logged Hours (History)">LHh</p>
+          </li>
+          <li class="mb4 w5 w2-m w2-l lf">
+            <p class="f3 fwb"><span id="secLSNH">0.00</span> h</p>
+            <p class="f6" title="Smallest Log Session (History)">LShn</p>
+          </li>
+          <li class="mb4 w5 w2-m w2-l lf">
+            <p class="f3 fwb"><span id="secLSXH">0.00</span> h</p>
+            <p class="f6" title="Longest Log Session (History)">LShx</p>
+          </li>
+          <li class="mb4 w5 w2-m w2-l lf">
+            <p class="f3 fwb"><span id="secLPH">0.00</span>%</p>
+            <p class="f6" title="Log Percentage (History)">LPh</p>
+          </li>
+          <li class="mb4 w5 w2-m w2-l lf">
+            <p class="f3 fwb"><span id="secASD">0.00</span> h</p>
+            <p class="f6" title="Average Session Duration (History)">ASD</p>
+          </li>
+          <li class="mb4 w5 w2-m w2-l lf">
+            <p class="f3 fwb"><span id="secPHH">0:00</span> h</p>
+            <p class="f6" title="Peak Hour (History)">PHh</p>
+          </li>
+          <li class="mb4 w5 w2-m w2-l lf">
+            <p class="f3 fwb"><span id="secPDH">0.00</span></p>
+            <p class="f6" title="Peak Day (History)">PDh</p>
+          </li>
+          <li class="mb4 w5 w2-m w2-l lf">
+            <p class="f3 fwb"><span id="secStreak">0</span> d</p>
+            <p class="f6" title="Peak Day (History)">Streak</p>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <div id="pro" class="dn subsect h9 r">
+      <div class="c2 hf-l">
+        <h3 id="projectsTitle" class="dib mb3 f6 fwn"></h3>  <span id="projectsListCount" class="f6">0</span>
+        <ul id="projectsList" class="nodrag lsn h9-l oya-l pr3"></ul>
+      </div>
+
+      <div class="ca pl4-l hf-l oya-l">
+        <h2 id="projectTitle" class="mb1 f4 lht">Project</h2>
+        <p class="mb3 f6">Last Activity: <span id="projectLastUpdate"></span></p>
+
+        <div id="projectChart" class="vh3 mb4"></div>
+
+        <ul class="lsn f6 lhc">
+          <li class="mb4 w5 w2-m w2-l lf">
+            <p class="f3 fwb"><span id="proLHH">0.00</span> h</p>
+            <p class="f6" title="Logged Hours (History)">LHh</p>
+          </li>
+          <li class="mb4 w5 w2-m w2-l lf">
+            <p class="f3 fwb"><span id="proLSNH">0.00</span> h</p>
+            <p class="f6" title="Smallest Log Session (History)">LShn</p>
+          </li>
+          <li class="mb4 w5 w2-m w2-l lf">
+            <p class="f3 fwb"><span id="proLSXH">0.00</span> h</p>
+            <p class="f6" title="Longest Log Session (History)">LShx</p>
+          </li>
+          <li class="mb4 w5 w2-m w2-l lf">
+            <p class="f3 fwb"><span id="proLPH">0.00</span>%</p>
+            <p class="f6" title="Log Percentage (History)">LPh</p>
+          </li>
+          <li class="mb4 w5 w2-m w2-l lf">
+            <p class="f3 fwb"><span id="proASD">0.00</span> h</p>
+            <p class="f6" title="Average Session Duration (History)">ASD</p>
+          </li>
+          <li class="mb4 w5 w2-m w2-l lf">
+            <p class="f3 fwb"><span id="proPHH">0:00</span> h</p>
+            <p class="f6" title="Peak Hour (History)">PHh</p>
+          </li>
+          <li class="mb4 w5 w2-m w2-l lf">
+            <p class="f3 fwb"><span id="proPDH">0.00</span></p>
+            <p class="f6" title="Peak Day (History)">PDh</p>
+          </li>
+          <li class="mb4 w5 w2-m w2-l lf">
+            <p class="f3 fwb"><span id="proStreak">0</span> d</p>
+            <p class="f6" title="Streak">Streak</p>
+          </li>
+        </ul>
+      </div>
     </div>
   </div>
 
@@ -212,7 +337,7 @@
           <tr><td>LHh</td><td>Total logged hours over all</td></tr>
           <tr><td>LShn</td><td>Shortest log session</td></tr>
           <tr><td>LShx</td><td>Longest log session</td></tr>
-          <tr><td>LPt</td><td>Log percentage; how much of the time period was logged</td></tr>
+          <tr><td>LPh</td><td>Log percentage; how much of the time period was logged</td></tr>
           <tr><td>ASD</td><td>Average session duration</td></tr>
           <tr><td>SF</td><td>Forecasted sector focus</td></tr>
           <tr><td>PF</td><td>Forecasted project focus</td></tr>

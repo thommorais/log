@@ -135,6 +135,73 @@ var Log = {
     for (let i = 0, l = b.length; i < l; i++) en(b[i], i)
   },
 
+  detail: {
+
+    sector(sec) {
+      let ent = Log.data.getEntriesBySector(sec)
+
+      Log.detail.clear.sector()
+
+      document.getElementById('sectorTitle').innerHTML = sec
+
+      document.getElementById('sectorLastUpdate').innerHTML = Log.time.timeago(Log.time.parse(ent[ent.length - 1].e) * 1E3)
+
+      Log.vis.bar('sectorChart', ent)
+
+      document.getElementById('secLHH').innerHTML = Log.data.lh(ent).toFixed(2)
+      document.getElementById('secLPH').innerHTML = Log.data.lp(ent).toFixed(2)
+      document.getElementById('secASD').innerHTML = Log.data.asd(ent).toFixed(2)
+      document.getElementById('secLSNH').innerHTML = Log.data.lsmin(ent).toFixed(2)
+      document.getElementById('secLSXH').innerHTML = Log.data.lsmax(ent).toFixed(2)
+
+      document.getElementById('secPHH').innerHTML = Log.data.peakHour(ent)
+      document.getElementById('secPDH').innerHTML = Log.data.peakDay(ent)
+
+      document.getElementById('secStreak').innerHTML = Log.data.streak(ent)
+    },
+
+    project(pro) {
+      let ent = Log.data.getEntriesByProject(pro)
+
+      Log.detail.clear.project()
+
+      document.getElementById('projectTitle').innerHTML = pro
+
+      document.getElementById('projectLastUpdate').innerHTML = Log.time.timeago(Log.time.parse(ent[ent.length - 1].e) * 1E3)
+
+      Log.vis.bar('projectChart', ent)
+
+      document.getElementById('proLHH').innerHTML = Log.data.lh(ent).toFixed(2)
+      document.getElementById('proLPH').innerHTML = Log.data.lp(ent).toFixed(2)
+      document.getElementById('proASD').innerHTML = Log.data.asd(ent).toFixed(2)
+      document.getElementById('proLSNH').innerHTML = Log.data.lsmin(ent).toFixed(2)
+      document.getElementById('proLSXH').innerHTML = Log.data.lsmax(ent).toFixed(2)
+
+      document.getElementById('proPHH').innerHTML = Log.data.peakHour(ent)
+      document.getElementById('proPDH').innerHTML = Log.data.peakDay(ent)
+
+      document.getElementById('proStreak').innerHTML = Log.data.streak(ent)
+    },
+
+    clear: {
+
+      sector() {
+        document.getElementById('sectorTitle').innerHTML = ''
+        document.getElementById('sectorChart').innerHTML = ''
+        document.getElementById('secLHH').innerHTML = ''
+        document.getElementById('secLPH').innerHTML = ''
+        document.getElementById('secASD').innerHTML = ''
+        document.getElementById('secLSNH').innerHTML = ''
+        document.getElementById('secLSXH').innerHTML = ''
+      },
+
+      project() {
+        document.getElementById('projectTitle').innerHTML = ''
+        document.getElementById('projectChart').innerHTML = ''
+      }
+    },
+  },
+
   utils: {
 
     /**
@@ -295,7 +362,7 @@ var Log = {
     ic('overviewTitle', '&#128902;&#xFE0E;', 'Overview')
     ic('sectorsTodayTitle', '&#11206;&#xFE0E;', 'Sectors')
     ic('projectsTodayTitle', '&#9964;&#xFE0E;', 'Projects')
-    ic('sectorsTitle', '&#11206;&#xFE0E;', 'Sectors')
+    // ic('sectorsTitle', '&#11206;&#xFE0E;', 'Sectors')
     ic('statsTitle', '&#9650;&#xFE0E;', 'Statistics')
     ic('projectsTitle', '&#9964;&#xFE0E;', 'Projects')
 
@@ -361,12 +428,10 @@ var Log = {
     Log.vis.peakD()
     Log.vis.day()
 
-    let fc = Log.data.forecast()
-
-    document.getElementById('fsf').innerHTML = fc.sf
-    document.getElementById('fpf').innerHTML = fc.pf
-    document.getElementById('fpt').innerHTML = fc.pt
-    document.getElementById('fsd').innerHTML = fc.sd.toFixed(2) + ' h'
+    document.getElementById('fsf').innerHTML = Log.data.forecast.sf()
+    document.getElementById('fpf').innerHTML = Log.data.forecast.pf()
+    document.getElementById('fpt').innerHTML = Log.data.forecast.pt()
+    document.getElementById('fsd').innerHTML = `${Log.data.forecast.sd().toFixed(2)} h`
 
     Log.timer(Log.status())
 
@@ -400,13 +465,25 @@ var Log = {
       t(tels[i], tval[i])
     }
 
+    document.getElementById('PHH').innerHTML = ld.peakHour()
+    document.getElementById('PDH').innerHTML = ld.peakDay()
+
     Log.vis.peakH(undefined, 'peakTimesHistory')
+
+    Log.vis.peakH(Log.data.getEntriesByDay(0), 'sunPeakTimes')
+    Log.vis.peakH(Log.data.getEntriesByDay(1), 'monPeakTimes')
+    Log.vis.peakH(Log.data.getEntriesByDay(2), 'tuePeakTimes')
+    Log.vis.peakH(Log.data.getEntriesByDay(3), 'wedPeakTimes')
+    Log.vis.peakH(Log.data.getEntriesByDay(4), 'thuPeakTimes')
+    Log.vis.peakH(Log.data.getEntriesByDay(5), 'friPeakTimes')
+    Log.vis.peakH(Log.data.getEntriesByDay(6), 'satPeakTimes')
+
     Log.vis.sectorBars(en)
     Log.vis.projectBars(en)
 
     Log.vis.sectorBars(undefined, 'sectorsList')
 
-    document.getElementById('sectorsListCount').innerHTML = `(${Log.data.listSectors().length})`
+    // document.getElementById('sectorsListCount').innerHTML = `(${Log.data.listSectors().length})`
 
     Log.vis.projectBars(undefined, 'projectsList')
 
