@@ -71,10 +71,10 @@ Log.data = {
     }
   },
 
-  sortEntries(a = Log.log) {
+  sortEntries(a = Log.log, end = new Date()) {
     let days = Log.time.listDates(
       Log.time.convert(Log.time.parse(a[0].s)),
-      Log.time.convert(Log.time.parse(a[a.length - 1].s))
+      end
     )
     let list = []
     let slots = []
@@ -505,6 +505,18 @@ Log.data = {
 
   trend(a, b) {
     return (a - b) / b * 100
+  },
+
+  streak(a = Log.log) {
+    let ent = Log.data.sortEntries(a)
+    let streak = 0
+
+    for (let i = 0, l = ent.length; i < l; i++) {
+      if (ent[i].length === 0) streak = 0
+      else streak++
+    }
+
+    return streak
   },
 
   /**
