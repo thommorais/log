@@ -8,6 +8,7 @@ var user = {
       font: "sans-serif",
       icons: false,
       view: 28,
+      tableView: 50
     },
     system: {
       calendar: "gregorian",
@@ -15,5 +16,6 @@ var user = {
     }
   },
   palette: {},
+  history: [],
   log: []
 }
