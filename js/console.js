@@ -3,7 +3,7 @@ Log.console = {
   history: [],
 
   commands: [
-    'start', 'end', 'delete', 'set', 'import', 'filter', 'export'
+    'start', 'end', 'delete', 'set', 'import', 'filter', 'export', 'invert'
   ],
 
   /**
@@ -37,6 +37,8 @@ Log.console = {
         case 6:
           Log.console.exportUser();
           break;
+        case 7:
+          Log.console.invert();
       }
     } else return
   },
@@ -167,6 +169,18 @@ Log.console = {
     } else if (a === 'category' || a === 'sector' || a === 'cat' || a === 'sec') {
       Log.options.setColourCode(i)
     } else return
+  },
+
+  /**
+   * Invert interface colours
+   */
+
+  invert() {
+    let bg = user.config.ui.bg
+    let c = user.config.ui.colour
+    user.config.ui.bg = c
+    user.config.ui.colour = bg
+    Log.options.update()
   },
 
   /**
