@@ -1,6 +1,10 @@
 Log = window.Log || {}
 Log.options = {
 
+  /**
+   * Update settings
+   */
+
   update() {
     localStorage.setItem('user', JSON.stringify(user))
     Log.refresh()

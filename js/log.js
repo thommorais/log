@@ -137,69 +137,74 @@ var Log = {
 
   detail: {
 
-    sector(sec) {
+    /**
+     * View sector details
+     * @param {string} sec - Sector
+     */
+
+    sector(sec = Log.data.listSectors()[0]) {
       let ent = Log.data.getEntriesBySector(sec)
 
       Log.detail.clear.sector()
 
-      document.getElementById('sectorTitle').innerHTML = sec
-
-      document.getElementById('sectorLastUpdate').innerHTML = Log.time.timeago(Log.time.parse(ent[ent.length - 1].e) * 1E3)
+      Log.ui.write('sectorTitle', sec)
+      Log.ui.write('sectorLastUpdate', Log.time.timeago(Log.time.parse(ent[ent.length - 1].e) * 1E3))
 
       Log.vis.bar('sectorChart', ent)
 
-      document.getElementById('secLHH').innerHTML = Log.data.lh(ent).toFixed(2)
-      document.getElementById('secLPH').innerHTML = Log.data.lp(ent).toFixed(2)
-      document.getElementById('secASD').innerHTML = Log.data.asd(ent).toFixed(2)
-      document.getElementById('secLSNH').innerHTML = Log.data.lsmin(ent).toFixed(2)
-      document.getElementById('secLSXH').innerHTML = Log.data.lsmax(ent).toFixed(2)
-
-      document.getElementById('secPHH').innerHTML = Log.data.peakHour(ent)
-      document.getElementById('secPDH').innerHTML = Log.data.peakDay(ent)
-
-      document.getElementById('secStreak').innerHTML = Log.data.streak(ent)
+      Log.ui.write('secLHH', Log.data.lh(ent).toFixed(2))
+      Log.ui.write('secLPH', Log.data.lp(ent).toFixed(2))
+      Log.ui.write('secASD', Log.data.asd(ent).toFixed(2))
+      Log.ui.write('secLSNH', Log.data.lsmin(ent).toFixed(2))
+      Log.ui.write('secLSXH', Log.data.lsmax(ent).toFixed(2))
+      Log.ui.write('secPHH', Log.data.peakHour(ent))
+      Log.ui.write('secPDH', Log.data.peakDay(ent))
+      Log.ui.write('secStreak', Log.data.streak(ent))
     },
 
-    project(pro) {
+    /**
+     * View project details
+     * @param {string} pro - Project
+     */
+
+    project(pro = Log.data.listProjects()[0]) {
       let ent = Log.data.getEntriesByProject(pro)
 
       Log.detail.clear.project()
 
-      document.getElementById('projectTitle').innerHTML = pro
+      Log.ui.write('projectTitle', pro)
 
-      document.getElementById('projectLastUpdate').innerHTML = Log.time.timeago(Log.time.parse(ent[ent.length - 1].e) * 1E3)
+      Log.ui.write('projectLastUpdate', Log.time.timeago(Log.time.parse(ent[ent.length - 1].e) * 1E3))
 
       Log.vis.bar('projectChart', ent)
 
-      document.getElementById('proLHH').innerHTML = Log.data.lh(ent).toFixed(2)
-      document.getElementById('proLPH').innerHTML = Log.data.lp(ent).toFixed(2)
-      document.getElementById('proASD').innerHTML = Log.data.asd(ent).toFixed(2)
-      document.getElementById('proLSNH').innerHTML = Log.data.lsmin(ent).toFixed(2)
-      document.getElementById('proLSXH').innerHTML = Log.data.lsmax(ent).toFixed(2)
+      Log.ui.write('proLHH', Log.data.lh(ent).toFixed(2))
+      Log.ui.write('proLPH', Log.data.lp(ent).toFixed(2))
+      Log.ui.write('proASD', Log.data.asd(ent).toFixed(2))
+      Log.ui.write('proLSNH', Log.data.lsmin(ent).toFixed(2))
+      Log.ui.write('proLSXH', Log.data.lsmax(ent).toFixed(2))
 
-      document.getElementById('proPHH').innerHTML = Log.data.peakHour(ent)
-      document.getElementById('proPDH').innerHTML = Log.data.peakDay(ent)
+      Log.ui.write('proPHH', Log.data.peakHour(ent))
+      Log.ui.write('proPDH', Log.data.peakDay(ent))
 
-      document.getElementById('proStreak').innerHTML = Log.data.streak(ent)
+      Log.ui.write('proStreak', Log.data.streak(ent))
     },
 
     clear: {
 
       sector() {
-        document.getElementById('sectorTitle').innerHTML = ''
-        document.getElementById('sectorChart').innerHTML = ''
-        document.getElementById('secLHH').innerHTML = ''
-        document.getElementById('secLPH').innerHTML = ''
-        document.getElementById('secASD').innerHTML = ''
-        document.getElementById('secLSNH').innerHTML = ''
-        document.getElementById('secLSXH').innerHTML = ''
+        let el = 'sectorTitle sectorChart secLHH secLPH secASD secLSNH secLSXH'.split(' ')
+
+        for (let i = 0, l = el.length; i < l; i++) {
+          Log.ui.empty(el[i])
+        }
       },
 
       project() {
-        document.getElementById('projectTitle').innerHTML = ''
-        document.getElementById('projectChart').innerHTML = ''
+        Log.ui.empty('projectTitle')
+        Log.ui.empty('projectChart')
       }
-    },
+    }
   },
 
   utils: {
@@ -216,9 +221,17 @@ var Log = {
       })
     },
 
+    /**
+     * Calculate width
+     */
+
     calcWidth(a, b) {
       return (a - b) / 86400 * 100
     },
+
+    /**
+     * Calculate DP
+     */
 
     calcDP(a) {
       let s = Log.time.convert(a)
@@ -267,12 +280,36 @@ var Log = {
     }
 
     for (let i = 0, l = b.length; i < l; i++) {
-      b[i].className = 'pv1 subtab on bg-cl o5 mr3'
+      b[i].className = 'db mb3 subtab on bg-cl o5 mr3'
     }
 
     document.getElementById(s).style.display = 'block'
-    document.getElementById(`b-${s}`).className = 'pv1 subtab on bg-cl of mr3'
+    document.getElementById(`b-${s}`).className = 'db mb3 subtab on bg-cl of mr3'
   },
+
+  /**
+   * Open a daytab
+   */
+
+  daytab(s) {
+    let x = document.getElementsByClassName('daysect')
+    let b = document.getElementsByClassName('daytab')
+
+    for (let i = 0, l = x.length; i < l; i++) {
+      x[i].style.display = 'none'
+    }
+
+    for (let i = 0, l = b.length; i < l; i++) {
+      b[i].className = 'pv0 daytab on bg-cl o5 mr3'
+    }
+
+    document.getElementById(s).style.display = 'block'
+    document.getElementById(`b-${s}`).className = 'pv0 daytab on bg-cl of mr3'
+  },
+
+  /**
+   * Refresh
+   */
 
   refresh() {
     Log.reset()
@@ -281,51 +318,37 @@ var Log = {
 
   res: {
 
+    /**
+     * Reset timer
+     */
+
     timer() {
       clearInterval(Log.clock)
-      document.getElementById('timer').innerHTML = '00:00:00'
+      Log.ui.write('timer', '00:00:00')
     },
+
+    /**
+     * Reset forecasts
+     */
 
     forecast() {
-      document.getElementById('fsf').innerHTML = '???'
-      document.getElementById('fpf').innerHTML = '???'
-      document.getElementById('fpt').innerHTML = '00:00'
-      document.getElementById('fsd').innerHTML = '0.00 h'
-    },
-
-    stats() {
-      let e = 'LHH LHT LPH LPT ASD ASDT LSN LSX LSNH LSXH'.split(' ')
-      let r = e => document.getElementById(e).innerHTML = '0.00'
-      for (let i = 0, l = e.length; i < l; i++) r(e[i])
-    },
-
+      Log.ui.write('fsf', '???')
+      Log.ui.write('fpf', '???')
+      Log.ui.write('fpt', '00:00')
+      Log.ui.write('fsd', '0.00 h')
+    }
   },
 
   reset() {
-    let c = e => document.getElementById(e).innerHTML = ''
-
     Log.res.timer()
     Log.res.forecast()
 
-    c('phc')
-    c('pdc')
-    c('dayChart')
-    c('weekChart')
+    let el = 'phc pdc dayChart weekChart peakTimesHistory sectorBars projectBars sectorsList projectsList vis logbook LHH LHT LPH LPT ASD ASDT LSN LSX LSNH LSXH'.split(' ')
 
-    Log.res.stats()
-
-    c('peakTimesHistory')
-    c('sectorBars')
-    c('projectBars')
-    c('sectorsList')
-    c('projectsList')
-    c('vis')
-    c('logbook')
+    for (let i = 0, l = el.length; i < l; i++) {
+      Log.ui.empty(el[i])
+    }
   },
-
-  /**
-   * Initialise
-   */
 
   init(log) {
     try {
@@ -338,73 +361,123 @@ var Log = {
         localStorage.setItem('user', JSON.stringify(user))
       }
     } catch(e) {
-      localStorage.clear()
+      // localStorage.clear()
+      return
     }
 
     Log.log = user.log
     Log.config = user.config
     Log.palette = user.palette
 
-    let icon = user.config.ui.icons
+    Log.ui.icon('b-ovw', '&#128902;&#xFE0E;', 'Overview')
+    Log.ui.icon('b-lis', '&#9783;&#xFE0E;', 'Details')
+    Log.ui.icon('b-vis', '&#9781;&#xFE0E;', 'Visualisation')
+    Log.ui.icon('b-tab', '&#128911;&#xFE0E;', 'Entries')
+    Log.ui.icon('b-set', '?', 'Guide')
 
-    let ic = (a, b, c) => {
-      document.getElementById(a).innerHTML = icon ? b : c
-    }
+    Log.ui.icon('peakTimesTitle', '&#9650;&#xFE0E;', 'Peaks')
+    Log.ui.icon('forecastTitle', '&#9670;&#xFE0E;', 'Forecast')
+    Log.ui.icon('overviewTitle', '&#128902;&#xFE0E;', 'Overview')
+    Log.ui.icon('sectorsTodayTitle', '&#11206;&#xFE0E;', 'Sectors')
+    Log.ui.icon('projectsTodayTitle', '&#9964;&#xFE0E;', 'Projects')
+    Log.ui.icon('statsTitle', '&#9650;&#xFE0E;', 'Statistics')
 
-    ic('b-ovw', '&#128902;&#xFE0E;', 'Overview')
-    ic('b-lis', '&#9783;&#xFE0E;', 'Details')
-    ic('b-vis', '&#9781;&#xFE0E;', 'Visualisation')
-    ic('b-tab', '&#128911;&#xFE0E;', 'Table')
-    ic('b-set', '?', 'Guide')
-
-    ic('peakTimesTitle', '&#9650;&#xFE0E;', 'Peak Times')
-    ic('forecastTitle', '&#9670;&#xFE0E;', 'Forecast')
-    ic('overviewTitle', '&#128902;&#xFE0E;', 'Overview')
-    ic('sectorsTodayTitle', '&#11206;&#xFE0E;', 'Sectors')
-    ic('projectsTodayTitle', '&#9964;&#xFE0E;', 'Projects')
-    // ic('sectorsTitle', '&#11206;&#xFE0E;', 'Sectors')
-    ic('statsTitle', '&#9650;&#xFE0E;', 'Statistics')
-    ic('projectsTitle', '&#9964;&#xFE0E;', 'Projects')
-
-    ic('tableDate', '&#128710;&#xFE0E;', 'Date')
-    ic('tableStart', '&#9210;&#xFE0E;', 'Start')
-    ic('tableEnd', '&#9209;&#xFE0E;', 'End')
-    ic('tableDuration', '&#11118;&#xFE0E;', 'Duration')
-    ic('tableSector', '&#11206;&#xFE0E;', 'Sector')
-    ic('tableProject', '&#9964;&#xFE0E;', 'Project')
-    ic('tableActivity', '&#11042;&#xFE0E;', 'Activity')
+    Log.ui.icon('tableDate', '&#128710;&#xFE0E;', 'Date')
+    Log.ui.icon('tableStart', '&#9210;&#xFE0E;', 'Start')
+    Log.ui.icon('tableEnd', '&#9209;&#xFE0E;', 'End')
+    Log.ui.icon('tableDuration', '&#11118;&#xFE0E;', 'Duration')
+    Log.ui.icon('tableSector', '&#11206;&#xFE0E;', 'Sector')
+    Log.ui.icon('tableProject', '&#9964;&#xFE0E;', 'Project')
+    Log.ui.icon('tableActivity', '&#11042;&#xFE0E;', 'Activity')
 
     document.getElementById('app').style.backgroundColor = Log.config.ui.bg
     document.getElementById('app').style.color = Log.config.ui.colour
-    document.getElementById('app').style.fontFamily = Log.config.ui.font
 
-    document.getElementById('cmd').addEventListener('submit', function() {
-      Log.console.parse(document.getElementById('console').value)
-      document.getElementById('console').value = ''
+    let cmd = document.getElementById('cmd')
+    let con = document.getElementById('console')
+
+    let cmdIndex = 1
+
+    cmd.addEventListener('submit', function() {
+      Log.console.history.push(con.value)
+      Log.console.parse(con.value)
+      con.value = ''
+      cmd.style.display = 'none'
+      cmdIndex = 0
+    })
+
+    cmd.addEventListener('keydown', function(e) {
+      if (e.which === 38) {
+        cmdIndex++
+        con.value = Log.console.history[Log.console.history.length - cmdIndex]
+      } else if (e.which === 40) {
+        cmdIndex--
+
+        if (cmdIndex < 0) cmdIndex = 0
+        con.value = Log.console.history[Log.console.history.length - cmdIndex]
+      }
     })
 
     document.addEventListener('keydown', function(e) {
       if (e.which >= 65 && e.which <= 90) {
-        document.getElementById('cmd').style.display = 'block'
-        document.getElementById('console').focus()
+        cmd.style.display = 'block'
+        con.focus()
       } else if (e.key === 'Escape') {
-        document.getElementById('console').value = ''
-        document.getElementById('cmd').style.display = 'none'
+        con.value = ''
+        cmd.style.display = 'none'
+        cmdIndex = 0
       }
     })
 
     if (Log.log.length === 0) return
 
-    let ld = Log.data
     let n = new Date()
     let y = new Date(n)
 
-    let d = (e, m) => {
-      document.getElementById(e).innerHTML = m.toFixed(2)
-    }
+    y.setDate(n.getDate() - 1)
 
-    let s = (e, c) => {
-      document.getElementById(e).className = c
+    let en = Log.data.getEntries(n)
+    let ey = Log.data.getEntries(y)
+    let mn = Log.data.getRecentEntries(Log.config.ui.view - 1)
+
+    let entriesByDay = Log.data.sortEntriesByDay()
+
+    Log.vis.bar('weekChart', Log.data.parse(mn))
+    Log.vis.peakH(entriesByDay[n.getDay()])
+    Log.vis.peakD()
+    Log.vis.day()
+
+    Log.ui.write('fsf', Log.data.forecast.sf())
+    Log.ui.write('fpf', Log.data.forecast.pf())
+    Log.ui.write('fpt', Log.data.forecast.pt())
+    Log.ui.write('fsd', `${Log.data.forecast.sd().toFixed(2)} h`)
+
+    Log.timer(Log.status())
+
+    let lhh = Log.data.lh()
+    let lht = Log.data.lh(en)
+    let lph = Log.data.lp()
+    let lpt = Log.data.lp(en)
+    let asd = Log.data.asd()
+    let asdt = Log.data.asd(en)
+    let lsn = Log.data.lsmin(en)
+    let lsx = Log.data.lsmax(en)
+    let lsnh = Log.data.lsmin()
+    let lsxh = Log.data.lsmax()
+
+    let lhtt = Log.data.trend(lht, Log.data.lh(ey))
+    let asdtt = Log.data.trend(asdt, Log.data.asd(ey))
+    let lptt = Log.data.trend(lpt, Log.data.lp(ey))
+    let lsnt = Log.data.trend(lsn, Log.data.lsmin(ey))
+    let lsxt = Log.data.trend(lsx, Log.data.lsmax(ey))
+
+    let els = ['LHH', 'LHT', 'LPH', 'LPT', 'ASD', 'ASDT', 'LSN', 'LSX', 'LSNH', 'LSXH']
+    let val = [lhh, lht, lph, lpt, asd, asdt, lsn, lsx, lsnh, lsxh]
+    let tels = ['lhtt', 'asdtt', 'lptt', 'lsnt', 'lsxt']
+    let tval = [lhtt, asdtt, lptt, lsnt, lsxt]
+
+    for (let i = 0, l = els.length; i < l; i++) {
+      Log.ui.write(els[i], val[i].toFixed(2))
     }
 
     let t = (e, c) => {
@@ -417,77 +490,31 @@ var Log = {
       d.innerHTML = s
     }
 
-    y.setDate(n.getDate() - 1)
-
-    let en = Log.data.getEntries(n)
-    let ey = Log.data.getEntries(y)
-    let mn = Log.data.getRecentEntries(Log.config.ui.view - 1)
-
-    Log.vis.bar('weekChart', Log.data.parse(mn))
-    Log.vis.peakH(Log.data.getEntriesByDay(n.getDay()))
-    Log.vis.peakD()
-    Log.vis.day()
-
-    document.getElementById('fsf').innerHTML = Log.data.forecast.sf()
-    document.getElementById('fpf').innerHTML = Log.data.forecast.pf()
-    document.getElementById('fpt').innerHTML = Log.data.forecast.pt()
-    document.getElementById('fsd').innerHTML = `${Log.data.forecast.sd().toFixed(2)} h`
-
-    Log.timer(Log.status())
-
-    let lhh = ld.lh()
-    let lht = ld.lh(en)
-    let lph = ld.lp()
-    let lpt = ld.lp(en)
-    let asd = ld.asd()
-    let asdt = ld.asd(en)
-    let lsn = ld.lsmin(en)
-    let lsx = ld.lsmax(en)
-    let lsnh = ld.lsmin()
-    let lsxh = ld.lsmax()
-
-    let lhtt = ld.trend(lht, ld.lh(ey))
-    let asdtt = ld.trend(asdt, ld.asd(ey))
-    let lptt = ld.trend(lpt, ld.lp(ey))
-    let lsnt = ld.trend(lsn, ld.lsmin(ey))
-    let lsxt = ld.trend(lsx, ld.lsmax(ey))
-
-    let els = ['LHH', 'LHT', 'LPH', 'LPT', 'ASD', 'ASDT', 'LSN', 'LSX', 'LSNH', 'LSXH']
-    let val = [lhh, lht, lph, lpt, asd, asdt, lsn, lsx, lsnh, lsxh]
-    let tels = ['lhtt', 'asdtt', 'lptt', 'lsnt', 'lsxt']
-    let tval = [lhtt, asdtt, lptt, lsnt, lsxt]
-
-    for (let i = 0, l = els.length; i < l; i++) {
-      document.getElementById(els[i]).innerHTML = val[i].toFixed(2)
-    }
-
     for (let i = 0, l = tels.length; i < l; i++) {
       t(tels[i], tval[i])
     }
 
-    document.getElementById('PHH').innerHTML = ld.peakHour()
-    document.getElementById('PDH').innerHTML = ld.peakDay()
+    Log.ui.write('PHH', Log.data.peakHour())
+    Log.ui.write('PDH', Log.data.peakDay())
 
     Log.vis.peakH(undefined, 'peakTimesHistory')
 
-    Log.vis.peakH(Log.data.getEntriesByDay(0), 'sunPeakTimes')
-    Log.vis.peakH(Log.data.getEntriesByDay(1), 'monPeakTimes')
-    Log.vis.peakH(Log.data.getEntriesByDay(2), 'tuePeakTimes')
-    Log.vis.peakH(Log.data.getEntriesByDay(3), 'wedPeakTimes')
-    Log.vis.peakH(Log.data.getEntriesByDay(4), 'thuPeakTimes')
-    Log.vis.peakH(Log.data.getEntriesByDay(5), 'friPeakTimes')
-    Log.vis.peakH(Log.data.getEntriesByDay(6), 'satPeakTimes')
+    Log.vis.peakH(entriesByDay[0], 'sunPeakTimes')
+    Log.vis.peakH(entriesByDay[1], 'monPeakTimes')
+    Log.vis.peakH(entriesByDay[2], 'tuePeakTimes')
+    Log.vis.peakH(entriesByDay[3], 'wedPeakTimes')
+    Log.vis.peakH(entriesByDay[4], 'thuPeakTimes')
+    Log.vis.peakH(entriesByDay[5], 'friPeakTimes')
+    Log.vis.peakH(entriesByDay[6], 'satPeakTimes')
+
+    Log.detail.sector()
+    Log.detail.project()
 
     Log.vis.sectorBars(en)
     Log.vis.projectBars(en)
 
     Log.vis.sectorBars(undefined, 'sectorsList')
-
-    // document.getElementById('sectorsListCount').innerHTML = `(${Log.data.listSectors().length})`
-
     Log.vis.projectBars(undefined, 'projectsList')
-
-    document.getElementById('projectsListCount').innerHTML = `(${Log.data.listProjects().length})`
 
     Log.vis.line('vis', Log.data.parse(mn))
     Log.display(Log.log, 1000, 'logbook')

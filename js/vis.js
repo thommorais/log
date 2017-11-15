@@ -244,7 +244,7 @@ Log.vis = {
       v.style.width = '14.2857%' // 100 / 7
       v.id = t
 
-      n.className = `sw1 hf cn`
+      n.className = 'sw1 hf cn'
       n.style.backgroundColor = i === (new Date).getDay() ? Log.config.ui.accent : Log.config.ui.colour
 
       e.className = 'psa b0 wf'
@@ -382,6 +382,37 @@ Log.vis = {
 
     for (let i = 0, l = s.length; i < l; i++) {
       add(s[i])
+    }
+  },
+
+  forecastBar(con, ent) {
+    console.log(ent)
+    console.log(Log.utils.getMax(ent))
+
+    for (let i = 0, l = ent.length; i < l; i++) {
+      let dy = document.createElement('div')
+      let e = document.createElement('div')
+      let id = `${con}-${i}`
+
+      dy.className = 'dib hf psr'
+      dy.style.width = `${100 / ent.length}%`
+
+      e.className = 'sw1 hf cn'
+      e.id = id
+
+      dy.appendChild(e)
+
+      document.getElementById(con).appendChild(dy)
+
+      let d = document.createElement('div')
+
+      d.className = 'psa sw1'
+      d.style.height = `${ent[i] * 100}%`
+      d.style.bottom = `0`
+      d.style.backgroundColor = Log.config.ui.colour
+
+      document.getElementById(id).appendChild(d)
+
     }
   }
 }

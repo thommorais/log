@@ -71,6 +71,12 @@ Log.data = {
     }
   },
 
+  /**
+   * Sort entries by date
+   * @param {Object[]=} a - Entries
+   * @param {Object=} end - End date
+   */
+
   sortEntries(a = Log.log, end = new Date()) {
     let days = Log.time.listDates(
       Log.time.convert(Log.time.parse(a[0].s)),
@@ -96,6 +102,21 @@ Log.data = {
     }
 
     return slots
+  },
+
+  /**
+   * Sort entries by day
+   * @returns {Object[]} Entries sorted by day
+   */
+
+  sortEntriesByDay() {
+    let ent = []
+
+    for (let i = 0; i < 7; i++) {
+      ent.push(Log.data.getEntriesByDay(i))
+    }
+
+    return ent
   },
 
   /**
@@ -162,7 +183,9 @@ Log.data = {
     let g = ({s}) => Log.time.convert(Log.time.parse(s)).getDay()
 
     for (let i = 0, l = Log.log.length; i < l; i++) {
-      Log.log[i].e !== 'undefined' && g(Log.log[i]) == d && e.push(Log.log[i])
+      Log.log[i].e !== 'undefined'
+      && g(Log.log[i]) === d
+      && e.push(Log.log[i])
     }
 
     return e
@@ -230,7 +253,7 @@ Log.data = {
 
   /**
    * List sectors
-   * @param {Object[]=} ent - Log entries
+   * @param {Object[]=} ent - Entries
    * @returns {Object[]} A list of sectors
    */
 
@@ -333,7 +356,7 @@ Log.data = {
 
     let check = ({s, e}) => {
       let n = Log.time.duration(Log.time.parse(s), Log.time.parse(e))
-      if (n < m || m == undefined) m = n
+      if (n < m || m === undefined) m = n
     }
 
     for (let i = 0, l = a.length; i < l; i++) {
@@ -345,7 +368,7 @@ Log.data = {
 
   /**
    * Calculate longest log session
-   * @param {Object[]=} ent - Log entries
+   * @param {Object[]=} ent - Entries
    * @returns {number} Longest log session
    */
 
@@ -368,7 +391,7 @@ Log.data = {
 
   /**
    * Calculate average session duration (ASD)
-   * @param {Object[]=} ent - Log entries
+   * @param {Object[]=} ent - Entries
    * @returns {number} Average session duration
    */
 
@@ -392,7 +415,7 @@ Log.data = {
 
   /**
    * Calculate the total number of logged hours
-   * @param {Object[]=} ent - Log entries
+   * @param {Object[]=} ent - Entries
    * @returns {number} Total logged hours
    */
 
@@ -414,7 +437,7 @@ Log.data = {
 
   /**
    * Calculate how much of a time period was logged
-   * @param {Object[]=} ent - Log entries
+   * @param {Object[]=} ent - Entries
    * @returns {number} Log percentage
    */
 
@@ -425,16 +448,16 @@ Log.data = {
     let d = Log.time.convert(Log.time.parse(ent[ent.length - 1].s))
     let h = Number(Log.data.lh(ent))
     let n = Math.ceil((
-          new Date(d.getFullYear(), d.getMonth(), d.getDate()) -
-          new Date(e.getFullYear(), e.getMonth(), e.getDate())
-        ) / 8.64e7)
+              new Date(d.getFullYear(), d.getMonth(), d.getDate()) -
+              new Date(e.getFullYear(), e.getMonth(), e.getDate())
+            ) / 8.64e7)
 
     return h / (24 * (n + 1)) * 100
   },
 
   /**
    * Calculate sector hours
-   * @param {Object[]=} ent - Log entries
+   * @param {Object[]=} ent - Entries
    * @param {string} sec - Sector
    * @returns {number} Sector hours
    */
@@ -457,7 +480,7 @@ Log.data = {
 
   /**
    * Calculate sector percentage
-   * @param {Object[]=} ent - Log entries
+   * @param {Object[]=} ent - Entries
    * @param {string} sec - Sector
    * @returns {number} Sector percentage
    */
@@ -468,7 +491,7 @@ Log.data = {
 
   /**
    * Calculate project hours
-   * @param {Object[]=} ent - Log entries
+   * @param {Object[]=} ent - Entries
    * @param {string} pro - Project
    * @returns {number} Project hours
    */
@@ -479,7 +502,9 @@ Log.data = {
     let d = ({s, e}) => Number(Log.time.duration(Log.time.parse(s), Log.time.parse(e)))
 
     for (let i = 0, l = ent.length; i < l; i++) {
-      ent[i].e !== 'undefined' && ent[i].t == pro && (h += d(ent[i]))
+      ent[i].e !== 'undefined'
+      && ent[i].t === pro
+      && (h += d(ent[i]))
     }
 
     return h
@@ -487,7 +512,7 @@ Log.data = {
 
   /**
    * Calculate project percentage
-   * @param {Object[]=} ent - Log entries
+   * @param {Object[]=} ent - Entries
    * @param {string} pro - Project
    * @returns {number} Project percentage
    */
@@ -512,8 +537,7 @@ Log.data = {
     let streak = 0
 
     for (let i = 0, l = ent.length; i < l; i++) {
-      if (ent[i].length === 0) streak = 0
-      else streak++
+      streak = ent[i].length === 0 ? 0 : streak + 1
     }
 
     return streak
@@ -585,6 +609,39 @@ Log.data = {
 
     sd() {
       return Log.data.asd(Log.data.getEntriesByDay(new Date().getDay()))
+    },
+
+
+
+    smoothForecast(lastForecast, lastActual, smoothingConstant = 0.5) {
+      return lastForecast + (smoothingConstant * (lastActual - lastForecast))
+    },
+
+    smoothTrend() {
+
+      let ent = Log.log
+      let forecasts = []
+
+      for (let i = 0, l = ent.length; i < l; i++) {
+        let e = ent[i]
+        let es = Log.time.parse(e.s)
+        let ee = Log.time.parse(e.e)
+        let duration = Log.time.duration(es, ee)
+
+        let lastForecast
+        if (forecasts.length === 0) {
+          lastForecast = duration
+        } else {
+          lastForecast = forecasts[forecasts.length - 1]
+        }
+
+        forecasts.push(Log.data.forecast.smoothForecast(lastForecast, duration))
+      }
+
+      console.log(forecasts)
+
+      Log.vis.forecastBar('forecastChart', forecasts)
+
     }
   }
 }

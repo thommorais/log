@@ -1,5 +1,7 @@
 Log = window.Log || {}
 Log.console = {
+  history: [],
+
   commands: [
     'start', 'end', 'delete', 'set', 'import', 'filter', 'export'
   ],
@@ -44,19 +46,19 @@ Log.console = {
    * @param {string} i - Input parameters
    */
 
-  importUser(i) {
-    let s = i.split(' ')
-    let f = ''
-
-    if (s[1].substr(-1) === '/') s[1].substr(0, s[1].length - 1)
-
-    if (SHELL.test("-f", s[1])) f = SHELL.cat(s[1])
-
-    localStorage.setItem('user', f)
-    user = JSON.parse(localStorage.getItem('user'))
-
-    Log.refresh()
-  },
+  // importUser(i) {
+  //   let s = i.split(' ')
+  //   let f = ''
+  //
+  //   if (s[1].substr(-1) === '/') s[1].substr(0, s[1].length - 1)
+  //
+  //   if (SHELL.test("-f", s[1])) f = SHELL.cat(s[1])
+  //
+  //   localStorage.setItem('user', f)
+  //   user = JSON.parse(localStorage.getItem('user'))
+  //
+  //   Log.refresh()
+  // },
 
   /**
    * Export user data
