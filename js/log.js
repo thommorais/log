@@ -470,15 +470,19 @@ var Log = {
     let lptt = Log.data.trend(lpt, Log.data.lp(ey))
     let lsnt = Log.data.trend(lsn, Log.data.lsmin(ey))
     let lsxt = Log.data.trend(lsx, Log.data.lsmax(ey))
+    let entt = Log.data.trend(en.length, ey.length)
 
     let els = ['LHH', 'LHT', 'LPH', 'LPT', 'ASD', 'ASDT', 'LSN', 'LSX', 'LSNH', 'LSXH']
     let val = [lhh, lht, lph, lpt, asd, asdt, lsn, lsx, lsnh, lsxh]
-    let tels = ['lhtt', 'asdtt', 'lptt', 'lsnt', 'lsxt']
-    let tval = [lhtt, asdtt, lptt, lsnt, lsxt]
+    let tels = ['lhtt', 'asdtt', 'lptt', 'lsnt', 'lsxt', 'entt']
+    let tval = [lhtt, asdtt, lptt, lsnt, lsxt, entt]
 
     for (let i = 0, l = els.length; i < l; i++) {
       Log.ui.write(els[i], val[i].toFixed(2))
     }
+
+    Log.ui.write('entryCount', en.length)
+    Log.ui.write('streakToday', Log.data.streak(Log.log))
 
     let t = (e, c) => {
       let s = ''
@@ -496,6 +500,13 @@ var Log = {
 
     Log.ui.write('PHH', Log.data.peakHour())
     Log.ui.write('PDH', Log.data.peakDay())
+
+    let sectors = Log.data.listSectors()
+    let projects = Log.data.listProjects()
+
+    Log.ui.write('entCount', Log.log.length)
+    Log.ui.write('secCount', sectors.length)
+    Log.ui.write('proCount', projects.length)
 
     Log.vis.peakH(undefined, 'peakTimesHistory')
 
