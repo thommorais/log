@@ -188,6 +188,11 @@ var Log = {
       Log.ui.write('proPDH', Log.data.peakDay(ent))
 
       Log.ui.write('proStreak', Log.data.streak(ent))
+
+      let list = Log.data.listSectors(ent)
+
+      Log.vis.sectorFocusBar(ent, 'sectorDetailFocus')
+      Log.vis.sectorLegend(ent, 'sectorLegend')
     },
 
     clear: {
@@ -201,6 +206,12 @@ var Log = {
       },
 
       project() {
+        let el = 'projectTitle projectLastUpdate projectChart proLHH proLPH proASD proLSNH proLSXH proPHH proPDH proStreak sectorDetailFocus sectorLegend'.split(' ')
+
+        for (let i = 0, l = el.length; i < l; i++) {
+          Log.ui.empty(el[i])
+        }
+
         Log.ui.empty('projectTitle')
         Log.ui.empty('projectChart')
       }
@@ -343,7 +354,7 @@ var Log = {
     Log.res.timer()
     Log.res.forecast()
 
-    let el = 'phc pdc dayChart weekChart peakTimesHistory sectorBars projectBars sectorsList projectsList vis logbook LHH LHT LPH LPT ASD ASDT LSN LSX LSNH LSXH'.split(' ')
+    let el = 'phc pdc dayChart weekChart peakTimesHistory sectorBars projectBars sectorsList projectsList vis logbook LHH LHT LPH LPT ASD ASDT LSN LSX LSNH LSXH focusChart sectorFocusBar projectFocusBar'.split(' ')
 
     for (let i = 0, l = el.length; i < l; i++) {
       Log.ui.empty(el[i])
@@ -507,6 +518,11 @@ var Log = {
     Log.ui.write('entCount', Log.log.length)
     Log.ui.write('secCount', sectors.length)
     Log.ui.write('proCount', projects.length)
+
+    Log.vis.focusBar()
+
+    Log.vis.sectorFocusBar()
+    Log.vis.projectFocusBar()
 
     Log.vis.peakH(undefined, 'peakTimesHistory')
 

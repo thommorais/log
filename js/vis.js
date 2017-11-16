@@ -448,6 +448,31 @@ Log.vis = {
 
   },
 
+  focusBar(ent = Log.log, con = 'focusChart') {
+    let set = Log.data.sortEntries(ent)
+
+    for (let i = 0, l = set.length; i < l; i++) {
+      let dy = document.createElement('div')
+      let e = document.createElement('div')
+
+      dy.className = 'dib hf psr'
+      dy.style.width = `${100 / set.length}%`
+
+      e.className = 'sw1 hf cn'
+
+      let d = document.createElement('div')
+
+      d.className = 'psa sw1 b0 bg-noir'
+      d.style.height = `${(1 / Log.data.listSectors(set[i]).length) * 100}%`
+      d.style.backgroundColor = Log.config.ui.colour
+
+      e.appendChild(d)
+      dy.appendChild(e)
+
+      document.getElementById(con).appendChild(dy)
+    }
+  },
+
   forecastBar(con, ent) {
     console.log(ent)
     console.log(Log.utils.getMax(ent))
