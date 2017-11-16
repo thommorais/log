@@ -385,6 +385,69 @@ Log.vis = {
     }
   },
 
+  /**
+   * Display sector focus bar
+   * @param {string} con - Container
+   */
+
+  sectorFocusBar(ent = Log.log, con = 'sectorFocusBar') {
+    let sectors = Log.data.listSectors(ent)
+
+    for (let i = 0, l = sectors.length; i < l; i++) {
+      let dt = document.createElement('div')
+
+      dt.className = 'psr t0 hf lf'
+      dt.style.backgroundColor = Log.palette[sectors[i]] || Log.config.ui.colour
+      dt.style.width = `${(Log.data.sp(sectors[i], ent))}%`
+
+      document.getElementById(con).appendChild(dt)
+    }
+  },
+
+  projectFocusBar(con = 'projectFocusBar') {
+
+    let projects = Log.data.listProjects()
+    let perc = {}
+    // let sp = Log.data.sp()
+
+    for (let i = 0, l = projects.length; i < l; i++) {
+      perc[projects[i]] = Log.data.sp(projects[i])
+
+      let dt = document.createElement('div')
+      dt.className = 'psr t0 hf lf bsir'
+      // dt.style.backgroundColor = Log.palette[projects[i]] || Log.config.ui.colour
+      dt.style.width = `${(Log.data.pp(projects[i]))}%`
+
+      document.getElementById(con).appendChild(dt)
+    }
+
+    console.log(perc)
+
+  },
+
+  sectorLegend(ent, con = 'sectorLegend') {
+    let list = Log.data.listSectors(ent)
+
+    for (let i = 0, l = list.length; i < l; i++) {
+      let li = document.createElement('li')
+      let cl = document.createElement('div')
+      let nm = document.createElement('div')
+
+      li.className = 'c3 mb3 f6 lhc'
+      cl.className = 'dib f6 p2 brf mr2'
+      cl.style.backgroundColor = Log.palette[list[i]] || Log.config.ui.colour
+      nm.className = 'dib pb1'
+
+      nm.innerHTML = `${list[i]} (${Log.data.sp(list[i], ent).toFixed(2)}%)`
+
+      li.appendChild(cl)
+      li.appendChild(nm)
+
+      document.getElementById(con).appendChild(li)
+    }
+
+  },
+
   forecastBar(con, ent) {
     console.log(ent)
     console.log(Log.utils.getMax(ent))

@@ -211,11 +211,11 @@
 
           <h3 id="" class="mb4 f6 fwn">Focus</h3>
 
-          <h3 id="" class="mb2 f6 fwn">Sector Focus</h3>
-          <div class="mb4 wf sh2 bg-noir"></div>
+          <h3 class="mb2 f6 fwn">Sector Focus</h3>
+          <div id="sectorFocusBar" class="mb4 wf sh2"></div>
 
-          <h3 id="" class="mb2 f6 fwn">Project Focus</h3>
-          <div class="mb4 wf sh2 bg-noir"></div>
+          <h3 class="mb2 f6 fwn">Project Focus</h3>
+          <div id="projectFocusBar" class="mb4 wf sh2"></div>
 
         </div>
 
@@ -240,7 +240,7 @@
       <div id="sec" class="dn subsect hf r">
         <div class="ca pr4-l hf-l oya-l">
           <h2 id="sectorTitle" class="mb0 f4 lht">Sector</h2>
-          <p class="mb3 f6">Last Updated: <span id="sectorLastUpdate"></span></p>
+          <p class="mb3 f6">Last updated <span id="sectorLastUpdate"></span></p>
 
           <div id="sectorChart" class="vh3 mb4"></div>
 
@@ -258,12 +258,12 @@
               <p class="f6" title="Longest Log Session (History)">LShx</p>
             </li>
             <li class="mb4 c6 c3-m c3-l">
-              <p class="f3 fwb"><span id="secLPH">0.00</span>%</p>
-              <p class="f6" title="Log Percentage (History)">LPh</p>
-            </li>
-            <li class="mb4 c6 c3-m c3-l">
               <p class="f3 fwb"><span id="secASD">0.00</span> h</p>
               <p class="f6" title="Average Session Duration (History)">ASD</p>
+            </li>
+            <li class="mb4 c6 c3-m c3-l">
+              <p class="f3 fwb"><span id="secLPH">0.00</span>%</p>
+              <p class="f6" title="Log Percentage (History)">LPh</p>
             </li>
             <li class="mb4 c6 c3-m c3-l">
               <p class="f3 fwb"><span id="secPHH">0:00</span> h</p>
@@ -285,13 +285,13 @@
       </div>
 
       <div id="pro" class="dn subsect hf r">
-        <div class="ca pr4-l hf-l oya-l">
-          <h2 id="projectTitle" class="mb1 f4 lht">Project</h2>
-          <p class="mb3 f6">Last Activity: <span id="projectLastUpdate"></span></p>
+        <div class="nodrag ca pr4-l hf-l oya-l">
+          <h2 id="projectTitle" class="mb0 f4 lht">Project</h2>
+          <p class="mb3 f6">Last updated <span id="projectLastUpdate"></span></p>
 
           <div id="projectChart" class="vh3 mb4"></div>
 
-          <ul class="lsn f6 lhc r">
+          <ul class="mb4 lsn f6 lhc r">
             <li class="mb4 c6 c3-m c3-l">
               <p class="f3 fwb"><span id="proLHH">0.00</span> h</p>
               <p class="f6" title="Logged Hours (History)">LHh</p>
@@ -305,26 +305,32 @@
               <p class="f6" title="Longest Log Session (History)">LShx</p>
             </li>
             <li class="mb4 c6 c3-m c3-l">
-              <p class="f3 fwb"><span id="proLPH">0.00</span>%</p>
-              <p class="f6" title="Log Percentage (History)">LPh</p>
-            </li>
-            <li class="mb4 c6 c3-m c3-l">
               <p class="f3 fwb"><span id="proASD">0.00</span> h</p>
               <p class="f6" title="Average Session Duration (History)">ASD</p>
             </li>
-            <li class="mb4 c6 c3-m c3-l">
+            <li class="mb4 mb0-l c6 c3-m c3-l">
+              <p class="f3 fwb"><span id="proLPH">0.00</span>%</p>
+              <p class="f6" title="Log Percentage (History)">LPh</p>
+            </li>
+            <li class="mb4 mb0-l c6 c3-m c3-l">
               <p class="f3 fwb"><span id="proPHH">0:00</span> h</p>
               <p class="f6" title="Peak Hour (History)">PHh</p>
             </li>
-            <li class="mb4 c6 c3-m c3-l">
+            <li class="mb4 mb0-l c6 c3-m c3-l">
               <p class="f3 fwb"><span id="proPDH">0.00</span></p>
               <p class="f6" title="Peak Day (History)">PDh</p>
             </li>
-            <li class="mb4 c6 c3-m c3-l">
+            <li class="mb4 mb0-l c6 c3-m c3-l">
               <p class="f3 fwb"><span id="proStreak">0</span> d</p>
               <p class="f6" title="Streak">Streak</p>
             </li>
           </ul>
+
+          <h3 class="mb2 f6 fwn">Sector Focus</h3>
+          <div id="sectorDetailFocus" class="mb4 wf sh2"></div>
+
+          <ul id="sectorLegend" class="lsn"></ul>
+
         </div>
         <div class="c2 hf-l">
           <ul id="projectsList" class="nodrag lsn h9-l oya-l"></ul>
