@@ -280,7 +280,7 @@ Log.data = {
    */
 
   peakDays(a = Log.log) {
-    let d = new Array(7).fill(0)
+    let d = [0, 0, 0, 0, 0, 0, 0]
     let count = ({s}) => d[(Log.time.convert(Log.time.parse(s))).getDay()]++
 
     for (let i = 0, l = a.length; i < l; i++) {
@@ -315,8 +315,11 @@ Log.data = {
    */
 
   peakHours(a = Log.log) {
-    let h = new Array(24).fill(0)
-    let count = ({s}) => h[(Log.time.convert(Log.time.parse(s))).getHours()]++
+    let h = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+    let count = ({s, e}) => {
+      let es = Log.time.parse(s)
+      h[(Log.time.convert(es)).getHours()] += Log.time.duration(es, Log.time.parse(e))
+    }
 
     for (let i = 0, l = a.length; i < l; i++) {
       a[i].e !== 'undefined' && count(a[i])
@@ -343,6 +346,20 @@ Log.data = {
     return `${mpht}:00`
   },
 
+  listDurations(ent = Log.log) {
+    let dur = []
+
+    let add = ({s, e}) => {
+      dur.push(Log.time.duration(Log.time.parse(s), Log.time.parse(e)))
+    }
+
+    for (let i = 0, l = ent.length; i < l; i++) {
+      ent[i].e !== 'undefined' && add(ent[i])
+    }
+
+    return dur
+  },
+
   /**
    * Calculate shortest log session
    * @param {Object[]=} a - Log entries
@@ -352,15 +369,11 @@ Log.data = {
   lsmin(a = Log.log) {
     if (a.length === 0) return 0
 
+    let dur = Log.data.listDurations(a)
     let m
 
-    let check = ({s, e}) => {
-      let n = Log.time.duration(Log.time.parse(s), Log.time.parse(e))
-      if (n < m || m === undefined) m = n
-    }
-
-    for (let i = 0, l = a.length; i < l; i++) {
-      check(a[i])
+    for (let i = 0, l = dur.length; i < l; i++) {
+      if (dur[i] < m || m === undefined) m = dur[i]
     }
 
     return m
@@ -375,15 +388,11 @@ Log.data = {
   lsmax(ent = Log.log) {
     if (ent.length === 0) return 0
 
+    let dur = Log.data.listDurations(ent)
     let m = 0
 
-    let c = ({s, e}) => {
-      let n = Number(Log.time.duration(Log.time.parse(s), Log.time.parse(e)))
-      if (n > m) m = n
-    }
-
-    for (let i = 0, l = ent.length; i < l; i++) {
-      c(ent[i])
+    for (let i = 0, l = dur.length; i < l; i++) {
+      if (dur[i] > m) m = dur[i]
     }
 
     return m
@@ -398,16 +407,13 @@ Log.data = {
   asd(ent = Log.log) {
     if (ent.length === 0) return 0
 
+    let dur = Log.data.listDurations(ent)
     let avg = 0
     let c = 0
 
-    let count = ({s, e}) => {
-      avg += Number(Log.time.duration(Log.time.parse(s), Log.time.parse(e)))
+    for (let i = 0, l = dur.length; i < l; i++) {
+      avg += dur[i]
       c++
-    }
-
-    for (let i = 0, l = ent.length; i < l; i++) {
-      ent[i].e !== 'undefined' && count(ent[i])
     }
 
     return avg / c
@@ -422,14 +428,11 @@ Log.data = {
   lh(ent = Log.log) {
     if (ent.length === 0) return 0
 
+    let dur = Log.data.listDurations(ent)
     let h = 0
 
-    let count = ({s, e}) => {
-      h += Number(Log.time.duration(Log.time.parse(s), Log.time.parse(e)))
-    }
-
-    for (let i = 0, l = ent.length; i < l; i++) {
-      ent[i].e !== 'undefined' && count(ent[i])
+    for (let i = 0, l = dur.length; i < l; i++) {
+      h += dur[i]
     }
 
     return h
@@ -463,6 +466,8 @@ Log.data = {
    */
 
   sh(sec, ent = Log.log) {
+    if (ent.length === 0) return 0
+
     let h = 0
 
     let count = ({s, e}) => {
@@ -541,6 +546,69 @@ Log.data = {
     }
 
     return streak
+  },
+
+  /**
+   * Get an array of focus stats
+   * @param {Object[]=} ent - Entries
+   * @returns {Object[]} Array of focus stats
+   */
+
+  listFocus(ent = Log.log) {
+    let days = Log.data.sortEntries(ent)
+    let foc = []
+
+    for (let i = 0, l = days.length; i < l; i++) {
+      foc.push(Log.data.projectFocus(days[i]))
+    }
+
+    return foc
+  },
+
+  sectorFocus(ent = Log.log) {
+    return 1 / Log.data.listSectors(ent).length
+  },
+
+  projectFocus(ent = Log.log) {
+    return 1 / Log.data.listProjects(ent).length
+  },
+
+  minFocus(ent = Log.log) {
+    if (ent.length === 0) return 0
+
+    let list = Log.data.listFocus(ent)
+    let m
+
+    for (let i = 0, l = list.length; i < l; i++) {
+      if (list[i] < m || m === undefined) m = list[i]
+    }
+
+    return m
+  },
+
+  maxFocus(ent = Log.log) {
+    if (ent.length === 0) return 0
+
+    let list = Log.data.listFocus(ent)
+    let m = 0
+
+    for (let i = 0, l = list.length; i < l; i++) {
+      if (list[i] > m) m = list[i]
+    }
+
+    return m
+  },
+
+  focusAvg(ent = Log.log) {
+    let set = Log.data.listSectors(ent)
+    let avg = 0
+
+    for (let i = 0, l = set.length; i < l; i++) {
+      let e = Log.data.getEntriesBySector(set[i]).length
+      avg += Log.data.sh(set[i], ent) * (Log.data.sp(set[i], ent) / 100)
+    }
+
+    return avg / Log.data.lh(ent)
   },
 
   /**

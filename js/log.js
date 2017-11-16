@@ -160,6 +160,14 @@ var Log = {
       Log.ui.write('secPHH', Log.data.peakHour(ent))
       Log.ui.write('secPDH', Log.data.peakDay(ent))
       Log.ui.write('secStreak', Log.data.streak(ent))
+
+      Log.vis.sectorFocusBar(ent, 'projectDetailFocus')
+      Log.vis.projectLegend(ent, 'projectLegend')
+
+      Log.vis.projectfocusBar(ent, 'secFocusChart')
+
+      Log.vis.peakH(ent, 'secPeakTimes')
+      Log.vis.peakD(ent, 'secPeakDays')
     },
 
     /**
@@ -193,12 +201,17 @@ var Log = {
 
       Log.vis.sectorFocusBar(ent, 'sectorDetailFocus')
       Log.vis.sectorLegend(ent, 'sectorLegend')
+
+      Log.vis.focusBar(ent, 'proFocusChart')
+
+      Log.vis.peakH(ent, 'proPeakTimes')
+      Log.vis.peakD(ent, 'proPeakDays')
     },
 
     clear: {
 
       sector() {
-        let el = 'sectorTitle sectorChart secLHH secLPH secASD secLSNH secLSXH'.split(' ')
+        let el = 'sectorTitle sectorChart secLHH secLPH secASD secLSNH secLSXH secPeakTimes secPeakDays projectDetailFocus projectLegend secFocusChart'.split(' ')
 
         for (let i = 0, l = el.length; i < l; i++) {
           Log.ui.empty(el[i])
@@ -206,14 +219,14 @@ var Log = {
       },
 
       project() {
-        let el = 'projectTitle projectLastUpdate projectChart proLHH proLPH proASD proLSNH proLSXH proPHH proPDH proStreak sectorDetailFocus sectorLegend'.split(' ')
+        let el = 'projectTitle projectLastUpdate projectChart proLHH proLPH proASD proLSNH proLSXH proPHH proPDH proStreak sectorDetailFocus sectorLegend proPeakTimes proPeakDays proFocusChart'.split(' ')
 
         for (let i = 0, l = el.length; i < l; i++) {
           Log.ui.empty(el[i])
         }
 
-        Log.ui.empty('projectTitle')
-        Log.ui.empty('projectChart')
+        // Log.ui.empty('projectTitle')
+        // Log.ui.empty('projectChart')
       }
     }
   },
@@ -354,7 +367,7 @@ var Log = {
     Log.res.timer()
     Log.res.forecast()
 
-    let el = 'phc pdc dayChart weekChart peakTimesHistory sectorBars projectBars sectorsList projectsList vis logbook LHH LHT LPH LPT ASD ASDT LSN LSX LSNH LSXH focusChart sectorFocusBar projectFocusBar'.split(' ')
+    let el = 'phc pdc dayChart weekChart peakTimesHistory sectorBars projectBars sectorsList projectsList vis logbook LHH LHT LPH LPT ASD ASDT LSN LSX LSNH LSXH focusToday focusChart sectorFocusBar'.split(' ')
 
     for (let i = 0, l = el.length; i < l; i++) {
       Log.ui.empty(el[i])
@@ -463,6 +476,10 @@ var Log = {
     Log.ui.write('fpt', Log.data.forecast.pt())
     Log.ui.write('fsd', `${Log.data.forecast.sd().toFixed(2)} h`)
 
+    Log.ui.write('AFH', Log.data.focusAvg().toFixed(2))
+    Log.ui.write('Fmin', Log.data.minFocus().toFixed(2))
+    Log.ui.write('Fmax', Log.data.maxFocus().toFixed(2))
+
     Log.timer(Log.status())
 
     let lhh = Log.data.lh()
@@ -494,6 +511,7 @@ var Log = {
 
     Log.ui.write('entryCount', en.length)
     Log.ui.write('streakToday', Log.data.streak(Log.log))
+    Log.ui.write('focusToday', Log.data.projectFocus(en).toFixed(2))
 
     let t = (e, c) => {
       let s = ''
@@ -522,7 +540,10 @@ var Log = {
     Log.vis.focusBar()
 
     Log.vis.sectorFocusBar()
-    Log.vis.projectFocusBar()
+    // Log.vis.projectFocusBar()
+
+    Log.vis.sectorLegend(undefined, 'sectorLegendSummary')
+    // Log.vis.projectLegend(undefined, 'projectLegendSummary')
 
     Log.vis.peakH(undefined, 'peakTimesHistory')
 

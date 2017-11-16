@@ -420,20 +420,17 @@ Log.vis = {
 
       document.getElementById(con).appendChild(dt)
     }
-
-    console.log(perc)
-
   },
 
-  sectorLegend(ent, con = 'sectorLegend') {
-    let list = Log.data.listSectors(ent)
+  sectorLegend(ent = Log.log, con = 'sectorLegend') {
+    let list = Log.data.listSectors(ent).sort()
 
     for (let i = 0, l = list.length; i < l; i++) {
       let li = document.createElement('li')
       let cl = document.createElement('div')
       let nm = document.createElement('div')
 
-      li.className = 'c3 mb3 f6 lhc'
+      li.className = 'c4 mb3 f6 lhc'
       cl.className = 'dib f6 p2 brf mr2'
       cl.style.backgroundColor = Log.palette[list[i]] || Log.config.ui.colour
       nm.className = 'dib pb1'
@@ -445,7 +442,28 @@ Log.vis = {
 
       document.getElementById(con).appendChild(li)
     }
+  },
 
+  projectLegend(ent = Log.log, con = 'projectLegend') {
+    let list = Log.data.listProjects(ent).sort()
+
+    for (let i = 0, l = list.length; i < l; i++) {
+      let li = document.createElement('li')
+      let cl = document.createElement('div')
+      let nm = document.createElement('div')
+
+      li.className = 'c4 mb3 f6 lhc'
+      cl.className = 'dib f6 p2 brf mr2'
+      cl.style.backgroundColor = Log.palette[list[i]] || Log.config.ui.colour
+      nm.className = 'dib pb1'
+
+      nm.innerHTML = `${list[i]} (${Log.data.pp(list[i], ent).toFixed(2)}%)`
+
+      li.appendChild(cl)
+      li.appendChild(nm)
+
+      document.getElementById(con).appendChild(li)
+    }
   },
 
   focusBar(ent = Log.log, con = 'focusChart') {
@@ -473,10 +491,32 @@ Log.vis = {
     }
   },
 
-  forecastBar(con, ent) {
-    console.log(ent)
-    console.log(Log.utils.getMax(ent))
+  projectfocusBar(ent = Log.log, con = 'focusChart') {
+    let set = Log.data.sortEntries(ent)
 
+    for (let i = 0, l = set.length; i < l; i++) {
+      let dy = document.createElement('div')
+      let e = document.createElement('div')
+
+      dy.className = 'dib hf psr'
+      dy.style.width = `${100 / set.length}%`
+
+      e.className = 'sw1 hf cn'
+
+      let d = document.createElement('div')
+
+      d.className = 'psa sw1 b0 bg-noir'
+      d.style.height = `${(1 / Log.data.listProjects(set[i]).length) * 100}%`
+      d.style.backgroundColor = Log.config.ui.colour
+
+      e.appendChild(d)
+      dy.appendChild(e)
+
+      document.getElementById(con).appendChild(dy)
+    }
+  },
+
+  forecastBar(con, ent) {
     for (let i = 0, l = ent.length; i < l; i++) {
       let dy = document.createElement('div')
       let e = document.createElement('div')
