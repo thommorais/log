@@ -71,18 +71,6 @@ Log.options = {
   },
 
   /**
-   * Set icon view
-   * @param {string} a - True or false
-   */
-
-  setIcons(a) {
-    if (a === 'true' || a === 'false') {
-      user.config.ui.icons = a === 'true' ? true : false
-      Log.options.update()
-    }
-  },
-
-  /**
    * Set overview (days to show)
    * @param {number} n - The number of days
    */

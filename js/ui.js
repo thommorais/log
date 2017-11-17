@@ -20,21 +20,7 @@ Log.ui = {
     Log.ui.write(el, '')
   },
 
-  /**
-   * Set icon or text title
-   * @param {string} el - Element
-   * @param {string} ic - Unicode character
-   * @param {string} wr - Text title
-   */
-
-  icon(el, ic, wr) {
-    document.getElementById(el).innerHTML = user.config.ui.icons ? ic : wr
-  },
-
   hide(el) {
     document.getElementById(el).style.display = 'none'
-  },
-
-
-
+  }
 }

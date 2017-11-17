@@ -6,7 +6,6 @@ var user = {
       colour: "#202020",
       accent: "#eb4e32",
       font: "sans-serif",
-      icons: false,
       view: 28,
       tableView: 50
     },

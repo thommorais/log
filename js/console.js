@@ -48,19 +48,19 @@ Log.console = {
    * @param {string} i - Input parameters
    */
 
-  // importUser(i) {
-  //   let s = i.split(' ')
-  //   let f = ''
-  //
-  //   if (s[1].substr(-1) === '/') s[1].substr(0, s[1].length - 1)
-  //
-  //   if (SHELL.test("-f", s[1])) f = SHELL.cat(s[1])
-  //
-  //   localStorage.setItem('user', f)
-  //   user = JSON.parse(localStorage.getItem('user'))
-  //
-  //   Log.refresh()
-  // },
+  importUser(i) {
+    let s = i.split(' ')
+    let f = ''
+
+    if (s[1].substr(-1) === '/') s[1].substr(0, s[1].length - 1)
+
+    if (SHELL.test("-f", s[1])) f = SHELL.cat(s[1])
+
+    localStorage.setItem('user', f)
+    user = JSON.parse(localStorage.getItem('user'))
+
+    Log.refresh()
+  },
 
   /**
    * Export user data
@@ -154,8 +154,6 @@ Log.console = {
       Log.options.setAccent(c[2])
     } else if (a === 'font' || a === 'typeface' || a === 'type') {
       Log.options.setFont(c[2])
-    } else if (a === 'icons' || a === 'icon') {
-      Log.options.setIcons(c[2])
     } else if (a === 'view') {
       Log.options.setView(c[2])
     } else if (a === 'cal' || a === 'calendar') {
