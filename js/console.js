@@ -169,6 +169,8 @@ Log.console = {
       Log.options.setWeekStart(c[2])
     } else if (a === 'category' || a === 'sector' || a === 'cat' || a === 'sec') {
       Log.options.setColourCode(i)
+    } else if (a === 'project' || a === 'pro') {
+      Log.options.setProjectColourCode(i)
     } else return
   },
 

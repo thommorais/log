@@ -392,7 +392,7 @@ Log.vis = {
     for (let i = 0, l = projects.length; i < l; i++) {
       let dt = document.createElement('div')
       dt.className = 'psr t0 hf lf'
-      dt.style.backgroundColor = Log.palette[projects[i]] || Log.config.ui.colour
+      dt.style.backgroundColor = Log.projectPalette[projects[i]] || Log.config.ui.colour
       dt.style.width = `${(Log.data.pp(projects[i], ent))}%`
 
       document.getElementById(con).appendChild(dt)
@@ -441,7 +441,7 @@ Log.vis = {
 
       li.className = 'c4 mb3 f6 lhc'
       cl.className = 'dib f6 p2 brf mr2'
-      cl.style.backgroundColor = Log.palette[list[i]] || Log.config.ui.colour
+      cl.style.backgroundColor = Log.projectPalette[list[i]] || Log.config.ui.colour
       nm.className = 'dib pb1'
 
       nm.innerHTML = `${list[i]} (${Log.data.pp(list[i], ent).toFixed(2)}%)`

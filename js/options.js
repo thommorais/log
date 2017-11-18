@@ -36,6 +36,10 @@ Log.options = {
     Log.options.update()
   },
 
+  setColourMode() {
+
+  },
+
   /**
    * Set sector colour code
    * @param {string} s - Input
@@ -54,6 +58,27 @@ Log.options = {
     }
 
     user.palette[sec] = s.substring(indices[1] + 1, s.length).trim()
+    Log.options.update()
+  },
+
+  /**
+   * Set project colour code
+   * @param {string} s - Input
+   */
+  setProjectColourCode(s) {
+    let ch = s.split('')
+    let indices = []
+    let sec = ''
+
+    for (let i = 0, l = ch.length; i < l; i++) {
+      ch[i] === '"' && indices.push(i)
+    }
+
+    for (let i = indices[0] + 1; i < indices[1]; i++) {
+      sec += ch[i]
+    }
+
+    user.projectPalette[sec] = s.substring(indices[1] + 1, s.length).trim()
     Log.options.update()
   },
 

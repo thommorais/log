@@ -15,6 +15,7 @@ var user = {
     }
   },
   palette: {},
+  projectPalette: {},
   history: [],
   log: []
 }
