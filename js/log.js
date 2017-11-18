@@ -16,6 +16,7 @@ var Log = {
   log: [],
   config: {},
   palette: {},
+  projectPalette: {},
   clock: {},
 
   /**
@@ -147,7 +148,7 @@ var Log = {
       Log.ui.write('sectorTitle', sec)
       Log.ui.write('sectorLastUpdate', Log.time.timeago(Log.time.parse(ent[ent.length - 1].e) * 1E3))
 
-      Log.vis.bar('sectorChart', mn)
+      Log.vis.bar('sectorChart', ent, 'project')
 
       Log.ui.write('secLHH', Log.data.lh(ent).toFixed(2))
       Log.ui.write('secLSNH', Log.data.lsmin(ent).toFixed(2))
@@ -181,7 +182,7 @@ var Log = {
 
       Log.ui.write('projectLastUpdate', Log.time.timeago(Log.time.parse(ent[ent.length - 1].e) * 1E3))
 
-      Log.vis.bar('projectChart', ent)
+      Log.vis.bar('projectChart', ent, 'sector')
 
       Log.ui.write('proLHH', Log.data.lh(ent).toFixed(2))
       Log.ui.write('proLSNH', Log.data.lsmin(ent).toFixed(2))
@@ -341,9 +342,12 @@ var Log = {
       return
     }
 
+    // user.projectPalette = user.projectPalette || {}
+
     Log.log = user.log
     Log.config = user.config
     Log.palette = user.palette
+    Log.projectPalette = user.projectPalette
 
     document.getElementById('app').style.backgroundColor = Log.config.ui.bg
     document.getElementById('app').style.color = Log.config.ui.colour

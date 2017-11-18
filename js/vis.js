@@ -6,7 +6,7 @@ Log.vis = {
    * @param {string} con - Container
    * @param {Object[]=} ent - Entries
    */
-  line(con, ent = Log.log) {
+  line(con, ent = Log.log, mode = Log.config.ui.colourMode) {
     let lw = 0 // the width of the last data element
     let lp = 0 // the percentage of the last data element
 
@@ -15,13 +15,18 @@ Log.vis = {
      * @param {Object} e - A Log entry
      * @param {Object} r - The Log entry's attributes
      */
-    let addEntry = ({s, c}, width, dp, margin, id) => {
+    let addEntry = ({s, c, t}, width, dp, margin, id) => {
       let v = document.createElement('div')
 
       v.className = 'psr t0 sh1 mb2 lf'
       v.style.width = `${width}%`
       v.style.margin = `0 0 0 ${margin}%`
-      v.style.backgroundColor = Log.palette[c] || Log.config.ui.colour
+
+      if (mode === 'sector') {
+        v.style.backgroundColor = Log.palette[c] || Log.config.ui.colour
+      } else if (mode === 'project') {
+        v.style.backgroundColor = Log.projectPalette[t] || Log.config.ui.colour
+      }
 
       document.getElementById(id).appendChild(v)
 
@@ -76,7 +81,7 @@ Log.vis = {
    * @param {string} con - Container
    * @param {Object[]=} ent - Entries
    */
-  bar(con, ent = Log.log) {
+  bar(con, ent = Log.log, mode = Log.config.ui.colourMode) {
     let lw = 0 // the width of the last data element
 
     /**
@@ -84,13 +89,18 @@ Log.vis = {
      * @param {Object} e - A Log entry
      * @param {Object} r - A width
      */
-    let addEntry = ({s, c}, w, id) => {
+    let addEntry = ({s, c, t}, w, id) => {
       let d = document.createElement('div')
 
       d.className = 'psa sw1'
       d.style.height = `${w}%`
       d.style.bottom = `${lw}%`
-      d.style.backgroundColor = Log.palette[c] || Log.config.ui.colour
+
+      if (mode === 'sector') {
+        d.style.backgroundColor = Log.palette[c] || Log.config.ui.colour
+      } else if (mode === 'project') {
+        d.style.backgroundColor = Log.projectPalette[t] || Log.config.ui.colour
+      }
 
       document.getElementById(id).appendChild(d)
 
@@ -348,7 +358,7 @@ Log.vis = {
       st.className = 'f6 rf'
       br.className = 'wf sh1'
       dt.className = 'psr t0 hf lf'
-      dt.style.backgroundColor = Log.config.ui.colour
+      dt.style.backgroundColor = Log.projectPalette[pro] || Log.config.ui.colour
       dt.style.width = `${(Log.data.pp(pro, ent))}%`
       tl.innerHTML = pro
       st.innerHTML = `${sh.toFixed(2)} h`

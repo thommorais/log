@@ -175,6 +175,8 @@ Log.console = {
       Log.options.setColourCode(i)
     } else if (a === 'project' || a === 'pro') {
       Log.options.setProjectColourCode(i)
+    } else if (a === 'colourmode' || a === 'colormode') {
+      Log.options.setColourMode(c[2])
     } else return
   },
 
