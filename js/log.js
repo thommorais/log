@@ -320,7 +320,7 @@ var Log = {
     Log.res.timer()
     Log.res.forecast()
 
-    let el = 'phc pdc dayChart weekChart peakTimesHistory sectorBars projectBars sectorsList projectsList vis logbook focusChart sectorFocusBar'.split(' ')
+    let el = 'phc pdc dayChart weekChart peakTimesHistory sectorBars projectBars sectorsList projectsList vis logbook focusChart sectorFocusBar sectorLegendSummary'.split(' ')
 
     for (let i = 0, l = el.length; i < l; i++) {
       Log.ui.empty(el[i])
