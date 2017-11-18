@@ -3,7 +3,7 @@ Log.console = {
   history: [],
 
   commands: [
-    'start', 'end', 'delete', 'set', 'import', 'export', 'invert'
+    'start', 'end', 'delete', 'set', 'import', 'export', 'invert', 'edit'
   ],
 
   /**
@@ -22,7 +22,7 @@ Log.console = {
           Log.console.endLog();
           break;
         case 2:
-          console.log('delete');
+          Log.console.delete(i);
           break;
         case 3:
           Log.console.set(i);
@@ -35,6 +35,10 @@ Log.console = {
           break;
         case 6:
           Log.console.invert();
+          break;
+        case 7:
+          Log.console.edit(i);
+          break;
       }
     }
   },
@@ -172,6 +176,53 @@ Log.console = {
     } else if (a === 'project' || a === 'pro') {
       Log.options.setProjectColourCode(i)
     } else return
+  },
+
+  /**
+   * Delete a log
+   * @param {string} i - Input
+   */
+  delete(i) {
+    let c = i.split(' ')
+    let id = Number(c[1]) - 1
+    user.log.splice(id, 1)
+    Log.options.update()
+  },
+
+  /**
+   * Edit a log
+   * @param {string} i - Input
+   */
+  edit(i) {
+    let c = i.split(' ')
+    let a = c[2]
+    let id = Number(c[1]) - 1
+
+    let proc = input => {
+      let p = input.split('')
+      let indices = []
+      let key = ''
+
+      for (let i = 0, l = p.length; i < l; i++) {
+        p[i] === '"' && indices.push(i)
+      }
+
+      for (let i = indices[0] + 1; i < indices[1]; i++) {
+        key += p[i]
+      }
+
+      return key.trim()
+    }
+
+    if (a === 'sec' || a === 'sector') {
+      user.log[id].c = proc(i)
+    } else if (a === 'title' || a === 'pro' || a === 'project') {
+      user.log[id].t = proc(i)
+    } else if (a === 'desc' || a === 'dsc' || a === 'description') {
+      user.log[id].d = proc(i)
+    } else return
+
+    Log.options.update()
   },
 
   /**
