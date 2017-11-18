@@ -349,7 +349,7 @@ var Log = {
       localStorage.setItem('logHistory', JSON.stringify(Log.console.history))
     }
 
-    Log.log = Log.data.parse(user.log)
+    Log.log = user.log
     Log.config = user.config
     Log.palette = user.palette
     Log.projectPalette = user.projectPalette
@@ -472,6 +472,6 @@ var Log = {
 
     Log.vis.line('vis', Log.data.parse(mn))
 
-    Log.display(user.log, 1000, 'logbook')
+    Log.display(undefined, 1000, 'logbook')
   }
 }
