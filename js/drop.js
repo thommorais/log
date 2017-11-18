@@ -23,7 +23,21 @@ window.addEventListener('drop', function(e) {
 
     reader.onload = (e) => {
       let o = JSON.parse(e.target.result);
-      localStorage.setItem('user', JSON.stringify(o))
+      console.log(o)
+
+      user.config.ui.bg = o.config.ui.bg || '#f8f8f8'
+      user.config.ui.colour = o.config.ui.colour || '#202020'
+      user.config.ui.accent = o.config.ui.accent || '#eb4e32'
+      user.config.ui.view = o.config.ui.view || 28
+      user.config.system.calendar = o.config.system.calendar || 'gregorian'
+      user.config.system.timeFormat = o.config.system.timeFormat || '24'
+
+      user.palette = o.palette || {}
+      user.projectPalette = o.projectPalette || {}
+      user.history = o.history || []
+      user.log = o.log || []
+
+      localStorage.setItem('user', JSON.stringify(user))
       Log.refresh()
     }
 
