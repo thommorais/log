@@ -6,7 +6,6 @@ Log.ui = {
    * @param {string} el - Element
    * @param {string} con - Content
    */
-
   write(el, con) {
     document.getElementById(el).innerHTML = con
   },
@@ -15,7 +14,6 @@ Log.ui = {
    * Empty an HTML element
    * @param {string} el - Element
    */
-
   empty(el) {
     Log.ui.write(el, '')
   },

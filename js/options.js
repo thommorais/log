@@ -4,7 +4,6 @@ Log.options = {
   /**
    * Update settings
    */
-
   update() {
     localStorage.setItem('user', JSON.stringify(user))
     Log.refresh()
@@ -12,9 +11,8 @@ Log.options = {
 
   /**
    * Set background colour
-   * @param {string} c - The colour
+   * @param {string} c - Colour
    */
-
   setBG(c) {
     user.config.ui.bg = c
     Log.options.update()
@@ -22,9 +20,8 @@ Log.options = {
 
   /**
    * Set text colour
-   * @param {string} c - The colour
+   * @param {string} c - Colour
    */
-
   setColour(c) {
     user.config.ui.colour = c
     Log.options.update()
@@ -32,9 +29,8 @@ Log.options = {
 
   /**
    * Set accent colour
-   * @param {string} c - The colour
+   * @param {string} c - Colour
    */
-
   setAccent(c) {
     user.config.ui.accent = c
     Log.options.update()
@@ -42,9 +38,8 @@ Log.options = {
 
   /**
    * Set sector colour code
-   * @param {string} s - Input string
+   * @param {string} s - Input
    */
-
   setColourCode(s) {
     let ch = s.split('')
     let indices = []
@@ -54,7 +49,9 @@ Log.options = {
       ch[i] === '"' && indices.push(i)
     }
 
-    for (let i = indices[0] + 1; i < indices[1]; i++) sec += ch[i]
+    for (let i = indices[0] + 1; i < indices[1]; i++) {
+      sec += ch[i]
+    }
 
     user.palette[sec] = s.substring(indices[1] + 1, s.length).trim()
     Log.options.update()
@@ -62,9 +59,8 @@ Log.options = {
 
   /**
    * Set interface font family
-   * @param {string} f - The font family
+   * @param {string} f - Font
    */
-
   setFont(f) {
     user.config.ui.font = f
     Log.options.update()
@@ -72,9 +68,8 @@ Log.options = {
 
   /**
    * Set overview (days to show)
-   * @param {number} n - The number of days
+   * @param {number} n - Number of days
    */
-
   setView(n) {
     user.config.ui.view = n
     Log.options.update()
@@ -82,9 +77,8 @@ Log.options = {
 
   /**
    * Set calendrical system
-   * @param {string} c - The calendrical system
+   * @param {string} c - Calendrical system
    */
-
   setCalendar(c) {
     if (c === 'aequirys' || c === 'monocal' || c === 'gregorian') {
       user.config.system.calendar = c
@@ -94,9 +88,8 @@ Log.options = {
 
   /**
    * Set time format
-   * @param {string} f - The time format
+   * @param {string} f - Time format
    */
-
   setTimeFormat(f) {
     if (f === '24' || f === '12') {
       user.config.system.timeFormat = f
@@ -106,9 +99,8 @@ Log.options = {
 
   /**
    * Set the week start
-   * @param {string} d - The day of the week
+   * @param {string} d - Day of the week
    */
-
   setWeekStart(d) {
     user.config.system.weekStart = d
     Log.options.update()

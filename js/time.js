@@ -2,11 +2,10 @@ Log = window.Log || {}
 Log.time = {
 
   /**
-   * Convert hexadecimal into decimal
+   * Convert hexadecimal to decimal
    * @param {string} s - Hexadecimal string
    * @returns {number} Decimal conversion
    */
-
   parse(s) {
     return parseInt(s, 16)
   },
@@ -15,7 +14,6 @@ Log.time = {
    * Convert to hexadecimal format
    * @param {number} t - Unix time
    */
-
   toHex(t) {
     return (new Date(t.getFullYear(), t.getMonth(), t.getDate(), t.getHours(), t.getMinutes(), t.getSeconds()).getTime() / 1E3).toString(16)
   },
@@ -25,7 +23,6 @@ Log.time = {
    * @param {number} t - Unix time
    * @returns {Object} Date
    */
-
   convert(t) {
     return new Date(t * 1E3)
   },
@@ -35,18 +32,19 @@ Log.time = {
    * @param {number} t - Unix time
    * @returns {string} Timestamp
    */
-
   stamp(t) {
     let d = Log.time.convert(t)
     let f = Log.config.system.timeFormat
-    let h = `0${d.getHours()}`
-    let m = `0${d.getMinutes()}`
-    let s = `0${d.getSeconds()}`
 
-    if (f === '24')
+    if (f === '24') {
+      let h = `0${d.getHours()}`
+      let m = `0${d.getMinutes()}`
+      let s = `0${d.getSeconds()}`
+
       return `${h.substr(-2)}:${m.substr(-2)}:${s.substr(-2)}`
-    else if (f === '12')
+    } else if (f === '12') {
       return Log.time.twelveHours(d)
+    }
   },
 
   /**
@@ -54,7 +52,6 @@ Log.time = {
    * @param {Object} d - Date and time
    * @returns {string} 12-hour format
    */
-
   twelveHours(d) {
     let h = d.getHours()
     let m = d.getMinutes()
@@ -75,7 +72,6 @@ Log.time = {
    * @param {number} t - Unix time
    * @returns {string} year, month, day
    */
-
   date(t) {
     let a = Log.time.convert(t)
     return `${a.getFullYear()}${a.getMonth()}${a.getDate()}`
@@ -85,60 +81,65 @@ Log.time = {
    * Display a date
    * @param {number} t - Unix time
    */
-
   displayDate(t) {
     let a = Log.time.convert(t)
     let f = Log.config.system.calendar
 
-    if (f === 'gregorian')
+    if (f === 'gregorian') {
       return `${a.getFullYear()} ${a.getMonth() + 1} ${a.getDate()}`
-    else if (f === 'monocal')
+    } else if (f === 'monocal') {
       return MONO.short(MONO.convert(a))
-    else if (f === 'aequirys')
+    } else if (f === 'aequirys') {
       return Aequirys.display(Aequirys.convert(a))
+    }
   },
 
+  /**
+   * Calculate elapsed time
+   * @param {number} t - Unix time
+   * @returns {string} Elapsed time
+   */
   timeago(t) {
-    let seconds = ((new Date()) - t) / 1E3
-    let minutes = Math.floor(seconds / 60)
+    let sec = ((new Date()) - t) / 1E3
+    let min = Math.abs(Math.floor(sec / 60))
 
-    minutes = Math.abs(minutes)
-
-    if (minutes === 0) {
+    if (min === 0) {
       return 'less than a minute ago'
     }
 
-    if (minutes === 1) {
+    if (min === 1) {
       return 'a minute ago'
     }
 
-    if (minutes < 59) {
-      return minutes + ' minutes ago'
+    if (min < 59) {
+      return `${min} minutes ago`
     }
 
-    if (minutes < 90) {
-      return 'about an hour ago'
+    if (min < 1440) {
+      return `${Math.floor(min / 60)} hours ago`
     }
 
-    if (minutes < 1440) {
-      return Math.floor(minutes / 60) + ' hours ago'
-    }
-
-    if (minutes < 2880) {
+    if (min < 2880) {
       return 'yesterday'
     }
 
-    if (minutes < 86400) {
-      return Math.floor(minutes / 1440) + ' days ago'
+    if (min < 86400) {
+      return `${Math.floor(min / 1440)} days ago`
     }
 
-    if (minutes < 1051199) {
-      return Math.floor(minutes / 43200) + ' months ago'
+    if (min < 1051199) {
+      return `${Math.floor(min / 43200)} months ago`
     }
 
-    return `over ${Math.floor(minutes / 525960)} years ago`
+    return `over ${Math.floor(min / 525960)} years ago`
   },
 
+  /**
+   * List dates
+   * @param {Object} start - Start date
+   * @param {Object} end - End date
+   * @returns {Object[]} List of dates
+   */
   listDates(start, end) {
     let interval = 1
     let list = []
@@ -158,7 +159,6 @@ Log.time = {
    * @param {number} b - End (Unix time)
    * @returns {number} Duration
    */
-
   duration(a, b) {
     return (b - a) / 3600
   }

@@ -6,7 +6,6 @@ Log.vis = {
    * @param {string} con - Container
    * @param {Object[]=} ent - Entries
    */
-
   line(con, ent = Log.log) {
     let lw = 0 // the width of the last data element
     let lp = 0 // the percentage of the last data element
@@ -16,7 +15,6 @@ Log.vis = {
      * @param {Object} e - A Log entry
      * @param {Object} r - The Log entry's attributes
      */
-
     let addEntry = ({s, c}, width, dp, margin, id) => {
       let v = document.createElement('div')
 
@@ -25,7 +23,6 @@ Log.vis = {
       v.style.margin = `0 0 0 ${margin}%`
       v.style.backgroundColor = Log.palette[c] || Log.config.ui.colour
 
-      // let id = con + Log.time.date(Log.time.parse(s))
       document.getElementById(id).appendChild(v)
 
       lw = width
@@ -36,7 +33,6 @@ Log.vis = {
      * Create a new row
      * @param {string} id - The new row's ID
      */
-
     let nr = id => {
       lw = 0
       lp = 0
@@ -54,7 +50,6 @@ Log.vis = {
      * @param {string} id - The column ID
      * @returns {boolean} Column existence status
      */
-
     let check = id => (document.getElementById(id) == null)
 
     for (let i = 0, l = ent.length; i < l; i++) {
@@ -81,7 +76,6 @@ Log.vis = {
    * @param {string} con - Container
    * @param {Object[]=} ent - Entries
    */
-
   bar(con, ent = Log.log) {
     let lw = 0 // the width of the last data element
 
@@ -90,7 +84,6 @@ Log.vis = {
      * @param {Object} e - A Log entry
      * @param {Object} r - A width
      */
-
     let addEntry = ({s, c}, w, id) => {
       let d = document.createElement('div')
 
@@ -108,7 +101,6 @@ Log.vis = {
      * Create a new column
      * @param {string} id - The new column's ID
      */
-
     let nc = id => {
       lw = 0
 
@@ -152,7 +144,6 @@ Log.vis = {
    * @param {Object=} d - Date
    * @param {string=} con - Container
    */
-
   day(d = new Date(), con = 'dayChart') {
     let en = Log.data.getEntries(d)
     let lw = 0 // the width of the last data element
@@ -192,7 +183,6 @@ Log.vis = {
    * @param {Object[]=} ent - Entries
    * @param {string=} con - Container
    */
-
   peakH(ent = Log.log, con = 'phc') {
     let h = Log.data.peakHours(ent)
     let m = Log.utils.getMax(h)
@@ -229,7 +219,6 @@ Log.vis = {
    * @param {Object[]=} ent - Entries
    * @param {string=} con - Container
    */
-
   peakD(ent = Log.log, con = 'pdc') {
     let d = Log.data.peakDays(ent)
     let m = Log.utils.getMax(d)
@@ -266,7 +255,6 @@ Log.vis = {
    * @param {Object[]=} ent - Entries
    * @param {string=} con - Container
    */
-
   sectorBar(ent = Log.log, con = 'sectorBar') {
     let s = Log.data.listSectors(ent).sort()
 
@@ -274,7 +262,6 @@ Log.vis = {
      * Add a partition to the sector bar
      * @param {Object} sec - A sector
      */
-
     let add = sec => {
       let d = document.createElement('div')
       let v = Log.data.sp(sec, ent)
@@ -296,7 +283,6 @@ Log.vis = {
    * @param {Object[]=} ent - Entries
    * @param {string=} con - Container
    */
-
   sectorBars(ent = Log.log, con = 'sectorBars') {
     let s = Log.data.listSectors(ent).sort()
 
@@ -304,7 +290,6 @@ Log.vis = {
      * Add an item to the sector bar list
      * @param {string} sec - A sector
      */
-
     let add = sec => {
       let sh = Log.data.sh(sec, ent)
       let li = document.createElement('li')
@@ -313,7 +298,7 @@ Log.vis = {
       let br = document.createElement('div')
       let dt = document.createElement('div')
 
-      li.className = 'mb4 f6 lhc'
+      li.className = 'mb4 f6 lhc c-pt'
       tl.className = 'dib sw6 f6 elip'
       st.className = 'f6 rf'
       br.className = 'wf sh1'
@@ -343,7 +328,6 @@ Log.vis = {
    * @param {Object[]=} ent - Entries
    * @param {string=} con - Container
    */
-
   projectBars(ent = Log.log, con = 'projectBars') {
     let s = Log.data.listProjects(ent).sort()
 
@@ -351,7 +335,6 @@ Log.vis = {
      * Add an item to the project bars list
      * @param {string} pro - A project
      */
-
     let add = pro => {
       let sh = Log.data.ph(pro, ent)
       let li = document.createElement('li')
@@ -360,7 +343,7 @@ Log.vis = {
       let br = document.createElement('div')
       let dt = document.createElement('div')
 
-      li.className = 'mb4 f6 lhc'
+      li.className = 'mb4 f6 lhc c-pt'
       tl.className = 'dib sw6 f6 elip'
       st.className = 'f6 rf'
       br.className = 'wf sh1'
@@ -389,7 +372,6 @@ Log.vis = {
    * Display sector focus bar
    * @param {string} con - Container
    */
-
   sectorFocusBar(ent = Log.log, con = 'sectorFocusBar') {
     let sectors = Log.data.listSectors(ent)
 
@@ -404,24 +386,24 @@ Log.vis = {
     }
   },
 
-  projectFocusBar(con = 'projectFocusBar') {
-
-    let projects = Log.data.listProjects()
-    let perc = {}
-    // let sp = Log.data.sp()
+  projectFocusBar(ent = Log.log, con = 'projectFocusBar') {
+    let projects = Log.data.listProjects(ent)
 
     for (let i = 0, l = projects.length; i < l; i++) {
-      perc[projects[i]] = Log.data.sp(projects[i])
-
       let dt = document.createElement('div')
-      dt.className = 'psr t0 hf lf bsir'
-      // dt.style.backgroundColor = Log.palette[projects[i]] || Log.config.ui.colour
-      dt.style.width = `${(Log.data.pp(projects[i]))}%`
+      dt.className = 'psr t0 hf lf'
+      dt.style.backgroundColor = Log.palette[projects[i]] || Log.config.ui.colour
+      dt.style.width = `${(Log.data.pp(projects[i], ent))}%`
 
       document.getElementById(con).appendChild(dt)
     }
   },
 
+  /**
+   * Create a sector legend
+   * @param {Object[]=} ent - Entries
+   * @param {string=} con - Container
+   */
   sectorLegend(ent = Log.log, con = 'sectorLegend') {
     let list = Log.data.listSectors(ent).sort()
 
@@ -444,6 +426,11 @@ Log.vis = {
     }
   },
 
+  /**
+   * Create a project legend
+   * @param {Object[]=} ent - Entries
+   * @param {string=} con - Container
+   */
   projectLegend(ent = Log.log, con = 'projectLegend') {
     let list = Log.data.listProjects(ent).sort()
 
@@ -540,7 +527,6 @@ Log.vis = {
       d.style.backgroundColor = Log.config.ui.colour
 
       document.getElementById(id).appendChild(d)
-
     }
   }
 }
