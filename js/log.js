@@ -342,7 +342,12 @@ var Log = {
       return
     }
 
-    // user.projectPalette = user.projectPalette || {}
+    if (localStorage.hasOwnProperty('logHistory')) {
+      Log.console.history = JSON.parse(localStorage.getItem('logHistory'))
+    } else {
+      Log.console.history = []
+      localStorage.setItem('logHistory', JSON.stringify(Log.console.history))
+    }
 
     Log.log = user.log
     Log.config = user.config
@@ -357,23 +362,20 @@ var Log = {
     let cmdIndex = 1
 
     cmd.addEventListener('submit', function() {
-      Log.console.history.push(con.value)
-      Log.console.parse(con.value)
+      if (con.value !== '') {
+        Log.console.history.push(con.value)
+
+        if (Log.console.history.length >= 100) {
+          Log.console.history.shift()
+        }
+
+        localStorage.setItem('logHistory', JSON.stringify(Log.console.history))
+
+        Log.console.parse(con.value)
+      }
       con.value = ''
       cmd.style.display = 'none'
-      cmdIndex = 0
-    })
-
-    cmd.addEventListener('keydown', function(e) {
-      if (e.which === 38) {
-        cmdIndex++
-        con.value = Log.console.history[Log.console.history.length - cmdIndex]
-      } else if (e.which === 40) {
-        cmdIndex--
-
-        if (cmdIndex < 0) cmdIndex = 0
-        con.value = Log.console.history[Log.console.history.length - cmdIndex]
-      }
+      cmdIndex = 1
     })
 
     document.addEventListener('keydown', function(e) {
@@ -383,7 +385,24 @@ var Log = {
       } else if (e.key === 'Escape') {
         con.value = ''
         cmd.style.display = 'none'
-        cmdIndex = 0
+        cmdIndex = 1
+      }
+
+      if (e.which === 38) {
+        cmd.style.display = 'block'
+        con.focus()
+        cmdIndex++
+
+        if (cmdIndex > Log.console.history.length) cmdIndex = Log.console.history.length
+
+        con.value = Log.console.history[Log.console.history.length - cmdIndex]
+      } else if (e.which === 40) {
+        cmd.style.display = 'block'
+        con.focus()
+        cmdIndex--
+
+        if (cmdIndex < 1) cmdIndex = 1
+        con.value = Log.console.history[Log.console.history.length - cmdIndex]
       }
     })
 
