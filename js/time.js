@@ -91,6 +91,8 @@ Log.time = {
       return MONO.short(MONO.convert(a))
     } else if (f === 'aequirys') {
       return Aequirys.display(Aequirys.convert(a))
+    } else if (f === 'desamber') {
+      return Desamber.display(Desamber.convert(a))
     }
   },
 

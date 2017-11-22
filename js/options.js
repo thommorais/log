@@ -113,7 +113,7 @@ Log.options = {
    * @param {string} c - Calendrical system
    */
   setCalendar(c) {
-    if (c === 'aequirys' || c === 'monocal' || c === 'gregorian') {
+    if (c === 'aequirys' || c === 'monocal' || c === 'desamber' || c === 'gregorian') {
       user.config.system.calendar = c
       Log.options.update()
     }
