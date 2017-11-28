@@ -121,7 +121,7 @@ Log.options = {
 
   /**
    * Set time format
-   * @param {string} f - Time format
+   * @param {string} f - Format
    */
   setTimeFormat(f) {
     if (f === '24' || f === '12') {

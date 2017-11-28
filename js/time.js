@@ -28,12 +28,11 @@ Log.time = {
   },
 
   /**
-   * Convert Unix time into a timestamp
-   * @param {number} t - Unix time
+   * Create a timestamp
+   * @param {Object} d - Date
    * @returns {string} Timestamp
    */
-  stamp(t) {
-    let d = Log.time.convert(t)
+  stamp(d) {
     let f = Log.config.system.timeFormat
 
     if (f === '24') {
@@ -49,7 +48,7 @@ Log.time = {
 
   /**
    * Convert to 12-hour time
-   * @param {Object} d - Date and time
+   * @param {Object} d - Date
    * @returns {string} 12-hour format
    */
   twelveHours(d) {
@@ -79,20 +78,20 @@ Log.time = {
 
   /**
    * Display a date
-   * @param {number} t - Unix time
+   * @param {number} d - Date
+   * @returns {string} Formatted date
    */
-  displayDate(t) {
-    let a = Log.time.convert(t)
+  displayDate(d) {
     let f = Log.config.system.calendar
 
     if (f === 'gregorian') {
-      return `${a.getFullYear()} ${a.getMonth() + 1} ${a.getDate()}`
+      return `${d.getFullYear()} ${d.getMonth() + 1} ${d.getDate()}`
     } else if (f === 'monocal') {
-      return MONO.short(MONO.convert(a))
+      return MONO.short(MONO.convert(d))
     } else if (f === 'aequirys') {
-      return Aequirys.display(Aequirys.convert(a))
+      return Aequirys.display(Aequirys.convert(d))
     } else if (f === 'desamber') {
-      return Desamber.display(Desamber.convert(a))
+      return Desamber.display(Desamber.convert(d))
     }
   },
 

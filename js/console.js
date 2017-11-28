@@ -13,33 +13,33 @@ Log.console = {
   parse(i) {
     let k = Log.console.commands.indexOf(i.split(' ')[0].toLowerCase())
 
-    if (k != -1) {
-      switch (k) {
-        case 0:
-          Log.console.startLog(i);
-          break;
-        case 1:
-          Log.console.endLog();
-          break;
-        case 2:
-          Log.console.delete(i);
-          break;
-        case 3:
-          Log.console.set(i);
-          break;
-        case 4:
-          Log.console.importUser(i);
-          break;
-        case 5:
-          Log.console.exportUser();
-          break;
-        case 6:
-          Log.console.invert();
-          break;
-        case 7:
-          Log.console.edit(i);
-          break;
-      }
+    if (k === -1) return
+
+    switch (k) {
+      case 0:
+        Log.console.startLog(i);
+        break;
+      case 1:
+        Log.console.endLog();
+        break;
+      case 2:
+        Log.console.delete(i);
+        break;
+      case 3:
+        Log.console.set(i);
+        break;
+      case 4:
+        Log.console.importUser(i);
+        break;
+      case 5:
+        Log.console.exportUser();
+        break;
+      case 6:
+        Log.console.invert();
+        break;
+      case 7:
+        Log.console.edit(i);
+        break;
     }
   },
 
@@ -49,13 +49,14 @@ Log.console = {
    */
   importUser(i) {
     let s = i.split(' ')
-    let f = ''
 
-    if (s[1].substr(-1) === '/') s[1].substr(0, s[1].length - 1)
+    if (s[1].substr(-1) === '/') {
+      s[1].substr(0, s[1].length - 1)
+    }
 
     if (SHELL.test("-f", s[1])) {
-      f = SHELL.cat(s[1])
-      localStorage.setItem('user', f)
+      let file = SHELL.cat(s[1])
+      localStorage.setItem('user', file)
       user = JSON.parse(localStorage.getItem('user'))
       Log.refresh()
     } else return

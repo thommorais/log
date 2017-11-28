@@ -3,11 +3,11 @@ Log.ui = {
 
   /**
    * Write HTML content
-   * @param {string} el - Element
+   * @param {string} id - Element ID
    * @param {string} con - Content
    */
-  write(el, con) {
-    document.getElementById(el).innerHTML = con
+  write(id, con) {
+    document.getElementById(id).innerHTML = con
   },
 
   /**

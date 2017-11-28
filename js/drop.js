@@ -22,14 +22,14 @@ window.addEventListener('drop', function(e) {
     let reader = new FileReader()
 
     reader.onload = (e) => {
-      let o = JSON.parse(e.target.result);
-      console.log(o)
+      let o = JSON.parse(e.target.result)
 
       user.config.ui.bg = o.config.ui.bg || '#f8f8f8'
       user.config.ui.colour = o.config.ui.colour || '#202020'
       user.config.ui.accent = o.config.ui.accent || '#eb4e32'
       user.config.ui.colourMode = o.config.ui.colourMode || 'sector'
       user.config.ui.view = o.config.ui.view || 28
+
       user.config.system.calendar = o.config.system.calendar || 'gregorian'
       user.config.system.timeFormat = o.config.system.timeFormat || '24'
 

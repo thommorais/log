@@ -5,74 +5,55 @@ Log.vis = {
    * Display a line visualisation
    * @param {string} con - Container
    * @param {Object[]=} ent - Entries
+   * @param {string=} mode - Colour mode
    */
   line(con, ent = Log.log, mode = Log.config.ui.colourMode) {
-    let lw = 0 // the width of the last data element
-    let lp = 0 // the percentage of the last data element
+    let lw = 0
+    let lp = 0
 
-    /**
-     * Add a data element to the chart
-     * @param {Object} e - A Log entry
-     * @param {Object} r - The Log entry's attributes
-     */
-    let addEntry = ({s, c, t}, width, dp, margin, id) => {
-      let v = document.createElement('div')
+    let addEntry = ({s, e, c, t}, row) => {
+      let entry = document.createElement('div')
 
-      v.className = 'psr t0 sh1 mb2 lf'
-      v.style.width = `${width}%`
-      v.style.margin = `0 0 0 ${margin}%`
+      let es = Log.time.parse(s)
+      let width = Log.utils.calcWidth(Log.time.parse(e), es)
+      let dp = Log.utils.calcDP(es)
+
+      entry.className = 'psr t0 sh1 mb2 lf'
+      entry.style.width = `${width}%`
+      entry.style.marginLeft = `${Log.utils.calcMargin(dp, lw, lp)}%`
 
       if (mode === 'sector') {
-        v.style.backgroundColor = Log.palette[c] || Log.config.ui.colour
+        entry.style.backgroundColor = Log.palette[c] || Log.config.ui.colour
       } else if (mode === 'project') {
-        v.style.backgroundColor = Log.projectPalette[t] || Log.config.ui.colour
+        entry.style.backgroundColor = Log.projectPalette[t] || Log.config.ui.colour
       }
 
-      document.getElementById(id).appendChild(v)
+      document.getElementById(row).appendChild(entry)
 
       lw = width
       lp = dp
     }
 
-    /**
-     * Create a new row
-     * @param {string} id - The new row's ID
-     */
-    let nr = id => {
+    let addRow = id => {
       lw = 0
       lp = 0
 
-      let e = document.createElement('div')
+      let row = document.createElement('div')
 
-      e.className = 'db wf sh1 mt2 mb3'
-      e.id = id
+      row.className = 'db wf sh1 mt2 mb3'
+      row.id = id
 
-      document.getElementById(con).appendChild(e)
+      document.getElementById(con).appendChild(row)
     }
-
-    /**
-     * Check if column exists
-     * @param {string} id - The column ID
-     * @returns {boolean} Column existence status
-     */
-    let check = id => (document.getElementById(id) == null)
 
     for (let i = 0, l = ent.length; i < l; i++) {
       if (ent[i].e === 'undefined') continue
 
-      let es = Log.time.parse(ent[i].s)
-      let ee = Log.time.parse(ent[i].e)
-      let dt = Log.time.date(es)
-      let end = Log.time.date(ee)
-      let id = con + dt
+      let id = con + Log.time.date(Log.time.parse(ent[i].s))
 
-      check(id) && nr(id)
+      document.getElementById(id) === null && addRow(id)
 
-      let wi = Log.utils.calcWidth(ee, es)
-      let dp = Log.utils.calcDP(es)
-      let mr = Log.utils.calcMargin(dp, lw, lp)
-
-      addEntry(ent[i], wi, dp, mr, id)
+      addEntry(ent[i], id)
     }
   },
 
@@ -80,52 +61,45 @@ Log.vis = {
    * Display a bar visualisation
    * @param {string} con - Container
    * @param {Object[]=} ent - Entries
+   * @param {string=} mode - Colour mode
    */
   bar(con, ent = Log.log, mode = Log.config.ui.colourMode) {
-    let lw = 0 // the width of the last data element
+    let lw = 0
 
-    /**
-     * Add a data element to the chart
-     * @param {Object} e - A Log entry
-     * @param {Object} r - A width
-     */
-    let addEntry = ({s, c, t}, w, id) => {
-      let d = document.createElement('div')
+    let addEntry = ({s, e, c, t}, row) => {
+      let entry = document.createElement('div')
+      let width = Log.utils.calcWidth(Log.time.parse(e), Log.time.parse(s))
 
-      d.className = 'psa sw1'
-      d.style.height = `${w}%`
-      d.style.bottom = `${lw}%`
+      entry.className = 'psa sw1'
+      entry.style.height = `${width}%`
+      entry.style.bottom = `${lw}%`
 
       if (mode === 'sector') {
-        d.style.backgroundColor = Log.palette[c] || Log.config.ui.colour
+        entry.style.backgroundColor = Log.palette[c] || Log.config.ui.colour
       } else if (mode === 'project') {
-        d.style.backgroundColor = Log.projectPalette[t] || Log.config.ui.colour
+        entry.style.backgroundColor = Log.projectPalette[t] || Log.config.ui.colour
       }
 
-      document.getElementById(id).appendChild(d)
+      document.getElementById(row).appendChild(entry)
 
-      lw += w
+      lw += width
     }
 
-    /**
-     * Create a new column
-     * @param {string} id - The new column's ID
-     */
-    let nc = id => {
+    let newCol = id => {
       lw = 0
 
-      let dy = document.createElement('div')
-      let e = document.createElement('div')
+      let col = document.createElement('div')
+      let inn = document.createElement('div')
 
-      dy.className = 'dib hf psr'
-      dy.style.width = `${100 / Log.config.ui.view}%`
+      col.className = 'dib hf psr'
+      col.style.width = `${100 / Log.config.ui.view}%`
 
-      e.className = 'sw1 hf cn'
-      e.id = id
+      inn.className = 'sw1 hf cn'
+      inn.id = id
 
-      dy.appendChild(e)
+      col.appendChild(inn)
 
-      document.getElementById(con).appendChild(dy)
+      document.getElementById(con).appendChild(col)
     }
 
     let sort = Log.data.sortEntries(ent)
@@ -133,18 +107,14 @@ Log.vis = {
     for (let i = 0, l = sort.length; i < l; i++) {
       let id = `${con}-${i}`
 
-      document.getElementById(id) === null && nc(id)
+      document.getElementById(id) === null && newCol(id)
 
       for (let o = 0, l = sort[i].length; o < l; o++) {
         if (sort[i][o].e === 'undefined') continue
 
-        if (o === 0) lw = 0
+        o === 0 && (lw = 0)
 
-        let s = Log.time.parse(sort[i][o].s)
-        let e = Log.time.parse(sort[i][o].e)
-        // let d = Log.time.date(s)
-
-        addEntry(sort[i][o], Log.utils.calcWidth(e, s), id)
+        addEntry(sort[i][o], id)
       }
     }
   },
@@ -153,38 +123,34 @@ Log.vis = {
    * Display a day chart
    * @param {Object=} d - Date
    * @param {string=} con - Container
+   * @param {string=} mode - Colour mode
    */
-  day(d = new Date(), con = 'dayChart') {
-    let en = Log.data.getEntries(d)
-    let lw = 0 // the width of the last data element
-    let lp = 0 // the percentage of the last data element
+  day(d = new Date(), con = 'dayChart', mode = Log.config.ui.colourMode) {
+    let ent = Log.data.getEntriesByDate(d)
 
-    let add = ({c, t, d}, width, dp, margin) => {
-      let div = document.createElement('div')
+    for (let i = 0, l = ent.length, lw = 0, lp = 0; i < l; i++) {
+      if (ent[i].e === 'undefined') continue
 
-      div.className = 'nodrag psr t0 hf mb2 lf'
-      div.style.width = `${width}%`
-      div.style.marginLeft = `${margin}%`
-      div.style.backgroundColor = Log.palette[c] || Log.config.ui.colour
+      let entry = document.createElement('div')
+      let es = Log.time.parse(ent[i].s)
+      let dp = Log.utils.calcDP(es)
+      let width = Log.utils.calcWidth(Log.time.parse(ent[i].e), es)
+      let margin = Log.utils.calcMargin(dp, lw, lp)
 
-      div.setAttribute('title', `${c}: ${t} - ${d}`)
+      entry.className = 'nodrag psr t0 hf mb2 lf'
+      entry.style.width = `${width}%`
+      entry.style.marginLeft = `${margin}%`
 
-      document.getElementById(con).appendChild(div)
+      if (mode === 'sector') {
+        entry.style.backgroundColor = Log.palette[ent[i].c] || Log.config.ui.colour
+      } else if (mode === 'project') {
+        entry.style.backgroundColor = Log.projectPalette[ent[i].t] || Log.config.ui.colour
+      }
+
+      document.getElementById(con).appendChild(entry)
 
       lw = width
       lp = dp
-    }
-
-    for (let i = 0, l = en.length; i < l; i++) {
-      if (en[i].e === 'undefined') continue
-
-      let es = Log.time.parse(en[i].s)
-      let ee = Log.time.parse(en[i].e)
-      let wd = Log.utils.calcWidth(ee, es)
-      let dp = Log.utils.calcDP(es)
-      let mr = Log.utils.calcMargin(dp, lw, lp)
-
-      add(en[i], wd, dp, mr)
     }
   },
 
@@ -194,10 +160,10 @@ Log.vis = {
    * @param {string=} con - Container
    */
   peakH(ent = Log.log, con = 'phc') {
-    let h = Log.data.peakHours(ent)
-    let m = Log.utils.getMax(h)
+    let hours = Log.data.peakHours(ent)
+    let max = Log.utils.getMax(hours)
 
-    let add = i => {
+    for (let i = 0, l = hours.length; i < l; i++) {
       let d = document.createElement('div')
       let e = document.createElement('div')
       let n = document.createElement('div')
@@ -211,16 +177,12 @@ Log.vis = {
       n.style.backgroundColor = i === (new Date).getHours() ? Log.config.ui.accent : Log.config.ui.colour
 
       e.className = 'psa b0 wf'
-      e.style.height = `${h[i] / m * 100}%`
+      e.style.height = `${hours[i] / max * 100}%`
 
       e.appendChild(n)
 
       document.getElementById(con).appendChild(d)
       document.getElementById(t).appendChild(e)
-    }
-
-    for (let i = 0, l = h.length; i < l; i++) {
-      add(i)
     }
   },
 
@@ -230,313 +192,189 @@ Log.vis = {
    * @param {string=} con - Container
    */
   peakD(ent = Log.log, con = 'pdc') {
-    let d = Log.data.peakDays(ent)
-    let m = Log.utils.getMax(d)
+    let peaks = Log.data.peakDays(ent)
+    let peakMax = Log.utils.getMax(peaks)
 
-    add = i => {
-      let v = document.createElement('div')
-      let e = document.createElement('div')
-      let n = document.createElement('div')
-      let t = `${con}-${i}`
-
-      v.className = 'dib hf psr'
-      v.style.width = '14.2857%' // 100 / 7
-      v.id = t
-
-      n.className = 'sw1 hf cn'
-      n.style.backgroundColor = i === (new Date).getDay() ? Log.config.ui.accent : Log.config.ui.colour
-
-      e.className = 'psa b0 wf'
-      e.style.height = `${d[i] / m * 100}%`
-
-      e.appendChild(n)
-
-      document.getElementById(con).appendChild(v)
-      document.getElementById(t).appendChild(e)
-    }
-
-    for (let i = 0, l = d.length; i < l; i++) {
-      add(i)
-    }
-  },
-
-  /**
-   * Display sector bar
-   * @param {Object[]=} ent - Entries
-   * @param {string=} con - Container
-   */
-  sectorBar(ent = Log.log, con = 'sectorBar') {
-    let s = Log.data.listSectors(ent).sort()
-
-    /**
-     * Add a partition to the sector bar
-     * @param {Object} sec - A sector
-     */
-    let add = sec => {
-      let d = document.createElement('div')
-      let v = Log.data.sp(sec, ent)
-
-      d.className = 'psr t0 hf mb2 lf bg-blanc'
-      d.style.width = `${v}%`
-      d.title = `${sec} (${v.toFixed(2)}%)`
-
-      document.getElementById(con).appendChild(d)
-    }
-
-    for (let i = 0, l = s.length; i < l; i++) {
-      add(s[i])
-    }
-  },
-
-  /**
-   * Display sector bars
-   * @param {Object[]=} ent - Entries
-   * @param {string=} con - Container
-   */
-  sectorBars(ent = Log.log, con = 'sectorBars') {
-    let s = Log.data.listSectors(ent).sort()
-
-    /**
-     * Add an item to the sector bar list
-     * @param {string} sec - A sector
-     */
-    let add = sec => {
-      let sh = Log.data.sh(sec, ent)
-      let li = document.createElement('li')
-      let tl = document.createElement('span')
-      let st = document.createElement('span')
-      let br = document.createElement('div')
-      let dt = document.createElement('div')
-
-      li.className = 'mb4 f6 lhc c-pt'
-      tl.className = 'dib sw6 f6 elip'
-      st.className = 'f6 rf'
-      br.className = 'wf sh1'
-      dt.className = 'psr t0 hf lf'
-      dt.style.backgroundColor = Log.palette[sec] || Log.config.ui.colour
-      dt.style.width = `${(Log.data.sp(sec, ent))}%`
-      tl.innerHTML = sec
-      st.innerHTML = `${sh.toFixed(2)} h`
-
-      li.setAttribute('onclick', `Log.detail.sector('${sec}')`)
-
-      br.appendChild(dt)
-      li.appendChild(tl)
-      li.appendChild(st)
-      li.appendChild(br)
-
-      document.getElementById(con).appendChild(li)
-    }
-
-    for (let i = 0, l = s.length; i < l; i++) {
-      add(s[i])
-    }
-  },
-
-  /**
-   * Display project bars
-   * @param {Object[]=} ent - Entries
-   * @param {string=} con - Container
-   */
-  projectBars(ent = Log.log, con = 'projectBars') {
-    let s = Log.data.listProjects(ent).sort()
-
-    /**
-     * Add an item to the project bars list
-     * @param {string} pro - A project
-     */
-    let add = pro => {
-      let sh = Log.data.ph(pro, ent)
-      let li = document.createElement('li')
-      let tl = document.createElement('span')
-      let st = document.createElement('span')
-      let br = document.createElement('div')
-      let dt = document.createElement('div')
-
-      li.className = 'mb4 f6 lhc c-pt'
-      tl.className = 'dib sw6 f6 elip'
-      st.className = 'f6 rf'
-      br.className = 'wf sh1'
-      dt.className = 'psr t0 hf lf'
-      dt.style.backgroundColor = Log.projectPalette[pro] || Log.config.ui.colour
-      dt.style.width = `${(Log.data.pp(pro, ent))}%`
-      tl.innerHTML = pro
-      st.innerHTML = `${sh.toFixed(2)} h`
-
-      li.setAttribute('onclick', `Log.detail.project('${pro}')`)
-
-      br.appendChild(dt)
-      li.appendChild(tl)
-      li.appendChild(st)
-      li.appendChild(br)
-
-      document.getElementById(con).appendChild(li)
-    }
-
-    for (let i = 0, l = s.length; i < l; i++) {
-      add(s[i])
-    }
-  },
-
-  /**
-   * Display sector focus bar
-   * @param {string} con - Container
-   */
-  sectorFocusBar(ent = Log.log, con = 'sectorFocusBar') {
-    let sectors = Log.data.listSectors(ent)
-
-    for (let i = 0, l = sectors.length; i < l; i++) {
-      let dt = document.createElement('div')
-
-      dt.className = 'psr t0 hf lf'
-      dt.style.backgroundColor = Log.palette[sectors[i]] || Log.config.ui.colour
-      dt.style.width = `${(Log.data.sp(sectors[i], ent))}%`
-
-      document.getElementById(con).appendChild(dt)
-    }
-  },
-
-  projectFocusBar(ent = Log.log, con = 'projectFocusBar') {
-    let projects = Log.data.listProjects(ent)
-
-    for (let i = 0, l = projects.length; i < l; i++) {
-      let dt = document.createElement('div')
-      dt.className = 'psr t0 hf lf'
-      dt.style.backgroundColor = Log.projectPalette[projects[i]] || Log.config.ui.colour
-      dt.style.width = `${(Log.data.pp(projects[i], ent))}%`
-
-      document.getElementById(con).appendChild(dt)
-    }
-  },
-
-  /**
-   * Create a sector legend
-   * @param {Object[]=} ent - Entries
-   * @param {string=} con - Container
-   */
-  sectorLegend(ent = Log.log, con = 'sectorLegend') {
-    let list = Log.data.listSectors(ent).sort()
-
-    for (let i = 0, l = list.length; i < l; i++) {
-      let li = document.createElement('li')
-      let cl = document.createElement('div')
-      let nm = document.createElement('div')
-
-      li.className = 'c4 mb3 f6 lhc'
-      cl.className = 'dib f6 p2 brf mr2'
-      cl.style.backgroundColor = Log.palette[list[i]] || Log.config.ui.colour
-      nm.className = 'dib pb1'
-
-      nm.innerHTML = `${list[i]} (${Log.data.sp(list[i], ent).toFixed(2)}%)`
-
-      li.appendChild(cl)
-      li.appendChild(nm)
-
-      document.getElementById(con).appendChild(li)
-    }
-  },
-
-  /**
-   * Create a project legend
-   * @param {Object[]=} ent - Entries
-   * @param {string=} con - Container
-   */
-  projectLegend(ent = Log.log, con = 'projectLegend') {
-    let list = Log.data.listProjects(ent).sort()
-
-    for (let i = 0, l = list.length; i < l; i++) {
-      let li = document.createElement('li')
-      let cl = document.createElement('div')
-      let nm = document.createElement('div')
-
-      li.className = 'c4 mb3 f6 lhc'
-      cl.className = 'dib f6 p2 brf mr2'
-      cl.style.backgroundColor = Log.projectPalette[list[i]] || Log.config.ui.colour
-      nm.className = 'dib pb1'
-
-      nm.innerHTML = `${list[i]} (${Log.data.pp(list[i], ent).toFixed(2)}%)`
-
-      li.appendChild(cl)
-      li.appendChild(nm)
-
-      document.getElementById(con).appendChild(li)
-    }
-  },
-
-  focusBar(ent = Log.log, con = 'focusChart') {
-    let set = Log.data.sortEntries(ent)
-
-    for (let i = 0, l = set.length; i < l; i++) {
-      let dy = document.createElement('div')
-      let e = document.createElement('div')
-
-      dy.className = 'dib hf psr'
-      dy.style.width = `${100 / set.length}%`
-
-      e.className = 'sw1 hf cn'
-
-      let d = document.createElement('div')
-
-      d.className = 'psa sw1 b0 bg-noir'
-      d.style.height = `${(1 / Log.data.listSectors(set[i]).length) * 100}%`
-      d.style.backgroundColor = Log.config.ui.colour
-
-      e.appendChild(d)
-      dy.appendChild(e)
-
-      document.getElementById(con).appendChild(dy)
-    }
-  },
-
-  projectfocusBar(ent = Log.log, con = 'focusChart') {
-    let set = Log.data.sortEntries(ent)
-
-    for (let i = 0, l = set.length; i < l; i++) {
-      let dy = document.createElement('div')
-      let e = document.createElement('div')
-
-      dy.className = 'dib hf psr'
-      dy.style.width = `${100 / set.length}%`
-
-      e.className = 'sw1 hf cn'
-
-      let d = document.createElement('div')
-
-      d.className = 'psa sw1 b0 bg-noir'
-      d.style.height = `${(1 / Log.data.listProjects(set[i]).length) * 100}%`
-      d.style.backgroundColor = Log.config.ui.colour
-
-      e.appendChild(d)
-      dy.appendChild(e)
-
-      document.getElementById(con).appendChild(dy)
-    }
-  },
-
-  forecastBar(con, ent) {
-    for (let i = 0, l = ent.length; i < l; i++) {
-      let dy = document.createElement('div')
-      let e = document.createElement('div')
+    for (let i = 0, l = peaks.length; i < l; i++) {
+      let col = document.createElement('div')
+      let inn = document.createElement('div')
+      let cor = document.createElement('div')
       let id = `${con}-${i}`
 
-      dy.className = 'dib hf psr'
-      dy.style.width = `${100 / ent.length}%`
+      col.className = 'dib hf psr'
+      col.style.width = '14.2857%'
+      col.id = id
 
-      e.className = 'sw1 hf cn'
-      e.id = id
+      cor.className = 'sw1 hf cn'
+      cor.style.backgroundColor = i === (new Date).getDay() ? Log.config.ui.accent : Log.config.ui.colour
 
-      dy.appendChild(e)
+      inn.className = 'psa b0 wf'
+      inn.style.height = `${peaks[i] / peakMax * 100}%`
 
-      document.getElementById(con).appendChild(dy)
+      inn.appendChild(cor)
 
-      let d = document.createElement('div')
+      document.getElementById(con).appendChild(col)
+      document.getElementById(id).appendChild(inn)
+    }
+  },
 
-      d.className = 'psa sw1'
-      d.style.height = `${ent[i] * 100}%`
-      d.style.bottom = `0`
-      d.style.backgroundColor = Log.config.ui.colour
+  /**
+   * List sectors or projects
+   * @param {string} mode - Sector or project
+   * @param {string} con - Container
+   * @param {Object[]=} ent - Entries
+   */
+  list(mode, con, ent = Log.log) {
+    let list = []
 
-      document.getElementById(id).appendChild(d)
+    if (mode === 'sector') {
+      list = Log.data.listSectors(ent).sort()
+    } else if (mode === 'project') {
+      list = Log.data.listProjects(ent).sort()
+    }
+
+    for (let i = 0, l = list.length; i < l; i++) {
+      let sh = 0
+
+      if (mode === 'sector') {
+        sh = Log.data.sh(list[i], ent)
+      } else if (mode === 'project') {
+        sh = Log.data.ph(list[i], ent)
+      }
+
+      let li = document.createElement('li')
+      let tl = document.createElement('span')
+      let st = document.createElement('span')
+      let br = document.createElement('div')
+      let dt = document.createElement('div')
+
+      li.className = 'mb4 f6 lhc c-pt'
+      tl.className = 'dib sw6 f6 elip'
+      st.className = 'f6 rf'
+      br.className = 'wf sh1'
+      dt.className = 'psr t0 hf lf'
+
+      if (mode === 'sector') {
+        dt.style.backgroundColor = Log.palette[list[i]] || Log.config.ui.colour
+        dt.style.width = `${(Log.data.sp(list[i], ent))}%`
+        st.innerHTML = `${sh.toFixed(2)} h`
+        li.setAttribute('onclick', `Log.detail.sector('${list[i]}')`)
+      } else if (mode === 'project') {
+        dt.style.backgroundColor = Log.projectPalette[list[i]] || Log.config.ui.colour
+        dt.style.width = `${(Log.data.pp(list[i], ent))}%`
+        st.innerHTML = `${sh.toFixed(2)} h`
+        li.setAttribute('onclick', `Log.detail.project('${list[i]}')`)
+      }
+
+      tl.innerHTML = list[i]
+
+      br.appendChild(dt)
+      li.appendChild(tl)
+      li.appendChild(st)
+      li.appendChild(br)
+
+      document.getElementById(con).appendChild(li)
+    }
+  },
+
+  /**
+   * Display a focus distribution bar
+   * @param {string} mode - Sector or project
+   * @param {Object[]=} ent - Entries
+   * @param {string=} con - Container
+   */
+  focusBar(mode, ent = Log.log, con = 'focusBar') {
+    let list = []
+
+    if (mode === 'sector') {
+      list = Log.data.listSectors(ent)
+    } else if (mode === 'project') {
+      list = Log.data.listProjects(ent)
+    }
+
+    for (let i = 0, l = list.length; i < l; i++) {
+      let item = document.createElement('div')
+      item.className = 'psr t0 hf lf'
+
+      if (mode === 'sector') {
+        item.style.backgroundColor = Log.palette[list[i]] || Log.config.ui.colour
+        item.style.width = `${(Log.data.sp(list[i], ent))}%`
+      } else if (mode === 'project') {
+        item.style.backgroundColor = Log.projectPalette[list[i]] || Log.config.ui.colour
+        item.style.width = `${(Log.data.pp(list[i], ent))}%`
+      }
+
+      document.getElementById(con).appendChild(item)
+    }
+  },
+
+  /**
+   * Create legend
+   * @param {string} mode - Sector or project
+   * @param {Object[]=} ent - Entries
+   * @param {string=} con - Container
+   */
+  legend(mode, ent = Log.log, con = 'legend') {
+    let list = []
+
+    if (mode === 'sector') {
+      list = Log.data.listSectors(ent).sort()
+    } else if (mode === 'project') {
+      list = Log.data.listProjects(ent).sort()
+    }
+
+    for (let i = 0, l = list.length; i < l; i++) {
+      let item = document.createElement('li')
+      let code = document.createElement('div')
+      let name = document.createElement('div')
+
+      item.className = 'c4 mb3 f6 lhc'
+      code.className = 'dib f6 p2 brf mr2'
+      name.className = 'dib pb1'
+
+      if (mode === 'sector') {
+        code.style.backgroundColor = Log.palette[list[i]] || Log.config.ui.colour
+        name.innerHTML = `${list[i]} (${Log.data.sp(list[i], ent).toFixed(2)}%)`
+      } else if (mode === 'project') {
+        code.style.backgroundColor = Log.projectPalette[list[i]] || Log.config.ui.colour
+        name.innerHTML = `${list[i]} (${Log.data.pp(list[i], ent).toFixed(2)}%)`
+      }
+
+      item.appendChild(code)
+      item.appendChild(name)
+      document.getElementById(con).appendChild(item)
+    }
+  },
+
+  /**
+   * Display a focus chart
+   * @param {string} mode - Sector or project
+   * @param {Object[]=} ent - Entries
+   * @param {string=} con - Container
+   */
+  focusChart(mode, ent = Log.log, con = 'focusChart') {
+    let set = Log.data.sortEntries(ent)
+
+    for (let i = 0, l = set.length; i < l; i++) {
+      let col = document.createElement('div')
+      let inn = document.createElement('div')
+      let cor = document.createElement('div')
+
+      col.className = 'dib hf psr'
+      col.style.width = `${100 / set.length}%`
+      inn.className = 'sw1 hf cn'
+      cor.className = 'psa sw1 b0 bg-noir'
+      cor.style.backgroundColor = Log.config.ui.colour
+
+      if (mode === 'sector') {
+        cor.style.height = `${(1 / Log.data.listSectors(set[i]).length) * 100}%`
+      } else if (mode === 'project') {
+        cor.style.height = `${(1 / Log.data.listProjects(set[i]).length) * 100}%`
+      }
+
+      inn.appendChild(cor)
+      col.appendChild(inn)
+      document.getElementById(con).appendChild(col)
     }
   }
 }
