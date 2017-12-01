@@ -390,7 +390,7 @@ Log.data = {
     if (ent.length === 0) return 0
 
     let h = Log.data.listDurations(ent).reduce(
-      (total, num) => total + num)
+      (total, num) => {return total + num}, 0)
 
     return h
   },
