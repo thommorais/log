@@ -434,19 +434,7 @@ Log.data = {
    * @returns {number} Sector hours
    */
   sh(sec, ent = Log.log) {
-    if (ent.length === 0) return 0
-
-    let h = 0
-
-    for (let i = 0, l = ent.length; i < l; i++) {
-      if (ent[i].e !== 'undefined' && ent[i].c === sec) {
-        h += Log.time.duration(
-          Log.time.parse(ent[i].s), Log.time.parse(ent[i].e)
-        )
-      }
-    }
-
-    return h
+    return ent.length === 0 ? 0 : Log.data.lh(Log.data.getEntriesBySector(sec, ent))
   },
 
   /**
@@ -466,17 +454,7 @@ Log.data = {
    * @returns {number} Project hours
    */
   ph(pro, ent = Log.log) {
-    let h = 0
-
-    for (let i = 0, l = ent.length; i < l; i++) {
-      if (ent[i].e !== 'undefined' && ent[i].t === pro) {
-        h += Log.time.duration(
-          Log.time.parse(ent[i].s), Log.time.parse(ent[i].e)
-        )
-      }
-    }
-
-    return h
+    return ent.length === 0 ? 0 : Log.data.lh(Log.data.getEntriesByProject(pro, ent))
   },
 
   /**
