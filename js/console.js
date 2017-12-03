@@ -186,9 +186,7 @@ Log.console = {
    * @param {string} i - Input
    */
   delete(i) {
-    let c = i.split(' ')
-    let id = Number(c[1]) - 1
-    user.log.splice(id, 1)
+    user.log.splice(Number(i.split(' ')[1]) - 1, 1)
     Log.options.update()
   },
 

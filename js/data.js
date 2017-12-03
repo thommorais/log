@@ -271,7 +271,7 @@ Log.data = {
    * @returns {string} Peak day
    */
   peakDay(pk = Log.data.peakDays(Log.log)) {
-    return ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][pk.indexOf(Math.max.apply(Math, pk))]
+    return ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][pk.indexOf(Math.max(...pk))]
   },
 
   /**
@@ -316,7 +316,7 @@ Log.data = {
    * @returns {string} Peak hour
    */
   peakHour(pk = Log.data.peakHours(Log.log)) {
-    return `${pk.indexOf(Math.max.apply(Math, pk))}:00`
+    return `${pk.indexOf(Math.max(...pk))}:00`
   },
 
   /**
@@ -347,8 +347,7 @@ Log.data = {
    * @returns {number} Shortest log session
    */
   lsmin(ent = Log.log) {
-    if (ent.length === 0) return 0
-    return Math.min.apply(Math, Log.data.listDurations(ent))
+    return ent.length === 0 ? 0 : Math.min(...Log.data.listDurations(ent))
   },
 
   /**
@@ -357,8 +356,7 @@ Log.data = {
    * @returns {number} Longest log session
    */
   lsmax(ent = Log.log) {
-    if (ent.length === 0) return 0
-    return Math.max.apply(Math, Log.data.listDurations(ent))
+    return ent.length === 0 ? 0 : Math.max(...Log.data.listDurations(ent))
   },
 
   /**
@@ -387,12 +385,9 @@ Log.data = {
    * @returns {number} Total logged hours
    */
   lh(ent = Log.log) {
-    if (ent.length === 0) return 0
-
-    let h = Log.data.listDurations(ent).reduce(
-      (total, num) => {return total + num}, 0)
-
-    return h
+    return ent.length === 0 ? 0 : Log.data.listDurations(ent).reduce(
+      (total, num) => {return total + num}, 0
+    )
   },
 
   /**
@@ -445,9 +440,9 @@ Log.data = {
 
     for (let i = 0, l = ent.length; i < l; i++) {
       if (ent[i].e !== 'undefined' && ent[i].c === sec) {
-        h += Number(Log.time.duration(
+        h += Log.time.duration(
           Log.time.parse(ent[i].s), Log.time.parse(ent[i].e)
-        ))
+        )
       }
     }
 
@@ -565,13 +560,7 @@ Log.data = {
    * @param {Object[]=} ent - Entries
    */
   minFocus(mode, ent = Log.log) {
-    if (ent.length === 0) return 0
-
-    if (mode === 'sector') {
-      return Math.min.apply(Math, Log.data.listFocus('sector', ent))
-    } else if (mode === 'project') {
-      return Math.min.apply(Math, Log.data.listFocus('project', ent))
-    }
+    return ent.length === 0 ? 0 : Math.min(...Log.data.listFocus(mode, ent))
   },
 
   /**
@@ -580,13 +569,7 @@ Log.data = {
    * @param {Object[]=} ent - Entries
    */
   maxFocus(mode, ent = Log.log) {
-    if (ent.length === 0) return 0
-
-    if (mode === 'sector') {
-      return Math.max.apply(Math, Log.data.listFocus('sector', ent))
-    } else if (mode === 'project') {
-      return Math.max.apply(Math, Log.data.listFocus('project', ent))
-    }
+    return ent.length === 0 ? 0 : Math.max(...Log.data.listFocus(mode, ent))
   },
 
   /**
@@ -649,7 +632,7 @@ Log.data = {
      */
     pt(d = new Date()) {
       let eph = Log.data.peakHours(Log.data.getEntriesByDay(d.getDay()))
-      return `${eph.indexOf(Math.max.apply(Math,eph))}:00`
+      return `${eph.indexOf(Math.max(...eph))}:00`
     },
 
     /**
