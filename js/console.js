@@ -91,7 +91,7 @@ Log.console = {
     let proj = ''
     let desc = ''
 
-    if (s.indexOf('"') >= 0) {
+    if (s.includes('"')) {
       p = s.split('')
 
       for (let i = 0, l = p.length; i < l; i++) {
@@ -109,17 +109,17 @@ Log.console = {
       for (let i = indices[4] + 1; i < indices[5]; i++) {
         desc += p[i]
       }
-    } else if (s.indexOf(';') >= 0) {
+    } else if (s.includes(';')) {
       p = s.split(';')
       sect = p[0].substring(6, p[0].length).trim()
       proj = p[1].trim()
       desc = p[2].trim()
-    } else if (s.indexOf('|') >= 0) {
+    } else if (s.includes('|')) {
       p = s.split('|')
       sect = p[0].substring(6, p[0].length).trim()
       proj = p[1].trim()
       desc = p[2].trim()
-    } else if (s.indexOf(',') >= 0) {
+    } else if (s.includes(',')) {
       p = s.split(',')
       sect = p[0].substring(6, p[0].length).trim()
       proj = p[1].trim()

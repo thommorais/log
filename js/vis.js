@@ -13,17 +13,14 @@ Log.vis = {
 
     let addEntry = ({s, e, c, t}, row) => {
       let entry = document.createElement('div')
-
       let es = Log.time.parse(s)
-      let width = Number(Log.utils.calcWidth(Log.time.parse(e), es).toFixed(2))
-      let dp = Number(Log.utils.calcDP(es).toFixed(2))
+      let width = Log.utils.calcWidth(Log.time.parse(e), es)
+      let dp = Log.utils.calcDP(es)
+      let colour = mode === 'sector' ? Log.palette[c] : Log.projectPalette[t]
 
       entry.className = 'psr t0 sh1 mb2 lf'
       entry.style.width = `${width}%`
       entry.style.marginLeft = `${Log.utils.calcMargin(dp, lw, lp).toFixed(2)}%`
-
-      let colour = mode === 'sector' ? Log.palette[c] : Log.projectPalette[t]
-
       entry.style.backgroundColor = colour || Log.config.ui.colour
 
       document.getElementById(row).appendChild(entry)
@@ -66,14 +63,12 @@ Log.vis = {
 
     let addEntry = ({s, e, c, t}, row) => {
       let entry = document.createElement('div')
-      let height = Number(Log.utils.calcWidth(Log.time.parse(e), Log.time.parse(s)).toFixed(2))
+      let height = Log.utils.calcWidth(Log.time.parse(e), Log.time.parse(s))
+      let colour = mode === 'sector' ? Log.palette[c] : Log.projectPalette[t]
 
       entry.className = 'psa sw1'
       entry.style.height = `${height}%`
       entry.style.bottom = `${lw}%`
-
-      let colour = mode === 'sector' ? Log.palette[c] : Log.projectPalette[t]
-
       entry.style.backgroundColor = colour || Log.config.ui.colour
 
       document.getElementById(row).appendChild(entry)
@@ -129,16 +124,14 @@ Log.vis = {
 
       let entry = document.createElement('div')
       let es = Log.time.parse(ent[i].s)
-      let dp = Number(Log.utils.calcDP(es).toFixed(2))
-      let width = Number(Log.utils.calcWidth(Log.time.parse(ent[i].e), es).toFixed(2))
-      let margin = Number(Log.utils.calcMargin(dp, lw, lp).toFixed(2))
+      let dp = Log.utils.calcDP(es)
+      let width = Log.utils.calcWidth(Log.time.parse(ent[i].e), es)
+      let margin = Log.utils.calcMargin(dp, lw, lp)
+      let colour = mode === 'sector' ? Log.palette[ent[i].c] : Log.projectPalette[ent[i].t]
 
       entry.className = 'nodrag psr t0 hf mb2 lf'
       entry.style.width = `${width}%`
       entry.style.marginLeft = `${margin}%`
-
-      let colour = mode === 'sector' ? Log.palette[ent[i].c] : Log.projectPalette[ent[i].t]
-
       entry.style.backgroundColor = colour || Log.config.ui.colour
 
       document.getElementById(con).appendChild(entry)
@@ -155,7 +148,7 @@ Log.vis = {
    */
   peakH(ent = Log.log, con = 'phc') {
     let hours = Log.data.peakHours(ent)
-    let max = Log.utils.getMax(hours)
+    let max = Math.max(...hours)
 
     for (let i = 0, l = hours.length; i < l; i++) {
       let d = document.createElement('div')
@@ -164,7 +157,7 @@ Log.vis = {
       let t = `${con}-${i}`
 
       d.className = 'dib hf psr'
-      d.style.width = '4.17%'
+      d.style.width = `${100 / 24}%`
       d.id = t
 
       n.className = 'sw1 hf cn'
@@ -187,7 +180,7 @@ Log.vis = {
    */
   peakD(ent = Log.log, con = 'pdc') {
     let peaks = Log.data.peakDays(ent)
-    let peakMax = Log.utils.getMax(peaks)
+    let peakMax = Math.max(...peaks)
 
     for (let i = 0, l = peaks.length; i < l; i++) {
       let col = document.createElement('div')
@@ -196,7 +189,7 @@ Log.vis = {
       let id = `${con}-${i}`
 
       col.className = 'dib hf psr'
-      col.style.width = '14.29%'
+      col.style.width = `${100 / 7}%`
       col.id = id
 
       cor.className = 'sw1 hf cn'
@@ -223,12 +216,13 @@ Log.vis = {
 
     for (let i = 0, l = list.length; i < l; i++) {
       let sh = mode === 'sector' ? Log.data.sh(list[i], ent) : Log.data.ph(list[i], ent)
-
       let li = document.createElement('li')
       let tl = document.createElement('span')
       let st = document.createElement('span')
       let br = document.createElement('div')
       let dt = document.createElement('div')
+      let colour = ''
+      let width = 0
 
       li.className = 'mb4 f6 lhc c-pt'
       tl.className = 'dib sw6 f6 elip'
@@ -236,24 +230,18 @@ Log.vis = {
       br.className = 'wf sh1'
       dt.className = 'psr t0 hf lf'
 
-      let colour = ''
-      let func = ''
-      let width = 0
-
       if (mode === 'sector') {
         colour = Log.palette[list[i]]
         width = Log.data.sp(list[i], ent)
-        func = `Log.detail.sector('${list[i]}')`
       } else if (mode === 'project') {
         colour = Log.projectPalette[list[i]]
         width = Log.data.pp(list[i], ent)
-        func = `Log.detail.project('${list[i]}')`
       }
 
       dt.style.backgroundColor = colour || Log.config.ui.colour
       dt.style.width = `${width.toFixed(2)}%`
       st.innerHTML = `${sh.toFixed(2)} h`
-      li.setAttribute('onclick', func)
+      li.setAttribute('onclick', `Log.detail.${mode}('${list[i]}')`)
       tl.innerHTML = list[i]
 
       br.appendChild(dt)
@@ -308,13 +296,12 @@ Log.vis = {
       let item = document.createElement('li')
       let code = document.createElement('div')
       let name = document.createElement('div')
-
-      item.className = 'c4 mb3 f6 lhc'
-      code.className = 'dib f6 p2 brf mr2'
-      name.className = 'dib pb1'
-
       let colour = ''
       let perc = 0
+
+      item.className = 'c3 mb3 f6 lhc'
+      code.className = 'dib f6 p2 brf mr2'
+      name.className = 'dib pb1'
 
       if (mode === 'sector') {
         colour = Log.palette[list[i]]
@@ -346,15 +333,15 @@ Log.vis = {
       let col = document.createElement('div')
       let inn = document.createElement('div')
       let cor = document.createElement('div')
+      let height = mode === 'sector' ? 1 / Log.data.listSectors(set[i]).length * 100 : 1 / Log.data.listProjects(set[i]).length * 100
 
       col.className = 'dib hf psr'
       col.style.width = `${(100 / set.length).toFixed(2)}%`
-      inn.className = 'sw1 hf cn'
+
+      inn.className = 'sw1 hf cn bsia'
+
       cor.className = 'psa sw1 b0 bg-noir'
       cor.style.backgroundColor = Log.config.ui.colour
-
-      let height = mode === 'sector' ? 1 / Log.data.listSectors(set[i]).length * 100 : 1 / Log.data.listProjects(set[i]).length * 100
-
       cor.style.height = `${height.toFixed(2)}%`
 
       inn.appendChild(cor)

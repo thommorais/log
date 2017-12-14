@@ -251,7 +251,7 @@ Log.data = {
    * @returns {Object[]} Peak days
    */
   peakDays(ent = Log.log) {
-    let days = [0, 0, 0, 0, 0, 0, 0]
+    let days = Array(7).fill(0)
 
     for (let i = 0, l = ent.length; i < l; i++) {
       if (ent[i].e === 'undefined') continue
@@ -280,7 +280,7 @@ Log.data = {
    * @returns {Object[]} Peak hours
    */
   peakHours(ent = Log.log) {
-    let hours = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+    let hours = Array(24).fill(0)
 
     for (let i = 0, l = ent.length; i < l; i++) {
       if (ent[i].e === 'undefined') continue
@@ -328,14 +328,14 @@ Log.data = {
     let list = []
 
     for (let i = 0, l = ent.length; i < l; i++) {
-      if (ent[i].e !== 'undefined') {
-        list.push(
-          Log.time.duration(
-            Log.time.parse(ent[i].s),
-            Log.time.parse(ent[i].e)
-          )
+      if (ent[i].e === 'undefined') continue
+
+      list.push(
+        Log.time.duration(
+          Log.time.parse(ent[i].s),
+          Log.time.parse(ent[i].e)
         )
-      }
+      )
     }
 
     return list
@@ -386,7 +386,7 @@ Log.data = {
    */
   lh(ent = Log.log) {
     return ent.length === 0 ? 0 : Log.data.listDurations(ent).reduce(
-      (total, num) => {return total + num}, 0
+      (total, num) => total + num, 0
     )
   },
 
@@ -417,7 +417,8 @@ Log.data = {
     if (ent.length === 0) return 0
 
     let e = Log.time.convert(Log.time.parse(ent[0].s))
-    let d = Log.time.convert(Log.time.parse(ent[ent.length - 1].s))
+    let d = Log.time.convert(Log.time.parse(ent.slice(-1)[0].s))
+
     let h = Log.data.lh(ent)
     let n = Math.ceil((
               new Date(d.getFullYear(), d.getMonth(), d.getDate()) -

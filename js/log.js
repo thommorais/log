@@ -55,11 +55,11 @@ var Log = {
 
   /**
    * Display a log table
-   * @param {Object[]=} ent - The log entries
-   * @param {number=} num - The number of entries to show
-   * @param {string=} con - The container
+   * @param {Object[]=} ent - Entries
+   * @param {number=} num - Number of entries to show
+   * @param {string=} con - Container
    */
-  display(ent = user.log, num = 50, con = 'logTable') {
+  display(ent = user.log, num = 50, con = 'logbook') {
     let count = user.log.length
 
     /**
@@ -97,29 +97,20 @@ var Log = {
      */
     let addRow = (e, i) => {
       let rw = document.getElementById(con).insertRow(i)
-      let c1 = rw.insertCell(0)
-      let c2 = rw.insertCell(1)
-      let c3 = rw.insertCell(2)
-      let c4 = rw.insertCell(3)
-      let c5 = rw.insertCell(4)
-      let c6 = rw.insertCell(5)
-      let c7 = rw.insertCell(6)
-      let c8 = rw.insertCell(7)
       let es = Log.time.parse(e.s)
       let ee = Log.time.parse(e.e)
-
       let cs = Log.time.convert(es)
 
       ee = e.e === 'undefined' ? '-' : ee
 
-      c1.innerHTML = count--
-      c2.innerHTML = Log.time.displayDate(cs)
-      c3.innerHTML = Log.time.stamp(cs)
-      c4.innerHTML = e.e === 'undefined' ? '-' : Log.time.stamp(Log.time.convert(ee))
-      c5.innerHTML = e.e === 'undefined' ? '-' : Log.time.duration(es, ee).toFixed(2)
-      c6.innerHTML = e.c
-      c7.innerHTML = e.t
-      c8.innerHTML = e.d
+      rw.insertCell(0).innerHTML = count--
+      rw.insertCell(1).innerHTML = Log.time.displayDate(cs)
+      rw.insertCell(2).innerHTML = Log.time.stamp(cs)
+      rw.insertCell(3).innerHTML = e.e === 'undefined' ? '-' : Log.time.stamp(Log.time.convert(ee))
+      rw.insertCell(4).innerHTML = e.e === 'undefined' ? '-' : Log.time.duration(es, ee).toFixed(2)
+      rw.insertCell(5).innerHTML = e.c
+      rw.insertCell(6).innerHTML = e.t
+      rw.insertCell(7).innerHTML = e.d
     }
 
     let entries = takeRight(ent, num).reverse()
@@ -135,14 +126,14 @@ var Log = {
      * View sector details
      * @param {string} sec - Sector
      */
-    sector(sec = Log.data.listSectors()[0]) {
+    sector(sec = Log.data.listSectors().sort()[0]) {
       Log.detail.clear.sector()
 
       let mn = Log.data.getRecentEntries(Log.config.ui.view - 1)
       let ent = Log.data.getEntriesBySector(sec, mn)
 
       Log.ui.write('sectorTitle', sec)
-      Log.ui.write('sectorLastUpdate', Log.time.timeago(Log.time.parse(ent[ent.length - 1].e) * 1E3))
+      Log.ui.write('sectorLastUpdate', Log.time.timeago(Log.time.parse(ent.slice(-1)[0].e) * 1E3))
 
       Log.vis.bar('sectorChart', ent, 'project')
 
@@ -171,7 +162,7 @@ var Log = {
      * View project details
      * @param {string} pro - Project
      */
-    project(pro = Log.data.listProjects()[0]) {
+    project(pro = Log.data.listProjects().sort()[0]) {
       Log.detail.clear.project()
 
       let mn = Log.data.getRecentEntries(Log.config.ui.view - 1)
@@ -179,7 +170,7 @@ var Log = {
 
       Log.ui.write('projectTitle', pro)
 
-      Log.ui.write('projectLastUpdate', Log.time.timeago(Log.time.parse(ent[ent.length - 1].e) * 1E3))
+      Log.ui.write('projectLastUpdate', Log.time.timeago(Log.time.parse(ent.slice(-1)[0].e) * 1E3))
 
       Log.vis.bar('projectChart', ent, 'sector')
 
@@ -329,7 +320,7 @@ var Log = {
     }
   },
 
-  init(log) {
+  init() {
     if (localStorage.hasOwnProperty('logHistory')) {
       Log.console.history = JSON.parse(localStorage.getItem('logHistory'))
     } else {
@@ -366,14 +357,14 @@ var Log = {
         con.value = ''
         cmd.style.display = 'none'
         cmdIndex = 1
-      }
-
-      if (e.which === 38) {
+      } else if (e.which === 38) {
         cmd.style.display = 'block'
         con.focus()
         cmdIndex++
 
-        if (cmdIndex > Log.console.history.length) cmdIndex = Log.console.history.length
+        if (cmdIndex > Log.console.history.length) {
+          cmdIndex = Log.console.history.length
+        }
 
         con.value = Log.console.history[Log.console.history.length - cmdIndex]
       } else if (e.which === 40) {
@@ -438,7 +429,7 @@ var Log = {
     Log.ui.write('ASDT', Log.data.asd(en).toFixed(2))
     Log.ui.write('LPT', Log.data.lp(en).toFixed(2))
     Log.ui.write('focusToday', Log.data.projectFocus(Log.data.listProjects(en)).toFixed(2))
-    Log.ui.write('entryCount', en.length)
+    Log.ui.write('entryCount', en.length - 1)
     Log.ui.write('streakToday', Log.data.streak(Log.log))
 
     Log.ui.write('LHH', Log.data.lh().toFixed(2))
@@ -473,6 +464,6 @@ var Log = {
 
     Log.vis.line('vis', mn)
 
-    Log.display(undefined, 1000, 'logbook')
+    Log.display(undefined, 1000)
   }
 }
