@@ -147,7 +147,7 @@
 
     <div class="cb pl4-l hf-l">
       <div id="sum" class="subsect hf r">
-        <div class="nodrag ca hf pr4-l oya-l">
+        <div class="nodrag hf pr4-l oya-l">
           <h3 class="mb4 f6 fwn">Statistics</h3>
 
           <ul class="mb4 lsn f6 lhc r">
@@ -177,15 +177,15 @@
             </li>
             <li class="mb4 c6 c3-m c3-l">
               <p class="f3 fwb"><span id="entCount">0</span></p>
-              <p class="f6 o9">Entry Count</p>
+              <p class="f6 o9">Entries</p>
             </li>
             <li class="mb4 c6 c3-m c3-l">
               <p class="f3 fwb"><span id="secCount">0</span></p>
-              <p class="f6 o9">Sector Count</p>
+              <p class="f6 o9">Sectors</p>
             </li>
             <li class="mb4 mb0-l c6 c3-m c3-l">
               <p class="f3 fwb"><span id="proCount">0</span></p>
-              <p class="f6 o9">Project Count</p>
+              <p class="f6 o9">Projects</p>
             </li>
             <li class="mb4 mb0-l c6 c3-m c3-l">
               <p class="f3 fwb"><span id="PHH">0:00</span></p>
@@ -208,7 +208,7 @@
             <li class="mb4 mb0-l c6 c3-m c3-l">
               <p class="f3 fwb"><span id="AFH">0.00</span></p>
               <p class="f6 o9">
-                <span class="mr2">Avg Focus</span>
+                <span class="mr2">Average Focus</span>
               </p>
             </li>
             <li class="mb4 mb0-l c6 c3-m c3-l">
@@ -253,14 +253,14 @@
             </li>
             <li class="mb4 c6 c3-m c3-l">
               <p class="f3 fwb"><span id="secASD">0.00</span> h</p>
-              <p class="f6 o9">Avg. Session</p>
+              <p class="f6 o9">Avg Session</p>
             </li>
             <li class="mb4 mb0-l c6 c3-m c3-l">
               <p class="f3 fwb"><span id="secLPH">0.00</span>%</p>
               <p class="f6 o9">Log Percentage</p>
             </li>
             <li class="mb4 mb0-l c6 c3-m c3-l">
-              <p class="f3 fwb"><span id="secPHH">0:00</span> h</p>
+              <p class="f3 fwb"><span id="secPHH">0:00</span></p>
               <p class="f6 o9">Peak Hour</p>
             </li>
             <li class="mb4 mb0-l c6 c3-m c3-l">
@@ -316,7 +316,7 @@
               <p class="f6 o9">Log Percentage</p>
             </li>
             <li class="mb4 mb0-l c6 c3-m c3-l">
-              <p class="f3 fwb"><span id="proPHH">0:00</span> h</p>
+              <p class="f3 fwb"><span id="proPHH">0:00</span></p>
               <p class="f6 o9">Peak Hour</p>
             </li>
             <li class="mb4 mb0-l c6 c3-m c3-l">
@@ -476,13 +476,13 @@
   </div>
 
   <form id="cmd" class="dn psf b0 l0 wf f6 z9" action="#" onsubmit="return false;" autocomplete="off" spellcheck="false">
-    <input type="text" class="wf bg-0 blanc on bn p3" id="console" autofocus="autofocus" placeholder="> Log.console" />
+    <input id="console" type="text" class="wf bg-0 blanc on bn p3" autofocus="autofocus" placeholder="Log.console" />
   </form>
 
   <script src="data/user.js"></script>
-
   <script src="js/drop.js"></script>
   <script src="js/log.js"></script>
+  <script src="js/utility.js"></script>
   <script src="js/ui.js"></script>
   <script src="js/options.js"></script>
   <script src="js/console.js"></script>
@@ -493,10 +493,7 @@
   <script>
     const {dialog,app} = require('electron').remote
     const fs = require('fs')
-    let log = user.log || []
-    let history = user.history || []
-
-    Log.init(log)
+    Log.init()
   </script>
 
 </body>
