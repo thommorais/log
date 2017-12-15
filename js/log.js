@@ -9,7 +9,7 @@
 
 'use strict';
 
-const SHELL = require('shelljs')
+// const SHELL = require('shelljs')
 
 var Log = {
 
@@ -60,8 +60,6 @@ var Log = {
    * @param {string=} con - Container
    */
   display(ent = user.log, num = 50, con = 'logbook') {
-    let count = user.log.length
-
     /**
      * Take the last n items of an array
      * @param {Object[]} a - The array
@@ -103,7 +101,7 @@ var Log = {
 
       ee = e.e === 'undefined' ? '-' : ee
 
-      rw.insertCell(0).innerHTML = count--
+      rw.insertCell(0).innerHTML = user.log.length - i
       rw.insertCell(1).innerHTML = Log.time.displayDate(cs)
       rw.insertCell(2).innerHTML = Log.time.stamp(cs)
       rw.insertCell(3).innerHTML = e.e === 'undefined' ? '-' : Log.time.stamp(Log.time.convert(ee))
@@ -129,33 +127,39 @@ var Log = {
     sector(sec = Log.data.listSectors().sort()[0]) {
       Log.detail.clear.sector()
 
-      let mn = Log.data.getRecentEntries(Log.config.ui.view - 1)
-      let ent = Log.data.getEntriesBySector(sec, mn)
+      let ent = Log.data.getEntriesBySector(sec, Log.data.getRecentEntries(Log.config.ui.view - 1))
+      let his = Log.data.getEntriesBySector(sec)
 
       Log.ui.write('sectorTitle', sec)
-      Log.ui.write('sectorLastUpdate', Log.time.timeago(Log.time.parse(ent.slice(-1)[0].e) * 1E3))
 
-      Log.vis.bar('sectorChart', ent, 'project')
+      let timeago = ent.length === 0 ? `No activity in the past ${Log.config.ui.view} days` : `Updated ${Log.time.timeago(Log.time.parse(ent.slice(-1)[0].e) * 1E3)}`
 
-      let peakHours = Log.data.peakHours(ent)
-      let peakDays = Log.data.peakDays(ent)
+      Log.ui.write('sectorLastUpdate', timeago)
 
-      Log.ui.write('secLHH', Log.data.lh(ent).toFixed(2))
-      Log.ui.write('secLSNH', Log.data.lsmin(ent).toFixed(2))
-      Log.ui.write('secLSXH', Log.data.lsmax(ent).toFixed(2))
-      Log.ui.write('secASD', Log.data.asd(ent).toFixed(2))
-      Log.ui.write('secLPH', Log.data.lp(ent).toFixed(2))
+      if (ent.length !== 0) Log.vis.bar('sectorChart', ent, 'project')
+
+      let peakHours = Log.data.peakHours(his)
+      let peakDays = Log.data.peakDays(his)
+
+      Log.ui.write('secEnt', his.length)
+      Log.ui.write('secLHH', Log.data.lh(his).toFixed(2))
+      Log.ui.write('secLSNH', Log.data.lsmin(his).toFixed(2))
+      Log.ui.write('secLSXH', Log.data.lsmax(his).toFixed(2))
+      Log.ui.write('secASD', Log.data.asd(his).toFixed(2))
+      Log.ui.write('secLPH', Log.data.lp(his).toFixed(2))
       Log.ui.write('secPHH', Log.data.peakHour(peakHours))
       Log.ui.write('secPDH', Log.data.peakDay(peakDays))
-      Log.ui.write('secStreak', Log.data.streak(ent))
+      Log.ui.write('secStreak', Log.data.streak(his))
 
-      Log.vis.peakH(ent, 'secPeakTimes')
-      Log.vis.peakD(ent, 'secPeakDays')
+      Log.vis.peakH(his, 'secPeakTimes')
+      Log.vis.peakD(his, 'secPeakDays')
 
-      Log.vis.focusChart('project', ent, 'secFocusChart')
+      if (ent.length !== 0) {
+        Log.vis.focusChart('project', ent, 'secFocusChart')
 
-      Log.vis.focusBar('project', ent, 'projectDetailFocus')
-      Log.vis.legend('project', ent, 'projectLegend')
+        Log.vis.focusBar('project', ent, 'projectDetailFocus')
+        Log.vis.legend('project', ent, 'projectLegend')
+      }
     },
 
     /**
@@ -165,34 +169,39 @@ var Log = {
     project(pro = Log.data.listProjects().sort()[0]) {
       Log.detail.clear.project()
 
-      let mn = Log.data.getRecentEntries(Log.config.ui.view - 1)
-      let ent = Log.data.getEntriesByProject(pro, mn)
+      let ent = Log.data.getEntriesByProject(pro, Log.data.getRecentEntries(Log.config.ui.view - 1))
+      let his = Log.data.getEntriesByProject(pro)
 
       Log.ui.write('projectTitle', pro)
 
-      Log.ui.write('projectLastUpdate', Log.time.timeago(Log.time.parse(ent.slice(-1)[0].e) * 1E3))
+      let timeago = ent.length === 0 ? `No activity in the past ${Log.config.ui.view} days` : `Updated ${Log.time.timeago(Log.time.parse(ent.slice(-1)[0].e) * 1E3)}`
 
-      Log.vis.bar('projectChart', ent, 'sector')
+      Log.ui.write('projectLastUpdate', timeago)
 
-      let peakHours = Log.data.peakHours(ent)
-      let peakDays = Log.data.peakDays(ent)
+      if (ent.length !== 0) Log.vis.bar('projectChart', ent, 'sector')
 
-      Log.ui.write('proLHH', Log.data.lh(ent).toFixed(2))
-      Log.ui.write('proLSNH', Log.data.lsmin(ent).toFixed(2))
-      Log.ui.write('proLSXH', Log.data.lsmax(ent).toFixed(2))
-      Log.ui.write('proASD', Log.data.asd(ent).toFixed(2))
-      Log.ui.write('proLPH', Log.data.lp(ent).toFixed(2))
+      let peakHours = Log.data.peakHours(his)
+      let peakDays = Log.data.peakDays(his)
+
+      Log.ui.write('proEnt', his.length)
+      Log.ui.write('proLHH', Log.data.lh(his).toFixed(2))
+      Log.ui.write('proLSNH', Log.data.lsmin(his).toFixed(2))
+      Log.ui.write('proLSXH', Log.data.lsmax(his).toFixed(2))
+      Log.ui.write('proASD', Log.data.asd(his).toFixed(2))
+      Log.ui.write('proLPH', Log.data.lp(his).toFixed(2))
       Log.ui.write('proPHH', Log.data.peakHour(peakHours))
       Log.ui.write('proPDH', Log.data.peakDay(peakDays))
-      Log.ui.write('proStreak', Log.data.streak(ent))
+      Log.ui.write('proStreak', Log.data.streak(his))
 
-      Log.vis.peakH(ent, 'proPeakTimes')
-      Log.vis.peakD(ent, 'proPeakDays')
+      Log.vis.peakH(his, 'proPeakTimes')
+      Log.vis.peakD(his, 'proPeakDays')
 
-      Log.vis.focusChart('sector', ent, 'proFocusChart')
+      if (ent.length !== 0) {
+        Log.vis.focusChart('sector', ent, 'proFocusChart')
 
-      Log.vis.focusBar('sector', ent, 'sectorDetailFocus')
-      Log.vis.legend('sector', ent, 'sectorLegend')
+        Log.vis.focusBar('sector', ent, 'sectorDetailFocus')
+        Log.vis.legend('sector', ent, 'sectorLegend')
+      }
     },
 
     clear: {
@@ -429,7 +438,7 @@ var Log = {
     Log.ui.write('ASDT', Log.data.asd(en).toFixed(2))
     Log.ui.write('LPT', Log.data.lp(en).toFixed(2))
     Log.ui.write('focusToday', Log.data.projectFocus(Log.data.listProjects(en)).toFixed(2))
-    Log.ui.write('entryCount', en.length - 1)
+    Log.ui.write('entryCount', en.length)
     Log.ui.write('streakToday', Log.data.streak(Log.log))
 
     Log.ui.write('LHH', Log.data.lh().toFixed(2))
