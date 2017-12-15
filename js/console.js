@@ -226,6 +226,10 @@ Log.console = {
       user.log[id].t = proc(i)
     } else if (a === 'desc' || a === 'dsc' || a === 'description') {
       user.log[id].d = proc(i)
+    } else if (a === 'start') {
+      user.log[id].s = Log.time.convertDateTime(proc(i))
+    } else if (a === 'end') {
+      user.log[id].e = Log.time.convertDateTime(proc(i))
     } else return
 
     Log.options.update()

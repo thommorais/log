@@ -28,6 +28,17 @@ Log.time = {
   },
 
   /**
+   * Convert datetime into Log format (from Twig)
+   * @param {string} i - Datetime
+   * @returns {string} Datetime in Log format
+   */
+  convertDateTime(i) {
+    let m = i.split(' ')
+
+    return (+new Date(m[0], Number(m[1] - 1), m[2], m[3], m[4], m[5]).getTime() / 1E3).toString(16)
+  },
+
+  /**
    * Create a timestamp
    * @param {Object} d - Date
    * @returns {string} Timestamp
@@ -38,9 +49,8 @@ Log.time = {
     if (f === '24') {
       let h = `0${d.getHours()}`
       let m = `0${d.getMinutes()}`
-      let s = `0${d.getSeconds()}`
 
-      return `${h.substr(-2)}:${m.substr(-2)}:${s.substr(-2)}`
+      return `${h.substr(-2)}:${m.substr(-2)}`
     } else if (f === '12') {
       return Log.time.twelveHours(d)
     }
