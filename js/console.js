@@ -29,7 +29,7 @@ Log.console = {
         Log.console.set(i);
         break;
       case 4:
-        Log.console.importUser(i);
+        Log.console.importUser();
         break;
       case 5:
         Log.console.exportUser();
@@ -45,21 +45,24 @@ Log.console = {
 
   /**
    * Import user data
-   * @param {string} i - Input
    */
-  importUser(i) {
-    let s = i.split(' ')
+  importUser() {
+    let path = dialog.showOpenDialog({properties: ['openFile']})
 
-    if (s[1].substr(-1) === '/') {
-      s[1].substr(0, s[1].length - 1)
-    }
+		if (!path) return
 
-    if (SHELL.test("-f", s[1])) {
-      let file = SHELL.cat(s[1])
-      localStorage.setItem('user', file)
-      user = JSON.parse(localStorage.getItem('user'))
-      Log.refresh()
-    } else return
+    let string = ''
+
+		try {
+			string = fs.readFileSync(path[0], 'utf-8')
+		} catch (e) {
+			console.log('Error while loading file')
+		}
+
+    localStorage.setItem('user', string)
+    user = JSON.parse(localStorage.getItem('user'))
+
+		Log.refresh()
   },
 
   /**

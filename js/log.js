@@ -383,6 +383,14 @@ var Log = {
 
         if (cmdIndex < 1) cmdIndex = 1
         con.value = Log.console.history[Log.console.history.length - cmdIndex]
+      } else if (e.key == "o" && (e.ctrlKey || e.metaKey)) {
+      	e.preventDefault()
+      	Log.console.importUser()
+      	return
+      } else if (e.key == "e" && (e.ctrlKey || e.metaKey)) {
+      	e.preventDefault()
+      	Log.console.exportUser()
+      	return
       }
     })
 
