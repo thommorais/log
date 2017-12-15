@@ -8,6 +8,8 @@ Log.vis = {
    * @param {string=} mode - Colour mode
    */
   line(con, ent = Log.log, mode = Log.config.ui.colourMode) {
+    if (ent.length === 0) return
+
     let lw = 0
     let lp = 0
 
@@ -59,6 +61,8 @@ Log.vis = {
    * @param {string=} mode - Colour mode
    */
   bar(con, ent = Log.log, mode = Log.config.ui.colourMode) {
+    if (ent.length === 0) return
+
     let lw = 0
 
     let addEntry = ({s, e, c, t}, row) => {
@@ -147,6 +151,8 @@ Log.vis = {
    * @param {string=} con - Container
    */
   peakH(ent = Log.log, con = 'phc') {
+    if (ent.length === 0) return
+
     let hours = Log.data.peakHours(ent)
     let max = Math.max(...hours)
 
@@ -179,6 +185,8 @@ Log.vis = {
    * @param {string=} con - Container
    */
   peakD(ent = Log.log, con = 'pdc') {
+    if (ent.length === 0) return
+
     let peaks = Log.data.peakDays(ent)
     let peakMax = Math.max(...peaks)
 
@@ -212,6 +220,8 @@ Log.vis = {
    * @param {Object[]=} ent - Entries
    */
   list(mode, con, ent = Log.log) {
+    if (ent.length === 0) return
+
     let list = mode === 'sector' ? Log.data.listSectors(ent).sort() : Log.data.listProjects(ent).sort()
 
     for (let i = 0, l = list.length; i < l; i++) {
@@ -260,6 +270,8 @@ Log.vis = {
    * @param {string=} con - Container
    */
   focusBar(mode, ent = Log.log, con = 'focusBar') {
+    if (ent.length === 0) return
+
     let list = mode === 'sector' ? Log.data.listSectors(ent) : Log.data.listProjects(ent)
 
     for (let i = 0, l = list.length; i < l; i++) {
@@ -290,6 +302,8 @@ Log.vis = {
    * @param {string=} con - Container
    */
   legend(mode, ent = Log.log, con = 'legend') {
+    if (ent.length === 0) return
+
     let list = mode === 'sector' ? Log.data.listSectors(ent).sort() : Log.data.listProjects(ent).sort()
 
     for (let i = 0, l = list.length; i < l; i++) {
@@ -327,6 +341,8 @@ Log.vis = {
    * @param {string=} con - Container
    */
   focusChart(mode, ent = Log.log, con = 'focusChart') {
+    if (ent.length === 0) return
+
     let set = Log.data.sortEntries(ent)
 
     for (let i = 0, l = set.length; i < l; i++) {
@@ -338,7 +354,7 @@ Log.vis = {
       col.className = 'dib hf psr'
       col.style.width = `${(100 / set.length).toFixed(2)}%`
 
-      inn.className = 'sw1 hf cn bsia'
+      inn.className = 'sw1 hf cn'
 
       cor.className = 'psa sw1 b0 bg-noir'
       cor.style.backgroundColor = Log.config.ui.colour

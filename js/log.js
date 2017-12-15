@@ -136,26 +136,26 @@ var Log = {
 
       Log.ui.write('sectorLastUpdate', timeago)
 
-      if (ent.length !== 0) Log.vis.bar('sectorChart', ent, 'project')
-
-      let peakHours = Log.data.peakHours(his)
-      let peakDays = Log.data.peakDays(his)
-
       Log.ui.write('secEnt', his.length)
       Log.ui.write('secLHH', Log.data.lh(his).toFixed(2))
       Log.ui.write('secLSNH', Log.data.lsmin(his).toFixed(2))
       Log.ui.write('secLSXH', Log.data.lsmax(his).toFixed(2))
       Log.ui.write('secASD', Log.data.asd(his).toFixed(2))
       Log.ui.write('secLPH', Log.data.lp(his).toFixed(2))
-      Log.ui.write('secPHH', Log.data.peakHour(peakHours))
-      Log.ui.write('secPDH', Log.data.peakDay(peakDays))
+      Log.ui.write('secPHH', Log.data.peakHour(Log.data.peakHours(his)))
+      Log.ui.write('secPDH', Log.data.peakDay(Log.data.peakDays(his)))
       Log.ui.write('secStreak', Log.data.streak(his))
 
       Log.vis.peakH(his, 'secPeakTimes')
       Log.vis.peakD(his, 'secPeakDays')
 
       if (ent.length !== 0) {
+        Log.vis.bar('sectorChart', ent, 'project')
         Log.vis.focusChart('project', ent, 'secFocusChart')
+
+        Log.ui.write('secAFH', Log.data.focusAvg(ent).toFixed(2))
+        Log.ui.write('secFmin', Log.data.minFocus('project', ent).toFixed(2))
+        Log.ui.write('secFmax', Log.data.maxFocus('project', ent).toFixed(2))
 
         Log.vis.focusBar('project', ent, 'projectDetailFocus')
         Log.vis.legend('project', ent, 'projectLegend')
@@ -178,26 +178,26 @@ var Log = {
 
       Log.ui.write('projectLastUpdate', timeago)
 
-      if (ent.length !== 0) Log.vis.bar('projectChart', ent, 'sector')
-
-      let peakHours = Log.data.peakHours(his)
-      let peakDays = Log.data.peakDays(his)
-
       Log.ui.write('proEnt', his.length)
       Log.ui.write('proLHH', Log.data.lh(his).toFixed(2))
       Log.ui.write('proLSNH', Log.data.lsmin(his).toFixed(2))
       Log.ui.write('proLSXH', Log.data.lsmax(his).toFixed(2))
       Log.ui.write('proASD', Log.data.asd(his).toFixed(2))
       Log.ui.write('proLPH', Log.data.lp(his).toFixed(2))
-      Log.ui.write('proPHH', Log.data.peakHour(peakHours))
-      Log.ui.write('proPDH', Log.data.peakDay(peakDays))
+      Log.ui.write('proPHH', Log.data.peakHour(Log.data.peakHours(his)))
+      Log.ui.write('proPDH', Log.data.peakDay(Log.data.peakDays(his)))
       Log.ui.write('proStreak', Log.data.streak(his))
 
       Log.vis.peakH(his, 'proPeakTimes')
       Log.vis.peakD(his, 'proPeakDays')
 
       if (ent.length !== 0) {
+        Log.vis.bar('projectChart', ent, 'sector')
         Log.vis.focusChart('sector', ent, 'proFocusChart')
+
+        Log.ui.write('proAFH', Log.data.focusAvg(ent).toFixed(2))
+        Log.ui.write('proFmin', Log.data.minFocus('sector', ent).toFixed(2))
+        Log.ui.write('proFmax', Log.data.maxFocus('sector', ent).toFixed(2))
 
         Log.vis.focusBar('sector', ent, 'sectorDetailFocus')
         Log.vis.legend('sector', ent, 'sectorLegend')

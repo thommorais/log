@@ -506,11 +506,13 @@ Log.data = {
 
     if (mode === 'sector') {
       for (let i = 0, l = days.length; i < l; i++) {
-        list.push(Log.data.sectorFocus(Log.data.listSectors(days[i])))
+        let f = Log.data.sectorFocus(Log.data.listSectors(days[i]))
+        if (f !== 0) list.push(f)
       }
     } else if (mode === 'project') {
       for (let i = 0, l = days.length; i < l; i++) {
-        list.push(Log.data.projectFocus(Log.data.listProjects(days[i])))
+        let f = Log.data.sectorFocus(Log.data.listProjects(days[i]))
+        if (f !== 0) list.push(f)
       }
     }
 
@@ -522,7 +524,7 @@ Log.data = {
    * @param {Object[]=} list - List of sectors
    */
   sectorFocus(list = Log.data.listSectors(Log.log)) {
-    return 1 / list.length
+    return list.length === 0 ? 0 : 1 / list.length
   },
 
   /**
@@ -530,7 +532,7 @@ Log.data = {
    * @param {Object[]=} list - List of projects
    */
   projectFocus(list = Log.data.listProjects(Log.log)) {
-    return 1 / list.length
+    return list.length === 0 ? 0 : 1 / list.length
   },
 
   /**

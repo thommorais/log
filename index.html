@@ -197,11 +197,11 @@
             </li>
           </ul>
 
-          <h3 class="mb3 f6 fwn">Peaks</h3>
+          <h3 class="mb4 f6 fwn">Peaks</h3>
           <div id="peakTimesHistory" class="dib mb3 mb4-l pr3-l lf h2 w5"></div>
           <div id="peakDaysHistory" class="dib mb4 pl3-l lf h2 w5"></div>
 
-          <h3 class="mb3 f6 fwn">Focus</h3>
+          <h3 class="mb4 f6 fwn">Focus</h3>
           <div id="focusChart" class="mb4 wf sh5"></div>
 
           <ul class="mb4 lsn f6 lhc r">
@@ -277,12 +277,34 @@
             </li>
           </ul>
 
-          <h3 class="mb3 f6 fwn">Peaks</h3>
+          <h3 class="mb4 f6 fwn">Peaks</h3>
           <div id="secPeakTimes" class="dib mb3 mb4-l pr3-l lf h2 w5"></div>
           <div id="secPeakDays" class="dib mb4 pl3-l lf h2 w5"></div>
 
           <h3 class="mb4 f6 fwn">Focus</h3>
           <div id="secFocusChart" class="mb4 wf sh5"></div>
+
+          <ul class="mb4 lsn f6 lhc r">
+            <li class="mb4 mb0-l c6 c3-m c3-l">
+              <p class="f3 fwb"><span id="secAFH">0.00</span></p>
+              <p class="f6 o9">
+                <span class="mr2">Average Focus</span>
+              </p>
+            </li>
+            <li class="mb4 mb0-l c6 c3-m c3-l">
+              <p class="f3 fwb"><span id="secFmin">0.00</span></p>
+              <p class="f6 o9">
+                <span class="mr2">Min Focus</span>
+              </p>
+            </li>
+            <li class="mb4 mb0-l c6 c3-m c3-l">
+              <p class="f3 fwb"><span id="secFmax">0.00</span></p>
+              <p class="f6 o9">
+                <span class="mr2">Max Focus</span>
+              </p>
+            </li>
+          </ul>
+
           <div id="projectDetailFocus" class="mb4 wf sh2"></div>
           <ul id="projectLegend" class="lsn r"></ul>
         </div>
@@ -337,12 +359,32 @@
             </li>
           </ul>
 
-          <h3 class="mb3 f6 fwn">Peaks</h3>
+          <h3 class="mb4 f6 fwn">Peaks</h3>
           <div id="proPeakTimes" class="dib mb3 mb4-l pr3-l lf h2 w5"></div>
           <div id="proPeakDays" class="dib mb4 pl3-l lf h2 w5"></div>
 
           <h3 class="mb4 f6 fwn">Focus</h3>
-          <div id="proFocusChart" class="mb4 wf sh5"></div>
+          <div id="proFocusChart" class="mb4 wf sh5 bb"></div>
+          <ul class="mb4 lsn f6 lhc r">
+            <li class="mb4 mb0-l c6 c3-m c3-l">
+              <p class="f3 fwb"><span id="proAFH">0.00</span></p>
+              <p class="f6 o9">
+                <span class="mr2">Average Focus</span>
+              </p>
+            </li>
+            <li class="mb4 mb0-l c6 c3-m c3-l">
+              <p class="f3 fwb"><span id="proFmin">0.00</span></p>
+              <p class="f6 o9">
+                <span class="mr2">Min Focus</span>
+              </p>
+            </li>
+            <li class="mb4 mb0-l c6 c3-m c3-l">
+              <p class="f3 fwb"><span id="proFmax">0.00</span></p>
+              <p class="f6 o9">
+                <span class="mr2">Max Focus</span>
+              </p>
+            </li>
+          </ul>
           <div id="sectorDetailFocus" class="mb3 wf sh2"></div>
           <ul id="sectorLegend" class="mb4 lsn r"></ul>
         </div>
@@ -384,7 +426,7 @@
 
       <p class="mb3 m">To start a log, you may do so in several ways:</p>
       <div class="mb4 bl pl3 m">
-        <p class="mb2">start "Sector or Category" "Title" "A description"</p>
+        <p class="mb2">start "Sector" "Title" "A description"</p>
         <p class="mb2">start Sector, Title, Description</p>
         <p class="mb2">start Sector; Title; Description</p>
         <p>start Sector | Title | Description</p>
@@ -397,9 +439,12 @@
 
       <p class="mb3 m">To edit a log entry, use the entry's log entry ID (shown in the Entries table):</p>
       <div class="mb4 bl pl3 m">
-        <p class="mb2">edit 12 sector "Code" <span class="o8">// changes entry 12's sector to Code</span></p>
+        <p class="mb2">edit 12 sector "Code"</p>
         <p class="mb2">edit 25 project "Fishing"</p>
-        <p>edit 3 description "Chasing dragon"</p>
+        <p class="mb2">edit 3 description "Chasing dragon"</p>
+        <p class="mb2">edit 24 start "YYYY MM DD HH MM SS"</p>
+        <p class="mb2">edit 1 start "2017 12 15 13 30 14"</p>
+        <p>edit 5 end "2018 10 9 12 15 0"</p>
       </div>
 
       <p class="mb3 m">To delete a log entry:</p>
@@ -456,9 +501,9 @@
         <p>set time 24</p>
       </div>
 
-      <p class="mb3 m">If you have an existing data file (JSON), you can import it using this command. Alternatively, you may also drag-and-drop the file into this window to import your logs and configurations.</p>
+      <p class="mb3 m">If you have an existing data file (JSON), you can import it:</p>
       <div class="mb4 bl pl3 m">
-        <p>import /location/of/file.json</p>
+        <p>import</p>
       </div>
 
       <p class="mb3 m">To export your data:</p>
@@ -468,7 +513,7 @@
 
     </div>
     <div class="nodrag mb5 mb0-l c6 pl4-l hf-l oya-l">
-      <h2 class="mb3 f5">Log v1.0.0</h2>
+      <h2 class="mb3 f5">Log v1.0.1</h2>
       <p class="mb4 m">Log is a log and time-tracking system. Its primary purpose is to provide insight to how one's time is spent to optimise personal productivity and better manage time.</p>
 
       <h3 class="mb3 f5">Contribution</h3>
@@ -490,7 +535,6 @@
   <script src="data/user.js"></script>
   <script src="js/drop.js"></script>
   <script src="js/log.js"></script>
-  <script src="js/utility.js"></script>
   <script src="js/ui.js"></script>
   <script src="js/options.js"></script>
   <script src="js/console.js"></script>
