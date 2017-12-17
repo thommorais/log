@@ -15,6 +15,7 @@
   "dependencies": {
     "electron-json-storage": "^4.0.2",
     "electron-packager": "^8.4.0",
-    "electron-storage": "^1.0.7"
+    "electron-storage": "^1.0.7",
+    "electron-reload": "^1.2.2"
   }
 }
