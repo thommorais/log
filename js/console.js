@@ -41,7 +41,7 @@ Log.console = {
         Log.console.edit(i);
         break;
       case 8:
-        Log.console.pause();
+        Log.console.endLog();
         break;
       case 9:
         Log.console.resume();
@@ -159,14 +159,6 @@ Log.console = {
     user.log[user.log.length - 1].e = Log.time.toHex(new Date())
     clearInterval(timer)
     Log.options.update()
-  },
-
-  /**
-   * Pause a log entry
-   */
-  pause() {
-    if (user.log.slice(-1)[0].e !== 'undefined') return
-    Log.console.endLog()
   },
 
   /**
