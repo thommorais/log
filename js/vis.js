@@ -273,23 +273,30 @@ Log.vis = {
     if (ent.length === 0) return
 
     let list = mode === 'sector' ? Log.data.listSectors(ent) : Log.data.listProjects(ent)
+    let temp = {}
 
     for (let i = 0, l = list.length; i < l; i++) {
-      let item = document.createElement('div')
-      let colour = ''
-      let width = 0
+      temp[list[i]] = mode === 'sector' ? Log.data.sp(list[i], ent) : Log.data.pp(list[i], ent)
+    }
 
-      if (mode === 'sector') {
-        colour = Log.palette[list[i]]
-        width = Log.data.sp(list[i], ent)
-      } else if (mode === 'project') {
-        colour = Log.projectPalette[list[i]]
-        width = Log.data.pp(list[i], ent)
-      }
+    let sorted = Object.keys(temp).sort(function(a,b){return temp[a]-temp[b]})
+    sorted = sorted.reverse()
+
+    let sor = []
+
+    for (let key in sorted) {
+      let perc = mode === 'sector' ? Log.data.sp(sorted[key], ent) : Log.data.pp(sorted[key], ent)
+
+      sor.push([sorted[key], perc])
+    }
+
+    for (let i = 0, l = sor.length; i < l; i++) {
+      let item = document.createElement('div')
+      let colour = mode === 'sector' ? Log.palette[sor[i][0]] : Log.projectPalette[sor[i][0]]
 
       item.className = 'psr t0 hf lf'
       item.style.backgroundColor = colour || Log.config.ui.colour
-      item.style.width = `${width.toFixed(2)}%`
+      item.style.width = `${sor[i][1].toFixed(2)}%`
 
       document.getElementById(con).appendChild(item)
     }
