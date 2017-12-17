@@ -3,7 +3,7 @@ Log.console = {
   history: [],
 
   commands: [
-    'start', 'end', 'delete', 'set', 'import', 'export', 'invert', 'edit'
+    'start', 'end', 'delete', 'set', 'import', 'export', 'invert', 'edit', 'pause', 'continue', 'resume'
   ],
 
   /**
@@ -39,6 +39,15 @@ Log.console = {
         break;
       case 7:
         Log.console.edit(i);
+        break;
+      case 8:
+        Log.console.pause();
+        break;
+      case 9:
+        Log.console.resume();
+        break;
+      case 10:
+        Log.console.resume();
         break;
     }
   },
@@ -146,8 +155,36 @@ Log.console = {
    * End a log entry
    */
   endLog() {
+    if (user.log.slice(-1)[0].e !== 'undefined') return
     user.log[user.log.length - 1].e = Log.time.toHex(new Date())
     clearInterval(timer)
+    Log.options.update()
+  },
+
+  /**
+   * Pause a log entry
+   */
+  pause() {
+    if (user.log.slice(-1)[0].e !== 'undefined') return
+    Log.console.endLog()
+  },
+
+  /**
+   * Resume a paused log entry
+   */
+  resume() {
+    let last = user.log.slice(-1)[0]
+
+    if (last.e === 'undefined') return
+
+    user.log.push({
+      s: Log.time.toHex(new Date()),
+      e: 'undefined',
+      c: last.c,
+      t: last.t,
+      d: last.d
+    })
+
     Log.options.update()
   },
 
