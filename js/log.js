@@ -9,8 +9,6 @@
 
 'use strict';
 
-// const SHELL = require('shelljs')
-
 var Log = {
 
   log: [],
@@ -408,7 +406,6 @@ var Log = {
         localStorage.setItem('user', JSON.stringify(user))
       }
     } catch(e) {
-      // localStorage.clear()
       return
     }
 
@@ -425,8 +422,6 @@ var Log = {
     let n = new Date()
     let en = Log.data.getEntriesByDate(n)
     let mn = Log.data.getRecentEntries(Log.config.ui.view - 1)
-    let sectors = Log.data.listSectors()
-    let projects = Log.data.listProjects()
 
     Log.timer(Log.status())
 
@@ -460,8 +455,8 @@ var Log = {
     Log.ui.write('ALHH', Log.data.avgLh().toFixed(2))
     Log.ui.write('LPH', Log.data.lp().toFixed(2))
     Log.ui.write('entCount', user.log.length)
-    Log.ui.write('secCount', sectors.length)
-    Log.ui.write('proCount', projects.length)
+    Log.ui.write('secCount', Log.data.listSectors().length)
+    Log.ui.write('proCount', Log.data.listProjects().length)
     Log.ui.write('PHH', Log.data.peakHour())
     Log.ui.write('PDH', Log.data.peakDay())
 
