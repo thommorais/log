@@ -148,6 +148,12 @@ Log.console = {
       d: desc
     })
 
+    let notif = new window.Notification(`Log started: ${sect} - ${proj} - ${desc}`)
+
+    notif.onclick = function () {
+      ipcRenderer.send('focusWindow', 'main')
+    }
+
     Log.options.update()
   },
 
