@@ -172,6 +172,8 @@ Log.data = {
    * @param {Object=} end - End date
    */
   sortEntries(ent = Log.log, end = new Date()) {
+    if (ent.length === 0) return
+
     let days = Log.time.listDates(
       Log.time.convert(Log.time.parse(ent[0].s)),
       end
@@ -484,6 +486,7 @@ Log.data = {
    * @returns {number} Streak
    */
   streak(a = Log.log) {
+    if (a.length === 0) return 0
     let ent = Log.data.sortEntries(a)
     let streak = 0
 

@@ -96,7 +96,7 @@ Log.console = {
    * @param {Object[]} s - Input array
    */
   startLog(s) {
-    if (Log.log.slice(-1)[0].e === 'undefined') return
+    if (user.log.length !== 0 && user.log.slice(-1)[0].e === 'undefined') return
 
     let start = Log.time.toHex(new Date())
     let p = []
