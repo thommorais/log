@@ -61,15 +61,23 @@ Log.console = {
 		if (!path) return
 
     let string = ''
+    let notif
 
 		try {
 			string = fs.readFileSync(path[0], 'utf-8')
 		} catch (e) {
 			console.log('Error while loading file')
+      notif = new window.Notification('An error occured while trying to load this file.')
+
+      notif.onclick = function () {
+        ipcRenderer.send('focusWindow', 'main')
+      }
 		}
 
     localStorage.setItem('user', string)
     user = JSON.parse(localStorage.getItem('user'))
+
+    notif = new window.Notification('Your log data was successfully imported.')
 
 		Log.refresh()
   },
@@ -79,13 +87,25 @@ Log.console = {
    */
   exportUser() {
     let data = JSON.stringify(JSON.parse(localStorage.getItem('user')))
+    let notif
 
     dialog.showSaveDialog((fileName) => {
       if (fileName === undefined) return
       fs.writeFile(fileName, data, (err) => {
         if (err) {
           alert (`An error occured creating the file ${err.message}`)
+          notif = new window.Notification(`An error occured creating the file ${err.message}`)
+
+          notif.onclick = function () {
+            ipcRenderer.send('focusWindow', 'main')
+          }
           return
+        } else {
+          notif = new window.Notification('Your log data has been exported.')
+
+          notif.onclick = function () {
+            ipcRenderer.send('focusWindow', 'main')
+          }
         }
       })
     })
@@ -161,9 +181,17 @@ Log.console = {
    * End a log entry
    */
   endLog() {
-    if (user.log.slice(-1)[0].e !== 'undefined') return
-    user.log[user.log.length - 1].e = Log.time.toHex(new Date())
+    let last = user.log.slice(-1)[0]
+    if (last.e !== 'undefined') return
+    last.e = Log.time.toHex(new Date())
     clearInterval(timer)
+
+    let notif = new window.Notification(`Log ended: ${last.c} - ${last.t} - ${last.d}`)
+
+    notif.onclick = function () {
+      ipcRenderer.send('focusWindow', 'main')
+    }
+
     Log.options.update()
   },
 
@@ -182,6 +210,12 @@ Log.console = {
       t: last.t,
       d: last.d
     })
+
+    let notif = new window.Notification(`Log resumed: ${last.c} - ${last.t} - ${last.d}`)
+
+    notif.onclick = function () {
+      ipcRenderer.send('focusWindow', 'main')
+    }
 
     Log.options.update()
   },
