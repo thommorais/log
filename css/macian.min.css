@@ -5,9 +5,19 @@
   font-style: normal;
 }
 
+@keyframes fadein {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
 body {
   max-width: 1500px;
   -webkit-app-region: drag;
+  animation: fadein 0.5s
 }
 
 input[type="submit"],

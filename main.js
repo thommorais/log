@@ -5,7 +5,7 @@ const url = require('url')
 var win
 
 function createWindow () {
-  win = new BrowserWindow({width: 1000, height: 610, backgroundColor: '#f8f8f8', resizable:true, autoHideMenuBar: true, frame: false})
+  win = new BrowserWindow({width: 1000, height: 610, backgroundColor: '#000', resizable:true, autoHideMenuBar: true, frame: false})
 
   win.loadURL(`file://${__dirname}/index.html`)
 
