@@ -619,6 +619,10 @@ Log.data = {
       return `${eph.indexOf(Math.max(...eph))}:00`
     },
 
+    lh() {
+      return Log.data.avgLh(Log.data.getEntriesByDay(new Date().getDay())) * 10
+    },
+
     /**
      * Forecast session duration
      * @returns {number} Session duration

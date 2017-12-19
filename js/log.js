@@ -431,6 +431,7 @@ var Log = {
     Log.ui.write('fsf', Log.data.forecast.sf())
     Log.ui.write('fpf', Log.data.forecast.pf())
     Log.ui.write('fpt', Log.data.forecast.pt())
+    Log.ui.write('flh', `${Log.data.forecast.lh().toFixed(2)} h`)
     Log.ui.write('fsd', `${Log.data.forecast.sd().toFixed(2)} h`)
 
     Log.vis.day()
