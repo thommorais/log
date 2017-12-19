@@ -66,12 +66,7 @@ Log.console = {
 		try {
 			string = fs.readFileSync(path[0], 'utf-8')
 		} catch (e) {
-			console.log('Error while loading file')
       notif = new window.Notification('An error occured while trying to load this file.')
-
-      notif.onclick = function () {
-        ipcRenderer.send('focusWindow', 'main')
-      }
 		}
 
     localStorage.setItem('user', string)
@@ -93,19 +88,11 @@ Log.console = {
       if (fileName === undefined) return
       fs.writeFile(fileName, data, (err) => {
         if (err) {
-          alert (`An error occured creating the file ${err.message}`)
           notif = new window.Notification(`An error occured creating the file ${err.message}`)
 
-          notif.onclick = function () {
-            ipcRenderer.send('focusWindow', 'main')
-          }
           return
         } else {
           notif = new window.Notification('Your log data has been exported.')
-
-          notif.onclick = function () {
-            ipcRenderer.send('focusWindow', 'main')
-          }
         }
       })
     })
@@ -170,10 +157,6 @@ Log.console = {
 
     let notif = new window.Notification(`Log started: ${sect} - ${proj} - ${desc}`)
 
-    notif.onclick = function () {
-      ipcRenderer.send('focusWindow', 'main')
-    }
-
     Log.options.update()
   },
 
@@ -187,10 +170,6 @@ Log.console = {
     clearInterval(timer)
 
     let notif = new window.Notification(`Log ended: ${last.c} - ${last.t} - ${last.d}`)
-
-    notif.onclick = function () {
-      ipcRenderer.send('focusWindow', 'main')
-    }
 
     Log.options.update()
   },
@@ -212,10 +191,6 @@ Log.console = {
     })
 
     let notif = new window.Notification(`Log resumed: ${last.c} - ${last.t} - ${last.d}`)
-
-    notif.onclick = function () {
-      ipcRenderer.send('focusWindow', 'main')
-    }
 
     Log.options.update()
   },

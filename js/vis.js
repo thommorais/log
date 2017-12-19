@@ -22,7 +22,7 @@ Log.vis = {
 
       entry.className = 'psr t0 sh1 mb2 lf'
       entry.style.width = `${width}%`
-      entry.style.marginLeft = `${Log.utils.calcMargin(dp, lw, lp).toFixed(2)}%`
+      entry.style.marginLeft = `${Log.utils.calcMargin(dp, lw, lp)}%`
       entry.style.backgroundColor = colour || Log.config.ui.colour
 
       document.getElementById(row).appendChild(entry)
@@ -36,7 +36,6 @@ Log.vis = {
       lp = 0
 
       let row = document.createElement('div')
-
       row.className = 'db wf sh1 mt2 mb3'
       row.id = id
 
@@ -46,7 +45,7 @@ Log.vis = {
     for (let i = 0, l = ent.length; i < l; i++) {
       if (ent[i].e === 'undefined') continue
 
-      let id = con + Log.time.date(Log.time.parse(ent[i].s))
+      let id = `${con}${Log.time.date(ent[i].s)}`
 
       document.getElementById(id) === null && addRow(id)
 
@@ -87,7 +86,7 @@ Log.vis = {
       let inn = document.createElement('div')
 
       col.className = 'dib hf psr'
-      col.style.width = `${(100 / Log.config.ui.view).toFixed(2)}%`
+      col.style.width = `${100 / Log.config.ui.view}%`
 
       inn.className = 'sw1 hf cn'
       inn.id = id
@@ -122,6 +121,8 @@ Log.vis = {
    */
   day(d = new Date(), con = 'dayChart', mode = Log.config.ui.colourMode) {
     let ent = Log.data.getEntriesByDate(d)
+
+    if (ent.length === 0) return
 
     for (let i = 0, l = ent.length, lw = 0, lp = 0; i < l; i++) {
       if (ent[i].e === 'undefined') continue
@@ -170,7 +171,7 @@ Log.vis = {
       n.style.backgroundColor = i === (new Date).getHours() ? Log.config.ui.accent : Log.config.ui.colour
 
       e.className = 'psa b0 wf'
-      e.style.height = `${(hours[i] / max * 100).toFixed(2)}%`
+      e.style.height = `${hours[i] / max * 100}%`
 
       e.appendChild(n)
 
@@ -204,7 +205,7 @@ Log.vis = {
       cor.style.backgroundColor = i === (new Date).getDay() ? Log.config.ui.accent : Log.config.ui.colour
 
       inn.className = 'psa b0 wf'
-      inn.style.height = `${(peaks[i] / peakMax * 100).toFixed(2)}%`
+      inn.style.height = `${peaks[i] / peakMax * 100}%`
 
       inn.appendChild(cor)
 
@@ -234,9 +235,9 @@ Log.vis = {
       let colour = ''
       let width = 0
 
-      li.className = 'mb4 f6 lhc c-pt'
-      tl.className = 'dib sw6 f6 elip'
-      st.className = 'f6 rf'
+      li.className = 'mb4 f6 c-pt'
+      tl.className = 'dib sw6 elip'
+      st.className = 'rf'
       br.className = 'wf sh1'
       dt.className = 'psr t0 hf lf'
 
@@ -249,7 +250,7 @@ Log.vis = {
       }
 
       dt.style.backgroundColor = colour || Log.config.ui.colour
-      dt.style.width = `${width.toFixed(2)}%`
+      dt.style.width = `${width}%`
       st.innerHTML = `${sh.toFixed(2)} h`
       li.setAttribute('onclick', `Log.detail.${mode}('${list[i]}')`)
       tl.innerHTML = list[i]
@@ -296,7 +297,7 @@ Log.vis = {
 
       item.className = 'psr t0 hf lf'
       item.style.backgroundColor = colour || Log.config.ui.colour
-      item.style.width = `${sor[i][1].toFixed(2)}%`
+      item.style.width = `${sor[i][1]}%`
 
       document.getElementById(con).appendChild(item)
     }
@@ -353,19 +354,21 @@ Log.vis = {
     let set = Log.data.sortEntries(ent)
 
     for (let i = 0, l = set.length; i < l; i++) {
+      let list = mode === 'sector' ? Log.data.listSectors(set[i]) : Log.data.listProjects(set[i])
+
       let col = document.createElement('div')
       let inn = document.createElement('div')
       let cor = document.createElement('div')
-      let height = mode === 'sector' ? 1 / Log.data.listSectors(set[i]).length * 100 : 1 / Log.data.listProjects(set[i]).length * 100
+      let height = list === undefined ? 0 : 1 / list.length * 100
 
       col.className = 'dib hf psr'
-      col.style.width = `${(100 / set.length).toFixed(2)}%`
+      col.style.width = `${100 / set.length}%`
 
       inn.className = 'sw1 hf cn'
 
       cor.className = 'psa sw1 b0 bg-noir'
       cor.style.backgroundColor = Log.config.ui.colour
-      cor.style.height = `${height.toFixed(2)}%`
+      cor.style.height = `${height}%`
 
       inn.appendChild(cor)
       col.appendChild(inn)

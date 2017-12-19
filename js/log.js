@@ -3,7 +3,7 @@
  * A log and time-tracking system
  *
  * @author Josh Avanier
- * @version 1.0.0
+ * @version 1.0.2
  * @license MIT
  */
 
@@ -23,18 +23,17 @@ var Log = {
    */
   status() {
     if (Log.log.length === 0) return
-    return Log.log[Log.log.length - 1].e === 'undefined' ? true : false
+    return Log.log.slice(-1)[0].e === 'undefined' ? true : false
   },
 
   /**
    * Display a session timer
    * @param {boolean} status - Log status
-   * @param {string=} con - Container
    */
-  timer(status, con = 'timer') {
+  timer(status) {
     if (status) {
       let l = Log.time.convert(
-          Log.time.parse(Log.log[Log.log.length - 1].s)
+          Log.time.parse(Log.log.slice(-1)[0].s)
         ).getTime()
 
       Log.clock = setInterval(() => {
@@ -46,7 +45,7 @@ var Log = {
         m %= 60
         s %= 60
 
-        document.getElementById(con).innerHTML = `${`0${h}`.substr(-2)}:${`0${m}`.substr(-2)}:${`0${s}`.substr(-2)}`
+        document.getElementById('timer').innerHTML = `${`0${h}`.substr(-2)}:${`0${m}`.substr(-2)}:${`0${s}`.substr(-2)}`
       }, 1E3)
     } else return
   },
@@ -103,7 +102,7 @@ var Log = {
       rw.insertCell(1).innerHTML = Log.time.displayDate(cs)
       rw.insertCell(2).innerHTML = Log.time.stamp(cs)
       rw.insertCell(3).innerHTML = e.e === 'undefined' ? '-' : Log.time.stamp(Log.time.convert(ee))
-      rw.insertCell(4).innerHTML = e.e === 'undefined' ? '-' : Log.time.duration(es, ee).toFixed(2)
+      rw.insertCell(4).innerHTML = e.e === 'undefined' ? '-' : `${Log.time.duration(e.s, e.e).toFixed(2)} h`
       rw.insertCell(5).innerHTML = e.c
       rw.insertCell(6).innerHTML = e.t
       rw.insertCell(7).innerHTML = e.d
@@ -124,6 +123,9 @@ var Log = {
      */
     sector(sec = Log.data.listSectors().sort()[0]) {
       Log.detail.clear.sector()
+
+      if (sec === undefined) return
+      if (sec.length === 0) return
 
       let ent = Log.data.getEntriesBySector(sec, Log.data.getRecentEntries(Log.config.ui.view - 1))
       let his = Log.data.getEntriesBySector(sec)
@@ -166,6 +168,9 @@ var Log = {
      */
     project(pro = Log.data.listProjects().sort()[0]) {
       Log.detail.clear.project()
+
+      if (pro === undefined) return
+      if (pro.length === 0) return
 
       let ent = Log.data.getEntriesByProject(pro, Log.data.getRecentEntries(Log.config.ui.view - 1))
       let his = Log.data.getEntriesByProject(pro)
@@ -228,18 +233,110 @@ var Log = {
     }
   },
 
-  utils: {
+  journal: {
 
     /**
-     * Get the max value in an array
-     * @param {Object[]} a - An array
-     * @returns {number} Max value
+     * Display entries from a date
+     * @param {Object=} hex - Hex code
      */
-    getMax(a) {
-      return a.reduce(function(x, y) {
-        return Math.max(x, y)
-      })
+    display(date = new Date()) {
+      Log.journal.clear()
+
+      let entries = Log.data.getEntriesByDate(date)
+
+      if (entries.length === 0) return
+
+      let months = 'January February March April May June July August September October November December'.split(' ')
+
+      document.getElementById('journalDate').innerHTML = Log.time.displayDate(date)
+
+      Log.vis.day(date, 'journalDay')
+
+      Log.ui.write('jLHT', Log.data.lh(entries).toFixed(2))
+      Log.ui.write('jLSN', Log.data.lsmin(entries).toFixed(2))
+      Log.ui.write('jLSX', Log.data.lsmax(entries).toFixed(2))
+      Log.ui.write('jASDT', Log.data.asd(entries).toFixed(2))
+      Log.ui.write('jLPT', Log.data.lp(entries).toFixed(2))
+      Log.ui.write('jfocusToday', Log.data.projectFocus(Log.data.listProjects(entries)).toFixed(2))
+
+      for (let i = 0, l = entries.length; i < l; i++) {
+        let li = document.createElement('li')
+        let time = document.createElement('span')
+        let info = document.createElement('span')
+        let duration = document.createElement('span')
+        let entry = document.createElement('p')
+        let es = Log.time.parse(entries[i].s)
+        let ee = Log.time.parse(entries[i].e)
+        let start = Log.time.convert(es)
+        let end = Log.time.convert(ee)
+
+        li.className = i !== l - 1 ? 'f6 lhc mb3 bt pt3' : 'f6 lhc bt pt3'
+        time.className = 'mr3 o7'
+        info.className = 'o7'
+        duration.className = 'rf o7'
+        entry.className = 'f4 lhc'
+
+        time.innerHTML = `${date.getHours()}:${date.getMinutes()}`
+        info.innerHTML = `${entries[i].c} - ${entries[i].t}`
+        duration.innerHTML = `${Log.time.duration(entries[i].s, entries[i].e).toFixed(2)} h`
+        entry.innerHTML = entries[i].d
+
+        li.appendChild(time)
+        li.appendChild(info)
+        li.appendChild(duration)
+        li.appendChild(entry)
+
+        let list = ''
+        if (start.getHours() >= 0 && start.getHours() < 12) {
+          list = 'morningEntries'
+        } else if (start.getHours() >= 12 && start.getHours() < 18) {
+          list = 'afternoonEntries'
+        } else {
+          list = 'eveningEntries'
+        }
+
+        document.getElementById(list).appendChild(li)
+      }
     },
+
+    /**
+     * Clear journal
+     */
+    clear() {
+      Log.ui.empty('journalDay')
+      Log.ui.empty('morningEntries')
+      Log.ui.empty('afternoonEntries')
+      Log.ui.empty('eveningEntries')
+    },
+
+    /**
+     * Journal navigation
+     */
+    nav() {
+      let entries = Log.data.sortEntries().reverse()
+      let months = 'January February March April May June July August September October November December'.split(' ')
+
+      for (let i = 0, l = entries.length; i < l; i++) {
+        if (entries[i].length !== 0) {
+          let li = document.createElement('li')
+          let date = Log.time.convert(Log.time.parse(entries[i][0].s))
+
+          li.className = 'lhd c-pt'
+          li.innerHTML = Log.time.displayDate(date)
+          // li.innerHTML = `${months[date.getMonth()]} ${date.getDate()}`
+
+          li.setAttribute('onclick', `Log.journal.translate('${Log.time.toHex(date)}')`)
+          document.getElementById('journalNav').appendChild(li)
+        }
+      }
+    },
+
+    translate(hex) {
+      Log.journal.display(Log.time.convert(Log.time.parse(hex)))
+    }
+  },
+
+  utils: {
 
     /**
      * Calculate width
@@ -295,32 +392,16 @@ var Log = {
     Log.init()
   },
 
-  res: {
-
-    /**
-     * Reset timer
-     */
-    timer() {
-      clearInterval(Log.clock)
-      Log.ui.write('timer', '00:00:00')
-    },
-
-    /**
-     * Reset forecasts
-     */
-    forecast() {
-      Log.ui.write('fsf', '&mdash;')
-      Log.ui.write('fpf', '&mdash;')
-      Log.ui.write('fpt', '00:00')
-      Log.ui.write('fsd', '0.00 h')
-    }
-  },
-
   reset() {
-    Log.res.timer()
-    Log.res.forecast()
+    clearInterval(Log.clock)
+    Log.ui.write('timer', '00:00:00')
 
-    let el = 'phc pdc dayChart weekChart peakTimesHistory sectorBars projectBars sectorsList projectsList vis logbook focusChart sectorFocusBar sectorLegendSummary'.split(' ')
+    Log.ui.write('fsf', '&mdash;')
+    Log.ui.write('fpf', '&mdash;')
+    Log.ui.write('fpt', '00:00')
+    Log.ui.write('fsd', '0.00 h')
+
+    let el = 'phc pdc dayChart weekChart peakTimesHistory sectorBars projectBars sectorsList projectsList vis logbook focusChart sectorFocusBar sectorLegendSummary journalNav'.split(' ')
 
     for (let i = 0, l = el.length; i < l; i++) {
       Log.ui.empty(el[i])
@@ -343,14 +424,13 @@ var Log = {
       if (con.value !== '') {
         Log.console.history.push(con.value)
 
-        if (Log.console.history.length >= 100) {
-          Log.console.history.shift()
-        }
+        if (Log.console.history.length >= 100) Log.console.history.shift()
 
         localStorage.setItem('logHistory', JSON.stringify(Log.console.history))
 
         Log.console.parse(con.value)
       }
+
       con.value = ''
       cmd.style.display = 'none'
       cmdIndex = 1
@@ -417,7 +497,10 @@ var Log = {
     document.getElementById('app').style.backgroundColor = Log.config.ui.bg
     document.getElementById('app').style.color = Log.config.ui.colour
 
-    if (Log.log.length === 0) return
+    if (user.log.length === 0 || Log.log.length === 0) {
+      Log.tab('gui', 'sect', 'tab')
+      return
+    }
 
     let n = new Date()
     let en = Log.data.getEntriesByDate(n)
@@ -482,5 +565,8 @@ var Log = {
     Log.vis.line('vis', mn)
 
     Log.display(undefined, 1000)
+
+    Log.journal.display()
+    Log.journal.nav()
   }
 }

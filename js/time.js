@@ -77,12 +77,12 @@ Log.time = {
   },
 
   /**
-   * Convert Unix time into date
-   * @param {number} t - Unix time
-   * @returns {string} year, month, day
+   * Convert hexadecimal timestamp into date
+   * @param {string} hex - Hexadecimal timestamp
+   * @returns {string} Date
    */
-  date(t) {
-    let a = Log.time.convert(t)
+  date(hex) {
+    let a = Log.time.convert(Log.time.parse(hex))
     return `${a.getFullYear()}${a.getMonth()}${a.getDate()}`
   },
 
@@ -95,7 +95,10 @@ Log.time = {
     let f = Log.config.system.calendar
 
     if (f === 'gregorian') {
-      return `${d.getFullYear()} ${d.getMonth() + 1} ${d.getDate()}`
+      let months = 'Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec'.split(' ')
+      let date = (`0${d.getDate()}`).slice(-2)
+
+      return `${date} ${months[d.getMonth()]} ${d.getFullYear().toString().substr(-2)}`
     } else if (f === 'monocal') {
       return MONO.short(MONO.convert(d))
     } else if (f === 'aequirys') {
@@ -171,6 +174,6 @@ Log.time = {
    * @returns {number} Duration
    */
   duration(a, b) {
-    return (b - a) / 3600
+    return (Log.time.parse(b) - Log.time.parse(a)) / 3600
   }
 }
