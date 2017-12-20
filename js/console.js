@@ -3,7 +3,7 @@ Log.console = {
   history: [],
 
   commands: [
-    'start', 'end', 'delete', 'set', 'import', 'export', 'invert', 'edit', 'pause', 'continue', 'resume'
+    'start', 'end', 'delete', 'set', 'import', 'export', 'invert', 'edit', 'pause', 'continue', 'resume', 'rename'
   ],
 
   /**
@@ -48,6 +48,9 @@ Log.console = {
         break;
       case 10:
         Log.console.resume();
+        break;
+      case 11:
+        Log.console.rename(i);
         break;
     }
   },
@@ -275,6 +278,62 @@ Log.console = {
     } else if (a === 'end') {
       user.log[id].e = Log.time.convertDateTime(proc(i))
     } else return
+
+    Log.options.update()
+  },
+
+  /**
+   * Rename a sector or project
+   * @param {Object[]} s - Input
+   */
+  rename(s) {
+    if (!s.includes('"')) return
+
+    let mode = s.split(' ')[1]
+    let p = s.split('')
+    let indices = []
+    let oldName = ''
+    let newName = ''
+    let notif
+
+    let notFound = mode => {
+      let message = mode === 'sector' ? `The sector "${oldName}" does not exist in your logs.` : `The project "${oldName}" does not exist in your logs.`
+      notif = new window.Notification(message)
+    }
+
+    for (let i = 0, l = p.length; i < l; i++) {
+      p[i] === '"' && indices.push(i)
+    }
+
+    for (let i = indices[0] + 1; i < indices[1]; i++) oldName += p[i]
+
+    for (let i = indices[2] + 1; i < indices[3]; i++) newName += p[i]
+
+    if (mode === 'sector' || mode === 'sec') {
+      if (Log.data.getEntriesBySector(oldName).length === 0) {
+        notFound('sector')
+        return
+      }
+
+      for (let i = 0, l = user.log.length; i < l; i++) {
+        if (user.log[i].c === oldName) {
+          user.log[i].c = newName
+        }
+      }
+    } else if (mode === 'project' || mode === 'pro') {
+      if (Log.data.getEntriesByProject(oldName).length === 0) {
+        notFound('project')
+        return
+      }
+
+      for (let i = 0, l = user.log.length; i < l; i++) {
+        if (user.log[i].t === oldName) {
+          user.log[i].t = newName
+        }
+      }
+    } else return
+
+    notif = new window.Notification(`The sector "${oldName}" has been renamed to "${newName}."`)
 
     Log.options.update()
   },
