@@ -408,6 +408,16 @@ var Log = {
     }
   },
 
+  nav: {
+    menu: 'ovw lis vis tab jou gui'.split(' '),
+    index: 0,
+
+    horizontal() {
+      Log.nav.index = Log.nav.index === 5 ? 0 : Log.nav.index + 1
+      Log.tab(Log.nav.menu[Log.nav.index], 'sect', 'tab')
+    }
+  },
+
   init() {
     if (localStorage.hasOwnProperty('logHistory')) {
       Log.console.history = JSON.parse(localStorage.getItem('logHistory'))
@@ -461,6 +471,9 @@ var Log = {
 
         if (cmdIndex < 1) cmdIndex = 1
         con.value = Log.console.history[Log.console.history.length - cmdIndex]
+      } else if (e.key === 'Tab') {
+        e.preventDefault()
+        Log.nav.horizontal()
       }
 
       if (e.key === 'o' && (e.ctrlKey || e.metaKey)) {
@@ -498,6 +511,7 @@ var Log = {
     document.getElementById('app').style.color = Log.config.ui.colour
 
     if (user.log.length === 0 || Log.log.length === 0) {
+      Log.nav.index = 5
       Log.tab('gui', 'sect', 'tab')
       return
     }
