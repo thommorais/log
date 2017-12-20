@@ -372,6 +372,8 @@ var Log = {
     let x = document.getElementsByClassName(g)
     let b = document.getElementsByClassName(t)
 
+    Log.nav.index = Log.nav.menu.indexOf(s)
+
     for (let i = 0, l = x.length; i < l; i++) {
       x[i].style.display = 'none'
     }
