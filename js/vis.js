@@ -224,9 +224,29 @@ Log.vis = {
     if (ent.length === 0) return
 
     let list = mode === 'sector' ? Log.data.listSectors(ent).sort() : Log.data.listProjects(ent).sort()
+    let temp = {}
 
     for (let i = 0, l = list.length; i < l; i++) {
-      let sh = mode === 'sector' ? Log.data.sh(list[i], ent) : Log.data.ph(list[i], ent)
+      temp[list[i]] = mode === 'sector' ? Log.data.sh(list[i], ent) : Log.data.ph(list[i], ent)
+    }
+
+    let sorted = Object.keys(temp).sort(function(a,b){return temp[a]-temp[b]})
+    sorted = sorted.reverse()
+
+    let sor = []
+
+    for (let key in sorted) {
+      let perc = mode === 'sector' ? Log.data.sh(sorted[key], ent) : Log.data.ph(sorted[key], ent)
+
+      sor.push([sorted[key], perc])
+    }
+
+    list = sor
+
+    console.log(list)
+
+    for (let i = 0, l = list.length; i < l; i++) {
+      let sh = mode === 'sector' ? Log.data.sh(list[i][0], ent) : Log.data.ph(list[i][0], ent)
       let li = document.createElement('li')
       let tl = document.createElement('span')
       let st = document.createElement('span')
@@ -242,18 +262,18 @@ Log.vis = {
       dt.className = 'psr t0 hf lf'
 
       if (mode === 'sector') {
-        colour = Log.palette[list[i]]
-        width = Log.data.sp(list[i], ent)
+        colour = Log.palette[list[i][0]]
+        width = Log.data.sp(list[i][0], ent)
       } else if (mode === 'project') {
-        colour = Log.projectPalette[list[i]]
-        width = Log.data.pp(list[i], ent)
+        colour = Log.projectPalette[list[i][0]]
+        width = Log.data.pp(list[i][0], ent)
       }
 
       dt.style.backgroundColor = colour || Log.config.ui.colour
       dt.style.width = `${width}%`
-      st.innerHTML = `${sh.toFixed(2)} h`
-      li.setAttribute('onclick', `Log.detail.${mode}('${list[i]}')`)
-      tl.innerHTML = list[i]
+      st.innerHTML = `${list[i][1].toFixed(2)} h`
+      li.setAttribute('onclick', `Log.detail.${mode}('${list[i][0]}')`)
+      tl.innerHTML = list[i][0]
 
       li.appendChild(tl)
       li.appendChild(st)
