@@ -235,8 +235,8 @@ Log.vis = {
       let colour = ''
       let width = 0
 
-      li.className = 'mb4 f6 c-pt'
-      tl.className = 'dib sw6 elip'
+      li.className = 'mb2 c-pt'
+      tl.className = 'dib xw6 elip'
       st.className = 'rf'
       br.className = 'wf sh1'
       dt.className = 'psr t0 hf lf'
@@ -255,10 +255,8 @@ Log.vis = {
       li.setAttribute('onclick', `Log.detail.${mode}('${list[i]}')`)
       tl.innerHTML = list[i]
 
-      br.appendChild(dt)
       li.appendChild(tl)
       li.appendChild(st)
-      li.appendChild(br)
 
       document.getElementById(con).appendChild(li)
     }
@@ -322,8 +320,8 @@ Log.vis = {
       let perc = 0
 
       item.className = 'c3 mb3 f6 lhc'
-      code.className = 'dib f6 p2 brf mr2'
-      name.className = 'dib pb1'
+      code.className = 'dib sh3 sw3 brf mr2 lhs'
+      name.className = 'dib'
 
       if (mode === 'sector') {
         colour = Log.palette[list[i]]
