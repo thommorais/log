@@ -407,7 +407,7 @@ var Log = {
     Log.ui.write('fpf', '&mdash;')
     Log.ui.write('fsd', '0.00 h')
 
-    let el = 'phc pdc dayChart weekChart peakTimesHistory sectorBars projectBars sectorsList projectsList vis logbook focusChart sectorFocusBar sectorLegendSummary journalNav'.split(' ')
+    let el = 'phc pdc dayChart weekChart peakTimesHistory sectorBars projectBars sectorsList projectsList vis logbook focusChart sectorFocusBar sectorLegendSummary journalNav journalDay morningEntries afternoonEntries eveningEntries'.split(' ')
 
     for (let i = 0, l = el.length; i < l; i++) {
       Log.ui.empty(el[i])
@@ -495,17 +495,16 @@ var Log = {
       }
     })
 
-    try {
-      JSON.parse(localStorage.getItem('user'))
-
-      if (localStorage.hasOwnProperty('user')) {
+    if (localStorage.hasOwnProperty('user')) {
+      try {
+        JSON.parse(localStorage.getItem('user'))
         user = JSON.parse(localStorage.getItem('user'))
-      } else {
-        user.log = Log.data.parse(log)
-        localStorage.setItem('user', JSON.stringify(user))
+      } catch(e) {
+        return
       }
-    } catch(e) {
-      return
+    } else {
+      user.log = []
+      localStorage.setItem('user', JSON.stringify(user))
     }
 
     Log.log = Log.data.parse(user.log)
