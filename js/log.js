@@ -141,7 +141,6 @@ var Log = {
       Log.ui.write('secLSNH', Log.data.lsmin(his).toFixed(2))
       Log.ui.write('secLSXH', Log.data.lsmax(his).toFixed(2))
       Log.ui.write('secASD', Log.data.asd(his).toFixed(2))
-      Log.ui.write('secLPH', Log.data.lp(his).toFixed(2))
       Log.ui.write('secPHH', Log.data.peakHour(Log.data.peakHours(his)))
       Log.ui.write('secPDH', Log.data.peakDay(Log.data.peakDays(his)))
       Log.ui.write('secStreak', Log.data.streak(his))
@@ -150,12 +149,14 @@ var Log = {
       Log.vis.peakD(his, 'secPeakDays')
 
       if (ent.length !== 0) {
-        Log.vis.bar('sectorChart', ent, 'project')
+        let mode = Log.config.ui.colourMode === 'none' ? 'none' : 'sector'
+
+        Log.vis.bar('sectorChart', ent, mode)
         Log.vis.focusChart('project', ent, 'secFocusChart')
 
         Log.ui.write('secAFH', Log.data.focusAvg(ent).toFixed(2))
-        Log.ui.write('secFmin', Log.data.minFocus('project', ent).toFixed(2))
-        Log.ui.write('secFmax', Log.data.maxFocus('project', ent).toFixed(2))
+        Log.ui.write('secFmin', Log.data.minFocus('sector', ent).toFixed(2))
+        Log.ui.write('secFmax', Log.data.maxFocus('sector', ent).toFixed(2))
 
         Log.vis.focusBar('project', ent, 'projectDetailFocus')
         Log.vis.legend('project', ent, 'projectLegend')
@@ -186,7 +187,6 @@ var Log = {
       Log.ui.write('proLSNH', Log.data.lsmin(his).toFixed(2))
       Log.ui.write('proLSXH', Log.data.lsmax(his).toFixed(2))
       Log.ui.write('proASD', Log.data.asd(his).toFixed(2))
-      Log.ui.write('proLPH', Log.data.lp(his).toFixed(2))
       Log.ui.write('proPHH', Log.data.peakHour(Log.data.peakHours(his)))
       Log.ui.write('proPDH', Log.data.peakDay(Log.data.peakDays(his)))
       Log.ui.write('proStreak', Log.data.streak(his))
@@ -195,7 +195,9 @@ var Log = {
       Log.vis.peakD(his, 'proPeakDays')
 
       if (ent.length !== 0) {
-        Log.vis.bar('projectChart', ent, 'sector')
+        let mode = Log.config.ui.colourMode === 'none' ? 'none' : 'sector'
+
+        Log.vis.bar('projectChart', ent, mode)
         Log.vis.focusChart('sector', ent, 'proFocusChart')
 
         Log.ui.write('proAFH', Log.data.focusAvg(ent).toFixed(2))
@@ -262,7 +264,8 @@ var Log = {
       for (let i = 0, l = entries.length; i < l; i++) {
         let li = document.createElement('li')
         let time = document.createElement('span')
-        let info = document.createElement('span')
+        let sector = document.createElement('span')
+        let project = document.createElement('span')
         let duration = document.createElement('span')
         let entry = document.createElement('p')
         let es = Log.time.parse(entries[i].s)
@@ -270,19 +273,22 @@ var Log = {
         let start = Log.time.convert(es)
         let end = Log.time.convert(ee)
 
-        li.className = i !== l - 1 ? 'f6 lhc mb3 bt pt3' : 'f6 lhc bt pt3'
+        li.className = i !== l - 1 ? 'f6 lhc mb4' : 'f6 lhc'
         time.className = 'mr3 o7'
-        info.className = 'o7'
+        sector.className = 'o7 mr3'
+        project.className = 'o7'
         duration.className = 'rf o7'
         entry.className = 'f4 lhc'
 
-        time.innerHTML = `${date.getHours()}:${date.getMinutes()}`
-        info.innerHTML = `${entries[i].c} - ${entries[i].t}`
+        time.innerHTML = `${start.getHours()}:${start.getMinutes()} - ${end.getHours()}:${end.getMinutes()}`
+        sector.innerHTML = entries[i].c
+        project.innerHTML = entries[i].t
         duration.innerHTML = `${Log.time.duration(entries[i].s, entries[i].e).toFixed(2)} h`
         entry.innerHTML = entries[i].d
 
         li.appendChild(time)
-        li.appendChild(info)
+        li.appendChild(sector)
+        li.appendChild(project)
         li.appendChild(duration)
         li.appendChild(entry)
 
@@ -323,7 +329,6 @@ var Log = {
 
           li.className = 'lhd c-pt'
           li.innerHTML = Log.time.displayDate(date)
-          // li.innerHTML = `${months[date.getMonth()]} ${date.getDate()}`
 
           li.setAttribute('onclick', `Log.journal.translate('${Log.time.toHex(date)}')`)
           document.getElementById('journalNav').appendChild(li)
@@ -400,7 +405,6 @@ var Log = {
 
     Log.ui.write('fsf', '&mdash;')
     Log.ui.write('fpf', '&mdash;')
-    Log.ui.write('fpt', '00:00')
     Log.ui.write('fsd', '0.00 h')
 
     let el = 'phc pdc dayChart weekChart peakTimesHistory sectorBars projectBars sectorsList projectsList vis logbook focusChart sectorFocusBar sectorLegendSummary journalNav'.split(' ')
@@ -529,7 +533,6 @@ var Log = {
 
     Log.ui.write('fsf', Log.data.forecast.sf())
     Log.ui.write('fpf', Log.data.forecast.pf())
-    Log.ui.write('fpt', Log.data.forecast.pt())
     Log.ui.write('flh', `${Log.data.forecast.lh().toFixed(2)} h`)
     Log.ui.write('fsd', `${Log.data.forecast.sd().toFixed(2)} h`)
 
