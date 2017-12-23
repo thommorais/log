@@ -2,56 +2,47 @@ Log = window.Log || {}
 Log.console = {
   history: [],
 
-  commands: [
-    'start', 'end', 'delete', 'set', 'import', 'export', 'invert', 'edit', 'pause', 'continue', 'resume', 'rename'
-  ],
-
   /**
    * Parse command
    * @param {string} i - Input
    */
   parse(i) {
-    let k = Log.console.commands.indexOf(i.split(' ')[0].toLowerCase())
 
-    if (k === -1) return
+    let command = i.split(' ')[0].toLowerCase()
 
-    switch (k) {
-      case 0:
+    switch (command) {
+      case 'start': case 'begin':
         Log.console.startLog(i);
         break;
-      case 1:
+      case 'stop': case 'end': case 'pause':
         Log.console.endLog();
         break;
-      case 2:
-        Log.console.delete(i);
+      case 'resume': case 'continue':
+        Log.console.resume();
         break;
-      case 3:
-        Log.console.set(i);
-        break;
-      case 4:
-        Log.console.importUser();
-        break;
-      case 5:
-        Log.console.exportUser();
-        break;
-      case 6:
-        Log.console.invert();
-        break;
-      case 7:
+      case 'edit':
         Log.console.edit(i);
         break;
-      case 8:
-        Log.console.endLog();
+      case 'delete':
+        Log.console.delete(i);
         break;
-      case 9:
-        Log.console.resume();
+      case 'set':
+        Log.console.set(i);
         break;
-      case 10:
-        Log.console.resume();
+      case 'import':
+        Log.console.importUser();
         break;
-      case 11:
+      case 'export':
+        Log.console.exportUser();
+        break;
+      case 'rename':
         Log.console.rename(i);
         break;
+      case 'invert':
+        Log.console.invert();
+        break;
+      default:
+        return
     }
   },
 
