@@ -14,10 +14,10 @@ To use the console, simply type.
 
 - `import` - Import existing log data
 - `export` - Export log data
-- `start "Sector" "Project" "Description"` - Start a log entry
-- `end` - End a log entry
+- `start "Sector" "Project" "Description"` - Start a log entry (alt: `begin`)
+- `stop` - Stop a log entry (alt: `end`)
 - `pause` - Pause a log session
-- `continue/resume` - Continue the last log session
+- `continue` - Continue the last log session (alt: `resume`)
 - `edit {ID} {attribute} "Lorem ipsum"` - Edit an entry's attributes
 - `set bg #fff` - Set the interface's background colour
 - `set colour red` - Set the interface's text colour
