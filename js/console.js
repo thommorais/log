@@ -1,3 +1,5 @@
+const timer = require('headless-work-timer')
+
 Log = window.Log || {}
 Log.console = {
   history: [],
@@ -14,8 +16,12 @@ Log.console = {
       case 'start': case 'begin':
         Log.console.startLog(i);
         break;
+      case 'pomodoro': case 'tomato':
+        Log.console.startTomatoLog(i);
+        break;
       case 'stop': case 'end': case 'pause':
         Log.console.endLog();
+        Log.stopTimer ? Log.stopTimer() : 'noop'
         break;
       case 'resume': case 'continue':
         Log.console.resume();
@@ -90,6 +96,21 @@ Log.console = {
         }
       })
     })
+  },
+
+  /**
+   * Start a log entry with pomodoro timing
+   * @param {Object[]} s - Input array
+   */
+  startTomatoLog(s) {
+    Log.stopTimer = timer()()( (state, phaseChanged) => {
+      console.log(state)
+      if (phaseChanged) {
+        state.phase === 'break' || state.phase === 'longBreak' ? Log.console.endLog() : Log.console.startLog(s)
+        let notif = new window.Notification(`Started ${state.phase}`)
+      }
+    })
+    Log.console.startLog(s)
   },
 
   /**
