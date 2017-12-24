@@ -225,11 +225,15 @@ Log.console = {
   },
 
   /**
-   * Delete a log
+   * Delete one or more logs
    * @param {string} i - Input
    */
   delete(i) {
-    user.log.splice(Number(i.split(' ')[1]) - 1, 1)
+    // all except first word are entry indices
+    const ascendingUniqueIndices = i.split(' ').slice(1).filter( /* uniq */ (v, i, self) => self.indexOf(v) === i).sort()
+    // remove all indices. We start from the highest to avoid the shifting of indices after removal.
+    ascendingUniqueIndices.reverse().forEach( index => user.log.splice(Number(index) - 1, 1))
+
     Log.options.update()
   },
 
