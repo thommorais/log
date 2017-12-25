@@ -1,3 +1,5 @@
+const timer = require('headless-work-timer')
+
 Log = window.Log || {}
 Log.console = {
   history: [],
@@ -14,8 +16,12 @@ Log.console = {
       case 'start': case 'begin':
         Log.console.startLog(i);
         break;
+      case 'pomodoro': case 'tomato':
+        Log.console.startTomatoLog(i);
+        break;
       case 'stop': case 'end': case 'pause':
         Log.console.endLog();
+        Log.stopTimer ? Log.stopTimer() : 'noop'
         break;
       case 'resume': case 'continue':
         Log.console.resume();
@@ -90,6 +96,21 @@ Log.console = {
         }
       })
     })
+  },
+
+  /**
+   * Start a log entry with pomodoro timing
+   * @param {Object[]} s - Input array
+   */
+  startTomatoLog(s) {
+    Log.stopTimer = timer()()( (state, phaseChanged) => {
+      console.log(state)
+      if (phaseChanged) {
+        state.phase === 'break' || state.phase === 'longBreak' ? Log.console.endLog() : Log.console.startLog(s)
+        let notif = new window.Notification(`Started ${state.phase}`)
+      }
+    })
+    Log.console.startLog(s)
   },
 
   /**
@@ -225,11 +246,15 @@ Log.console = {
   },
 
   /**
-   * Delete a log
+   * Delete one or more logs
    * @param {string} i - Input
    */
   delete(i) {
-    user.log.splice(Number(i.split(' ')[1]) - 1, 1)
+    // all except first word are entry indices
+    const ascendingUniqueIndices = i.split(' ').slice(1).filter( /* uniq */ (v, i, self) => self.indexOf(v) === i).sort()
+    // remove all indices. We start from the highest to avoid the shifting of indices after removal.
+    ascendingUniqueIndices.reverse().forEach( index => user.log.splice(Number(index) - 1, 1))
+
     Log.options.update()
   },
 
