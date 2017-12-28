@@ -13,7 +13,7 @@ window.addEventListener('drop', function(e) {
   for (let file_id in files) {
     let file = files[file_id]
 
-    if (file.name.indexOf('.json') == -1) {
+    if (file.name.indexOf('.json') === -1) {
       console.log('skipped', file)
       continue
     }
@@ -35,7 +35,6 @@ window.addEventListener('drop', function(e) {
 
       user.palette = o.palette || {}
       user.projectPalette = o.projectPalette || {}
-      user.history = o.history || []
       user.log = o.log || []
 
       localStorage.setItem('user', JSON.stringify(user))

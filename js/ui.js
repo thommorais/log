@@ -2,23 +2,27 @@ Log = window.Log || {}
 Log.ui = {
 
   /**
-   * Write HTML content
-   * @param {string} id - Element ID
-   * @param {string} con - Content
+   * Write content
+   * @param {string} i - Element ID
+   * @param {string} c - Content
    */
-  write(id, con) {
-    document.getElementById(id).innerHTML = con
+  write(i, c) {
+    document.getElementById(i).innerHTML = c
   },
 
   /**
-   * Empty an HTML element
-   * @param {string} el - Element
+   * Empty element
+   * @param {string} e - Element
    */
-  empty(el) {
-    Log.ui.write(el, '')
+  empty(e) {
+    Log.ui.write(e, '')
   },
 
-  hide(el) {
-    document.getElementById(el).style.display = 'none'
+  /**
+   * Hide element
+   * @param {string} e - Element
+   */
+  hide(e) {
+    document.getElementById(e).style.display = 'none'
   }
 }

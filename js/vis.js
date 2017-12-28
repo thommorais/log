@@ -88,7 +88,7 @@ Log.vis = {
       col.className = 'dib hf psr'
       col.style.width = `${100 / Log.config.ui.view}%`
 
-      inn.className = 'sw1 hf cn'
+      inn.className = 'sw1 hf cn bb'
       inn.id = id
 
       col.appendChild(inn)
@@ -147,67 +147,36 @@ Log.vis = {
   },
 
   /**
-   * Display peak hours chart
-   * @param {Object[]=} ent - Entries
-   * @param {string=} con - Container
-   */
-  peakH(ent = Log.log, con = 'phc') {
-    if (ent.length === 0) return
-
-    let hours = Log.data.peakHours(ent)
-    let max = Math.max(...hours)
-
-    for (let i = 0, l = hours.length; i < l; i++) {
-      let d = document.createElement('div')
-      let e = document.createElement('div')
-      let n = document.createElement('div')
-      let t = `${con}-${i}`
-
-      d.className = 'dib hf psr'
-      d.style.width = `${100 / 24}%`
-      d.id = t
-
-      n.className = 'sw1 hf cn'
-      n.style.backgroundColor = i === (new Date).getHours() ? Log.config.ui.accent : Log.config.ui.colour
-
-      e.className = 'psa b0 wf'
-      e.style.height = `${hours[i] / max * 100}%`
-
-      e.appendChild(n)
-
-      document.getElementById(con).appendChild(d)
-      document.getElementById(t).appendChild(e)
-    }
-  },
-
-  /**
    * Display peak days chart
-   * @param {Object[]=} ent - Entries
+   * @param {string} mode - Hours or days
+   * @param {Object[]} peaks - Peaks
    * @param {string=} con - Container
    */
-  peakD(ent = Log.log, con = 'pdc') {
-    if (ent.length === 0) return
+  peakChart(mode, peaks, con) {
+    if (peaks.length === 0) return
+    if (['hours', 'days'].indexOf(mode) < 0) return
 
-    let peaks = Log.data.peakDays(ent)
-    let peakMax = Math.max(...peaks)
+    let peak = Math.max(...peaks)
 
     for (let i = 0, l = peaks.length; i < l; i++) {
       let col = document.createElement('div')
       let inn = document.createElement('div')
-      let cor = document.createElement('div')
       let id = `${con}-${i}`
 
       col.className = 'dib hf psr'
-      col.style.width = `${100 / 7}%`
+      col.style.width = `${100 / peaks.length}%`
       col.id = id
 
-      cor.className = 'sw1 hf cn'
-      cor.style.backgroundColor = i === (new Date).getDay() ? Log.config.ui.accent : Log.config.ui.colour
+      inn.className = 'psa b0 sw1 bb'
+      inn.style.height = `${peaks[i] / peak * 100}%`
 
-      inn.className = 'psa b0 wf'
-      inn.style.height = `${peaks[i] / peakMax * 100}%`
-
-      inn.appendChild(cor)
+      if (mode === 'hours') {
+        inn.style.backgroundColor = i === (new Date).getHours() ? Log.config.ui.accent : Log.config.ui.colour
+        inn.style.borderColor = i === (new Date).getHours() ? Log.config.ui.accent : Log.config.ui.colour
+      } else {
+        inn.style.backgroundColor = i === (new Date).getDay() ? Log.config.ui.accent : Log.config.ui.colour
+        inn.style.borderColor = i === (new Date).getDay() ? Log.config.ui.accent : Log.config.ui.colour
+      }
 
       document.getElementById(con).appendChild(col)
       document.getElementById(id).appendChild(inn)
@@ -242,8 +211,6 @@ Log.vis = {
     }
 
     list = sor
-
-    console.log(list)
 
     for (let i = 0, l = list.length; i < l; i++) {
       let sh = mode === 'sector' ? Log.data.sh(list[i][0], ent) : Log.data.ph(list[i][0], ent)
@@ -329,10 +296,11 @@ Log.vis = {
    */
   legend(mode, ent = Log.log, con = 'legend') {
     if (ent.length === 0) return
+    if (['sector', 'project'].indexOf(mode) < 0) return
 
     let list = mode === 'sector' ? Log.data.listSectors(ent).sort() : Log.data.listProjects(ent).sort()
 
-    for (let i = 0, l = list.length; i < l; i++) {
+    let addItem = i => {
       let item = document.createElement('li')
       let code = document.createElement('div')
       let name = document.createElement('div')
@@ -344,19 +312,23 @@ Log.vis = {
       name.className = 'dib'
 
       if (mode === 'sector') {
-        colour = Log.palette[list[i]]
-        perc = Log.data.sp(list[i], ent)
+        colour = Log.palette[i]
+        perc = Log.data.sp(i, ent)
       } else if (mode === 'project') {
-        colour = Log.projectPalette[list[i]]
-        perc = Log.data.pp(list[i], ent)
+        colour = Log.projectPalette[i]
+        perc = Log.data.pp(i, ent)
       }
 
       code.style.backgroundColor = colour || Log.config.ui.colour
-      name.innerHTML = `${list[i]} (${perc.toFixed(2)}%)`
+      name.innerHTML = `${i} (${perc.toFixed(2)}%)`
 
       item.appendChild(code)
       item.appendChild(name)
       document.getElementById(con).appendChild(item)
+    }
+
+    for (let i = 0, l = list.length; i < l; i++) {
+      addItem(list[i])
     }
   },
 
@@ -371,8 +343,8 @@ Log.vis = {
 
     let set = Log.data.sortEntries(ent)
 
-    for (let i = 0, l = set.length; i < l; i++) {
-      let list = mode === 'sector' ? Log.data.listSectors(set[i]) : Log.data.listProjects(set[i])
+    let addItem = i => {
+      let list = mode === 'sector' ? Log.data.listSectors(i) : Log.data.listProjects(i)
 
       let col = document.createElement('div')
       let inn = document.createElement('div')
@@ -381,9 +353,7 @@ Log.vis = {
 
       col.className = 'dib hf psr'
       col.style.width = `${100 / set.length}%`
-
-      inn.className = 'sw1 hf cn'
-
+      inn.className = 'sw1 hf cn bb'
       cor.className = 'psa sw1 b0 bg-noir'
       cor.style.backgroundColor = Log.config.ui.colour
       cor.style.height = `${height}%`
@@ -391,6 +361,10 @@ Log.vis = {
       inn.appendChild(cor)
       col.appendChild(inn)
       document.getElementById(con).appendChild(col)
+    }
+
+    for (let i = 0, l = set.length; i < l; i++) {
+      addItem(set[i])
     }
   }
 }

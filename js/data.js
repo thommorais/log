@@ -23,27 +23,29 @@ Log.data = {
     let p = []
 
     for (let i = 0, l = ent.length; i < l; i++) {
-      if (Log.time.date(ent[i].s) !== Log.time.date(ent[i].e) && ent[i].e !== 'undefined') {
-        let a = Log.time.convert(Log.time.parse(ent[i].s))
-        let b = Log.time.convert(Log.time.parse(ent[i].e))
+      let e = ent[i]
+
+      if (Log.time.date(e.s) !== Log.time.date(e.e) && e.e !== 'undefined') {
+        let a = Log.time.convert(Log.time.parse(e.s))
+        let b = Log.time.convert(Log.time.parse(e.e))
 
         p.push({
-          s: ent[i].s,
+          s: e.s,
           e: Log.time.toHex(new Date(a.getFullYear(), a.getMonth(), a.getDate(), 23, 59, 59)),
-          c: ent[i].c,
-          t: ent[i].t,
-          d: ent[i].d
+          c: e.c,
+          t: e.t,
+          d: e.d
         })
 
         p.push({
           s: Log.time.toHex(new Date(b.getFullYear(), b.getMonth(), b.getDate(), 0, 0, 0)),
-          e: ent[i].e,
-          c: ent[i].c,
-          t: ent[i].t,
-          d: ent[i].d
+          e: e.e,
+          c: e.c,
+          t: e.t,
+          d: e.d
         })
       } else {
-        p.push(ent[i])
+        p.push(e)
       }
     }
 
@@ -117,12 +119,14 @@ Log.data = {
    * @param {number} d - A day of the week (0 - 6)
    * @returns {Object[]} Entries
    */
-  getEntriesByDay(d) {
+  getEntriesByDay(d, ent = Log.log) {
+    if (ent.length === 0) return
+
     let entries = []
 
-    for (let i = 0, l = Log.log.length; i < l; i++) {
-      if (Log.log[i].e !== 'undefined' && Log.time.convert(Log.time.parse(Log.log[i].s)).getDay() === d) {
-        entries.push(Log.log[i])
+    for (let i = 0, l = ent.length; i < l; i++) {
+      if (ent[i].e !== 'undefined' && Log.time.convert(Log.time.parse(ent[i].s)).getDay() === d) {
+        entries.push(ent[i])
       }
     }
 
@@ -205,14 +209,14 @@ Log.data = {
    * Sort entries by day
    * @returns {Object[]} Entries sorted by day
    */
-  sortEntriesByDay() {
-    let ent = []
+  sortEntriesByDay(ent = Log.log) {
+    let sort = []
 
     for (let i = 0; i < 7; i++) {
-      ent.push(Log.data.getEntriesByDay(i))
+      sort.push(Log.data.getEntriesByDay(i, ent))
     }
 
-    return ent
+    return sort
   },
 
   /**
@@ -277,7 +281,7 @@ Log.data = {
    * @param {Object[]=} pk - Peak days
    * @returns {string} Peak day
    */
-  peakDay(pk = Log.data.peakDays(Log.log)) {
+  peakDay(pk = Log.cache.peakDays) {
     if (pk.length === 0) return
     return ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][pk.indexOf(Math.max(...pk))]
   },
@@ -325,7 +329,7 @@ Log.data = {
    * @param {Object[]=} pk - Peak hours
    * @returns {string} Peak hour
    */
-  peakHour(pk = Log.data.peakHours(Log.log)) {
+  peakHour(pk = Log.cache.peakHours) {
     if (pk.length === 0) return
     return `${pk.indexOf(Math.max(...pk))}:00`
   },
@@ -351,35 +355,30 @@ Log.data = {
 
   /**
    * Calculate shortest log session
-   * @param {Object[]=} ent - Log entries
+   * @param {Object[]=} list - Durations
    * @returns {number} Shortest log session
    */
-  lsmin(ent = Log.log) {
-    let list = Log.data.listDurations(ent)
+  lsmin(list = Log.cache.durations) {
     if (list === undefined) return 0
     return list.length === 0 ? 0 : Math.min(...list)
   },
 
   /**
    * Calculate longest log session
-   * @param {Object[]=} ent - Entries
+   * @param {Object[]=} list - Durations
    * @returns {number} Longest log session
    */
-  lsmax(ent = Log.log) {
-    let list = Log.data.listDurations(ent)
+  lsmax(list = Log.cache.durations) {
     if (list === undefined) return 0
     return list.length === 0 ? 0 : Math.max(...list)
   },
 
   /**
    * Calculate average session duration (ASD)
-   * @param {Object[]=} ent - Entries
+   * @param {Object[]=} list - Durations
    * @returns {number} Average session duration
    */
-  asd(ent = Log.log) {
-    if (ent.length === 0) return 0
-
-    let list = Log.data.listDurations(ent)
+  asd(list = Log.cache.durations) {
     if (list === undefined || list.length === 0) return 0
 
     let c = 0
@@ -407,20 +406,19 @@ Log.data = {
 
   /**
    * Calculate average logged hours
-   * @param {Object[]=} ent - Entries
+   * @param {Object[]=} ent - Sorted entries
    * @returns {number} Average logged hours
    */
-  avgLh(ent = Log.log) {
+  avgLh(ent = Log.cache.sortEntries) {
     if (ent.length === 0) return 0
 
-    let list = Log.data.sortEntries(ent)
     let h = 0
 
-    for (let i = 0, l = list.length; i < l; i++) {
-      h += Log.data.lh(list[i])
+    for (let i = 0, l = ent.length; i < l; i++) {
+      h += Log.data.lh(ent[i])
     }
 
-    return h / list.length
+    return h / ent.length
   },
 
   /**
@@ -495,13 +493,12 @@ Log.data = {
 
   /**
    * Calculate streak
-   * @param {Object[]=} a - Entries
+   * @param {Object[]=} ent - Sorted entries
    * @returns {number} Streak
    */
-  streak(a = Log.log) {
-    if (a.length === 0) return 0
+  streak(ent = Log.cache.sortEntries) {
+    if (ent.length === 0) return 0
 
-    let ent = Log.data.sortEntries(a)
     let streak = 0
 
     for (let i = 0, l = ent.length; i < l; i++) {
@@ -514,23 +511,22 @@ Log.data = {
   /**
    * Get an array of focus stats
    * @param {string} mode - Sector or project
-   * @param {Object[]=} ent - Entries
+   * @param {Object[]=} ent - Sorted entries
    * @returns {Object[]} Array of focus stats
    */
-  listFocus(mode, ent = Log.log) {
+  listFocus(mode, ent = Log.cache.sortEntries) {
     if (ent.length === 0) return
 
-    let days = Log.data.sortEntries(ent)
     let list = []
 
     if (mode === 'sector') {
-      for (let i = 0, l = days.length; i < l; i++) {
-        let f = Log.data.sectorFocus(Log.data.listSectors(days[i]))
+      for (let i = 0, l = ent.length; i < l; i++) {
+        let f = Log.data.sectorFocus(Log.data.listSectors(ent[i]))
         if (f !== 0) list.push(f)
       }
     } else if (mode === 'project') {
-      for (let i = 0, l = days.length; i < l; i++) {
-        let f = Log.data.sectorFocus(Log.data.listProjects(days[i]))
+      for (let i = 0, l = ent.length; i < l; i++) {
+        let f = Log.data.sectorFocus(Log.data.listProjects(ent[i]))
         if (f !== 0) list.push(f)
       }
     }
@@ -542,7 +538,7 @@ Log.data = {
    * Calculate sector focus
    * @param {Object[]=} list - Sectors list
    */
-  sectorFocus(list = Log.data.listSectors(Log.log)) {
+  sectorFocus(list = Log.cache.sectors) {
     return list.length === 0 ? 0 : 1 / list.length
   },
 
@@ -550,25 +546,25 @@ Log.data = {
    * Calculate project focus
    * @param {Object[]=} list - Projects list
    */
-  projectFocus(list = Log.data.listProjects(Log.log)) {
+  projectFocus(list = Log.cache.projects) {
     return list.length === 0 ? 0 : 1 / list.length
   },
 
   /**
    * Calculate minimum focus
    * @param {string} mode - Sector or project
-   * @param {Object[]=} ent - Entries
+   * @param {Object[]=} ent - Sorted entries
    */
-  minFocus(mode, ent = Log.log) {
+  minFocus(mode, ent = Log.cache.sortEntries) {
     return ent.length === 0 ? 0 : Math.min(...Log.data.listFocus(mode, ent))
   },
 
   /**
    * Calculate maximum focus
    * @param {string} mode - Sector or project
-   * @param {Object[]=} ent - Entries
+   * @param {Object[]=} ent - Sorted entries
    */
-  maxFocus(mode, ent = Log.log) {
+  maxFocus(mode, ent = Log.cache.sortEntries) {
     return ent.length === 0 ? 0 : Math.max(...Log.data.listFocus(mode, ent))
   },
 
@@ -644,7 +640,7 @@ Log.data = {
      * @returns {number} Log hours
      */
     lh() {
-      return Log.data.avgLh(Log.data.getEntriesByDay(new Date().getDay())) * 10
+      return Log.data.avgLh(Log.data.sortEntries(Log.data.getEntriesByDay(new Date().getDay()))) * 10
     },
 
     /**
@@ -652,7 +648,7 @@ Log.data = {
      * @returns {number} Session duration
      */
     sd() {
-      return Log.data.asd(Log.data.getEntriesByDay(new Date().getDay()))
+      return Log.data.asd(Log.data.listDurations(Log.data.getEntriesByDay(new Date().getDay())))
     }
   }
 }

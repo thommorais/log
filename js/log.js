@@ -17,6 +17,15 @@ var Log = {
   projectPalette: {},
   clock: {},
 
+  cache: {
+    sortEntries: [],
+    sectors: [],
+    projects: [],
+    peakHours: [],
+    peakDays: [],
+    durations: []
+  },
+
   /**
    * Get log status; true means a session is in progress
    * @returns {boolean} Log status
@@ -121,7 +130,7 @@ var Log = {
      * View sector details
      * @param {string} sec - Sector
      */
-    sector(sec = Log.data.listSectors().sort()[0]) {
+    sector(sec = Log.cache.sectors.sort()[0]) {
       Log.detail.clear.sector()
 
       if (sec === undefined) return
@@ -136,17 +145,19 @@ var Log = {
 
       Log.ui.write('sectorLastUpdate', timeago)
 
+      let durations = Log.data.listDurations(his)
+
       Log.ui.write('secEnt', his.length)
       Log.ui.write('secLHH', Log.data.lh(his).toFixed(2))
-      Log.ui.write('secLSNH', Log.data.lsmin(his).toFixed(2))
-      Log.ui.write('secLSXH', Log.data.lsmax(his).toFixed(2))
-      Log.ui.write('secASD', Log.data.asd(his).toFixed(2))
+      Log.ui.write('secLSNH', Log.data.lsmin(durations).toFixed(2))
+      Log.ui.write('secLSXH', Log.data.lsmax(durations).toFixed(2))
+      Log.ui.write('secASD', Log.data.asd(durations).toFixed(2))
       Log.ui.write('secPHH', Log.data.peakHour(Log.data.peakHours(his)))
       Log.ui.write('secPDH', Log.data.peakDay(Log.data.peakDays(his)))
-      Log.ui.write('secStreak', Log.data.streak(his))
+      Log.ui.write('secStreak', Log.data.streak(Log.data.sortEntries(his)))
 
-      Log.vis.peakH(his, 'secPeakTimes')
-      Log.vis.peakD(his, 'secPeakDays')
+      Log.vis.peakChart('hours', Log.data.peakHours(his), 'secPeakTimes')
+      Log.vis.peakChart('days', Log.data.peakDays(his), 'secPeakDays')
 
       if (ent.length !== 0) {
         let mode = Log.config.ui.colourMode === 'none' ? 'none' : 'sector'
@@ -155,8 +166,8 @@ var Log = {
         Log.vis.focusChart('project', ent, 'secFocusChart')
 
         Log.ui.write('secAFH', Log.data.focusAvg(ent).toFixed(2))
-        Log.ui.write('secFmin', Log.data.minFocus('sector', ent).toFixed(2))
-        Log.ui.write('secFmax', Log.data.maxFocus('sector', ent).toFixed(2))
+        Log.ui.write('secFmin', Log.data.minFocus('sector', Log.data.sortEntries(ent)).toFixed(2))
+        Log.ui.write('secFmax', Log.data.maxFocus('sector', Log.data.sortEntries(ent)).toFixed(2))
 
         Log.vis.focusBar('project', ent, 'projectDetailFocus')
         Log.vis.legend('project', ent, 'projectLegend')
@@ -167,7 +178,7 @@ var Log = {
      * View project details
      * @param {string} pro - Project
      */
-    project(pro = Log.data.listProjects().sort()[0]) {
+    project(pro = Log.cache.projects.sort()[0]) {
       Log.detail.clear.project()
 
       if (pro === undefined) return
@@ -182,17 +193,19 @@ var Log = {
 
       Log.ui.write('projectLastUpdate', timeago)
 
+      let durations = Log.data.listDurations(his)
+
       Log.ui.write('proEnt', his.length)
       Log.ui.write('proLHH', Log.data.lh(his).toFixed(2))
-      Log.ui.write('proLSNH', Log.data.lsmin(his).toFixed(2))
-      Log.ui.write('proLSXH', Log.data.lsmax(his).toFixed(2))
-      Log.ui.write('proASD', Log.data.asd(his).toFixed(2))
+      Log.ui.write('proLSNH', Log.data.lsmin(durations).toFixed(2))
+      Log.ui.write('proLSXH', Log.data.lsmax(durations).toFixed(2))
+      Log.ui.write('proASD', Log.data.asd(durations).toFixed(2))
       Log.ui.write('proPHH', Log.data.peakHour(Log.data.peakHours(his)))
       Log.ui.write('proPDH', Log.data.peakDay(Log.data.peakDays(his)))
-      Log.ui.write('proStreak', Log.data.streak(his))
+      Log.ui.write('proStreak', Log.data.streak(Log.data.sortEntries(his)))
 
-      Log.vis.peakH(his, 'proPeakTimes')
-      Log.vis.peakD(his, 'proPeakDays')
+      Log.vis.peakChart('hours', Log.data.peakHours(his), 'proPeakTimes')
+      Log.vis.peakChart('days', Log.data.peakDays(his), 'proPeakDays')
 
       if (ent.length !== 0) {
         let mode = Log.config.ui.colourMode === 'none' ? 'none' : 'sector'
@@ -201,8 +214,8 @@ var Log = {
         Log.vis.focusChart('sector', ent, 'proFocusChart')
 
         Log.ui.write('proAFH', Log.data.focusAvg(ent).toFixed(2))
-        Log.ui.write('proFmin', Log.data.minFocus('sector', ent).toFixed(2))
-        Log.ui.write('proFmax', Log.data.maxFocus('sector', ent).toFixed(2))
+        Log.ui.write('proFmin', Log.data.minFocus('sector', Log.data.sortEntries(ent)).toFixed(2))
+        Log.ui.write('proFmax', Log.data.maxFocus('sector', Log.data.sortEntries(ent)).toFixed(2))
 
         Log.vis.focusBar('sector', ent, 'sectorDetailFocus')
         Log.vis.legend('sector', ent, 'sectorLegend')
@@ -254,10 +267,12 @@ var Log = {
 
       Log.vis.day(date, 'journalDay')
 
+      let durations = Log.data.listDurations(entries)
+
       Log.ui.write('jLHT', Log.data.lh(entries).toFixed(2))
-      Log.ui.write('jLSN', Log.data.lsmin(entries).toFixed(2))
-      Log.ui.write('jLSX', Log.data.lsmax(entries).toFixed(2))
-      Log.ui.write('jASDT', Log.data.asd(entries).toFixed(2))
+      Log.ui.write('jLSN', Log.data.lsmin(durations).toFixed(2))
+      Log.ui.write('jLSX', Log.data.lsmax(durations).toFixed(2))
+      Log.ui.write('jASDT', Log.data.asd(durations).toFixed(2))
       Log.ui.write('jLPT', Log.data.lp(entries).toFixed(2))
       Log.ui.write('jfocusToday', Log.data.projectFocus(Log.data.listProjects(entries)).toFixed(2))
 
@@ -319,7 +334,7 @@ var Log = {
      * Journal navigation
      */
     nav() {
-      let entries = Log.data.sortEntries().reverse()
+      let entries = Log.cache.sortEntries.reverse()
       let months = 'January February March April May June July August September October November December'.split(' ')
 
       for (let i = 0, l = entries.length; i < l; i++) {
@@ -521,14 +536,21 @@ var Log = {
       return
     }
 
+    Log.cache.sortEntries = Log.data.sortEntries()
+    Log.cache.sectors = Log.data.listSectors()
+    Log.cache.projects = Log.data.listProjects()
+    Log.cache.peakHours = Log.data.peakHours()
+    Log.cache.peakDays = Log.data.peakDays()
+    Log.cache.durations = Log.data.listDurations()
+
     let n = new Date()
     let en = Log.data.getEntriesByDate(n)
     let mn = Log.data.getRecentEntries(Log.config.ui.view - 1)
 
     Log.timer(Log.status())
 
-    Log.vis.peakH(Log.data.sortEntriesByDay()[n.getDay()])
-    Log.vis.peakD()
+    Log.vis.peakChart('hours', Log.data.peakHours(Log.data.sortEntriesByDay()[n.getDay()]), 'phc')
+    Log.vis.peakChart('days', Log.cache.peakDays, 'pdc')
 
     Log.ui.write('fsf', Log.data.forecast.sf())
     Log.ui.write('fpf', Log.data.forecast.pf())
@@ -541,14 +563,16 @@ var Log = {
     Log.vis.list('sector', 'sectorBars', en)
     Log.vis.list('project', 'projectBars', en)
 
+    let durations = Log.data.listDurations(en)
+
     Log.ui.write('LHT', Log.data.lh(en).toFixed(2))
-    Log.ui.write('LSN', Log.data.lsmin(en).toFixed(2))
-    Log.ui.write('LSX', Log.data.lsmax(en).toFixed(2))
-    Log.ui.write('ASDT', Log.data.asd(en).toFixed(2))
+    Log.ui.write('LSN', Log.data.lsmin(durations).toFixed(2))
+    Log.ui.write('LSX', Log.data.lsmax(durations).toFixed(2))
+    Log.ui.write('ASDT', Log.data.asd(durations).toFixed(2))
     Log.ui.write('LPT', Log.data.lp(en).toFixed(2))
     Log.ui.write('focusToday', Log.data.projectFocus(Log.data.listProjects(en)).toFixed(2))
     Log.ui.write('entryCount', en.length)
-    Log.ui.write('streakToday', Log.data.streak(Log.log))
+    Log.ui.write('streakToday', Log.data.streak())
 
     Log.ui.write('LHH', Log.data.lh().toFixed(2))
     Log.ui.write('LSNH', Log.data.lsmin().toFixed(2))
@@ -557,19 +581,19 @@ var Log = {
     Log.ui.write('ALHH', Log.data.avgLh().toFixed(2))
     Log.ui.write('LPH', Log.data.lp().toFixed(2))
     Log.ui.write('entCount', user.log.length)
-    Log.ui.write('secCount', Log.data.listSectors().length)
-    Log.ui.write('proCount', Log.data.listProjects().length)
+    Log.ui.write('secCount', Log.cache.sectors.length)
+    Log.ui.write('proCount', Log.cache.projects.length)
     Log.ui.write('PHH', Log.data.peakHour())
     Log.ui.write('PDH', Log.data.peakDay())
 
-    Log.vis.peakH(undefined, 'peakTimesHistory')
-    Log.vis.peakD(undefined, 'peakDaysHistory')
+    Log.vis.peakChart('hours', Log.cache.peakHours, 'peakTimesHistory')
+    Log.vis.peakChart('days', Log.cache.peakDays, 'peakDaysHistory')
 
     Log.vis.focusChart('project', mn)
 
     Log.ui.write('AFH', Log.data.focusAvg().toFixed(2))
-    Log.ui.write('Fmin', Log.data.minFocus('project').toFixed(2))
-    Log.ui.write('Fmax', Log.data.maxFocus('project').toFixed(2))
+    Log.ui.write('Fmin', Log.data.minFocus('project', Log.cache.sortEntries).toFixed(2))
+    Log.ui.write('Fmax', Log.data.maxFocus('project', Log.cache.sortEntries).toFixed(2))
 
     Log.vis.focusBar('sector', mn, 'sectorFocusBar')
     Log.vis.legend('sector', undefined, 'sectorLegendSummary')

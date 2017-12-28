@@ -47,10 +47,7 @@ Log.time = {
     let f = Log.config.system.timeFormat
 
     if (f === '24') {
-      let h = `0${d.getHours()}`
-      let m = `0${d.getMinutes()}`
-
-      return `${h.substr(-2)}:${m.substr(-2)}`
+      return `${`0${d.getHours()}`.substr(-2)}:${`0${d.getMinutes()}`.substr(-2)}`
     } else if (f === '12') {
       return Log.time.twelveHours(d)
     }
