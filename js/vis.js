@@ -18,7 +18,15 @@ Log.vis = {
       let es = Log.time.parse(s)
       let width = Log.utils.calcWidth(Log.time.parse(e), es)
       let dp = Log.utils.calcDP(es)
-      let colour = mode === 'sector' ? Log.palette[c] : Log.projectPalette[t]
+      let colour = ''
+
+      if (mode === 'sector') {
+        colour = Log.palette[c]
+      } else if (mode === 'project') {
+        colour = Log.projectPalette[t]
+      } else if (mode === 'none') {
+        colour = Log.config.ui.colour
+      }
 
       entry.className = 'psr t0 sh1 mb2 lf'
       entry.style.width = `${width}%`
@@ -67,7 +75,15 @@ Log.vis = {
     let addEntry = ({s, e, c, t}, row) => {
       let entry = document.createElement('div')
       let height = Log.utils.calcWidth(Log.time.parse(e), Log.time.parse(s))
-      let colour = mode === 'sector' ? Log.palette[c] : Log.projectPalette[t]
+      let colour = ''
+
+      if (mode === 'sector') {
+        colour = Log.palette[c]
+      } else if (mode === 'project') {
+        colour = Log.projectPalette[t]
+      } else if (mode === 'none') {
+        colour = Log.config.ui.colour
+      }
 
       entry.className = 'psa sw1'
       entry.style.height = `${height}%`
@@ -132,7 +148,15 @@ Log.vis = {
       let dp = Log.utils.calcDP(es)
       let width = Log.utils.calcWidth(Log.time.parse(ent[i].e), es)
       let margin = Log.utils.calcMargin(dp, lw, lp)
-      let colour = mode === 'sector' ? Log.palette[ent[i].c] : Log.projectPalette[ent[i].t]
+      let colour = ''
+
+      if (mode === 'sector') {
+        colour = Log.palette[ent[i].c]
+      } else if (mode === 'project') {
+        colour = Log.projectPalette[ent[i].t]
+      } else if (mode === 'none') {
+        colour = Log.config.ui.colour
+      }
 
       entry.className = 'nodrag psr t0 hf mb2 lf'
       entry.style.width = `${width}%`
