@@ -11,6 +11,8 @@
 
 var Log = {
 
+  path: '',
+
   log: [],
   config: {},
   palette: {},
@@ -510,17 +512,23 @@ var Log = {
       }
     })
 
-    if (localStorage.hasOwnProperty('user')) {
-      try {
-        JSON.parse(localStorage.getItem('user'))
-        user = JSON.parse(localStorage.getItem('user'))
-      } catch(e) {
-        return
-      }
-    } else {
-      user.log = []
-      localStorage.setItem('user', JSON.stringify(user))
+    var user = {
+      config: dataStore.get('config') || {},
+      palette: dataStore.get('palette') || {},
+      projectPalette: dataStore.get('projectPalette') || {},
+      log: dataStore.get('log') || []
     }
+
+    // if (localStorage.hasOwnProperty('user')) {
+    //   try {
+    //     JSON.parse(localStorage.getItem('user'))
+    //     user = JSON.parse(localStorage.getItem('user'))
+    //   } catch(e) {
+    //     return
+    //   }
+    // } else {
+    //   localStorage.setItem('user', JSON.stringify(user))
+    // }
 
     Log.log = Log.data.parse(user.log)
     Log.config = user.config
@@ -549,8 +557,10 @@ var Log = {
 
     Log.timer(Log.status())
 
-    Log.vis.peakChart('hours', Log.data.peakHours(Log.data.sortEntriesByDay()[n.getDay()]), 'phc')
-    Log.vis.peakChart('days', Log.cache.peakDays, 'pdc')
+    if (Log.log.length > 1) {
+      Log.vis.peakChart('hours', Log.data.peakHours(Log.data.sortEntriesByDay()[n.getDay()]), 'phc')
+      Log.vis.peakChart('days', Log.cache.peakDays, 'pdc')
+    }
 
     Log.ui.write('fsf', Log.data.forecast.sf())
     Log.ui.write('fpf', Log.data.forecast.pf())
@@ -585,6 +595,9 @@ var Log = {
     Log.ui.write('proCount', Log.cache.projects.length)
     Log.ui.write('PHH', Log.data.peakHour())
     Log.ui.write('PDH', Log.data.peakDay())
+
+    Log.ui.write('efec', (Log.data.lh() / Log.cache.projects.length).toFixed(2))
+    Log.ui.write('efic', (Log.data.lh() / Log.cache.sectors.length).toFixed(2))
 
     Log.vis.peakChart('hours', Log.cache.peakHours, 'peakTimesHistory')
     Log.vis.peakChart('days', Log.cache.peakDays, 'peakDaysHistory')

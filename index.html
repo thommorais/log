@@ -23,7 +23,7 @@
     <button id="b-jou" class="pv1 tab on bg-cl o5 mr3" onclick="Log.tab('jou', 'sect', 'tab')">Journal</button>
     <button id="b-gui" class="pv1 tab on bg-cl o5 mr3" onclick="Log.tab('gui', 'sect', 'tab')">Guide</button>
 
-    <span id="timer" class="rf f5 dn di-m di-l" title="Current Log Session Duration">00:00:00</span>
+    <span id="timer" class="rf f5 dn di-m di-l">00:00:00</span>
   </header>
 
   <div id="ovw" class="sect h9">
@@ -145,27 +145,27 @@
 
         <ul class="mb5 lsn f6 lhc r">
           <li class="mb4 c6 c3-m c3-l">
-            <p class="f3 mb1 fwb"><span id="LHH">0.00</span> h</p>
+            <p id="LHH" class="f3 mb1 fwb">0.00 h</p>
             <p class="o9">Logged Hours</p>
           </li>
           <li class="mb4 c6 c3-m c3-l">
-            <p class="f3 mb1 fwb"><span id="LSNH">0.00</span> h</p>
+            <p id="LSNH" class="f3 mb1 fwb">0.00 h</p>
             <p class="o9">Min Session</p>
           </li>
           <li class="mb4 c6 c3-m c3-l">
-            <p class="f3 mb1 fwb"><span id="LSXH">0.00</span> h</p>
+            <p id="LSXH" class="f3 mb1 fwb">0.00 h</p>
             <p class="o9">Max Session</p>
           </li>
           <li class="mb4 c6 c3-m c3-l">
-            <p class="f3 mb1 fwb"><span id="ASD">0.00</span> h</p>
+            <p id="ASD" class="f3 mb1 fwb">0.00 h</p>
             <p class="o9">Avg Session</p>
           </li>
           <li class="mb4 c6 c3-m c3-l">
-            <p class="f3 mb1 fwb"><span id="ALHH">0.00</span> h</p>
+            <p id="ALHH" class="f3 mb1 fwb">0.00 h</p>
             <p class="o9">Daily Average</p>
           </li>
           <li class="mb4 c6 c3-m c3-l">
-            <p class="f3 mb1 fwb"><span id="LPH">0.00</span>%</p>
+            <p id="LPH" class="f3 mb1 fwb">0.00%</p>
             <p class="o9">Log Percentage</p>
           </li>
           <li class="mb4 c6 c3-m c3-l">
@@ -176,18 +176,25 @@
             <p id="secCount" class="f3 mb1 fwb">0</p>
             <p class="o9">Sectors</p>
           </li>
-          <li class="mb4 mb0-l c6 c3-m c3-l">
+          <li class="mb4 c6 c3-m c3-l">
             <p id="proCount" class="f3 mb1 fwb">0</p>
             <p class="o9">Projects</p>
           </li>
-
-          <li class="mb4 mb0-l c6 c3-m c3-l">
+          <li class="mb4 c6 c3-m c3-l">
             <p id="PHH" class="f3 mb1 fwb">0:00</p>
             <p class="o9">Peak Hour</p>
           </li>
-          <li class="mb4 mb0-l c6 c3-m c3-l">
+          <li class="mb4 c6 c3-m c3-l">
             <p id="PDH" class="f3 mb1 fwb">0.00</p>
             <p class="o9">Peak Day</p>
+          </li>
+          <li class="mb4 c6 c3-m c3-l">
+            <p id="efec" class="f3 mb1 fwb">0</p>
+            <p class="o9">Effectiveness</p>
+          </li>
+          <li class="mb4 mb0-l c6 c3-m c3-l">
+            <p id="efic" class="f3 mb1 fwb">0</p>
+            <p class="o9">Efficiency</p>
           </li>
         </ul>
 
@@ -229,19 +236,19 @@
 
           <ul class="mb5 lsn f6 lhc r">
             <li class="mb4 c6 c3-m c3-l">
-              <p class="f3 mb1 fwb"><span id="secLHH">0.00</span> h</p>
+              <p id="secLHH" class="f3 mb1 fwb">0.00 h</p>
               <p class="o9">Logged Hours</p>
             </li>
             <li class="mb4 c6 c3-m c3-l">
-              <p class="f3 mb1 fwb"><span id="secLSNH">0.00</span> h</p>
+              <p id="secLSNH" class="f3 mb1 fwb">0.00 h</p>
               <p class="o9">Min Session</p>
             </li>
             <li class="mb4 c6 c3-m c3-l">
-              <p class="f3 mb1 fwb"><span id="secLSXH">0.00</span> h</p>
+              <p id="secLSXH" class="f3 mb1 fwb">0.00 h</p>
               <p class="o9">Max Session</p>
             </li>
             <li class="mb4 c6 c3-m c3-l">
-              <p class="f3 mb1 fwb"><span id="secASD">0.00</span> h</p>
+              <p id="secASD" class="f3 mb1 fwb">0.00 h</p>
               <p class="o9">Avg Session</p>
             </li>
             <li class="mb4 mb0-l c6 c3-m c3-l">
@@ -249,15 +256,15 @@
               <p class="o9">Entries</p>
             </li>
             <li class="mb4 mb0-l c6 c3-m c3-l">
-              <p class="f3 mb1 fwb"><span id="secStreak">0</span> d</p>
+              <p id="secStreak" class="f3 mb1 fwb">0 d</p>
               <p class="o9">Streak</p>
             </li>
             <li class="mb4 mb0-l c6 c3-m c3-l">
-              <p id="secPHH" class="f3 mb1 fwb">0:00</p>
+              <p id="secPHH" class="f3 mb1 fwb">&mdash;</p>
               <p class="o9">Peak Hour</p>
             </li>
             <li class="mb4 mb0-l c6 c3-m c3-l">
-              <p id="secPDH" class="f3 mb1 fwb">-</p>
+              <p id="secPDH" class="f3 mb1 fwb">&mdash;</p>
               <p class="o9">Peak Day</p>
             </li>
           </ul>
@@ -304,19 +311,19 @@
 
           <ul class="mb5 lsn f6 lhc r">
             <li class="mb4 c6 c3-m c3-l">
-              <p class="f3 mb1 fwb"><span id="proLHH">0.00</span> h</p>
+              <p id="proLHH" class="f3 mb1 fwb">0.00 h</p>
               <p class="o9">Logged Hours</p>
             </li>
             <li class="mb4 c6 c3-m c3-l">
-              <p class="f3 mb1 fwb"><span id="proLSNH">0.00</span>h</p>
+              <p id="proLSNH" class="f3 mb1 fwb">0.00h</p>
               <p class="o9">Min Session</p>
             </li>
             <li class="mb4 c6 c3-m c3-l">
-              <p class="f3 mb1 fwb"><span id="proLSXH">0.00</span> h</p>
+              <p id="proLSXH" class="f3 mb1 fwb">0.00 h</p>
               <p class="o9">Max Session</p>
             </li>
             <li class="mb4 c6 c3-m c3-l">
-              <p class="f3 mb1 fwb"><span id="proASD">0.00</span> h</p>
+              <p id="proASD" class="f3 mb1 fwb">0.00 h</p>
               <p class="o9">Avg Session</p>
             </li>
             <li class="mb4 mb0-l c6 c3-m c3-l">
@@ -324,7 +331,7 @@
               <p class="o9">Entries</p>
             </li>
             <li class="mb4 mb0-l c6 c3-m c3-l">
-              <p class="f3 mb1 fwb"><span id="proStreak">0</span> d</p>
+              <p id="proStreak" class="f3 mb1 fwb">0 d</p>
               <p class="o9">Streak</p>
             </li>
             <li class="mb4 mb0-l c6 c3-m c3-l">
@@ -440,23 +447,23 @@
         <div class="c4 pl4-l">
           <ul class="lsn f6 lhc r">
             <li class="mb4 c6">
-              <p class="f3 mb1 fwb"><span id="jLHT">0.00</span> h</p>
+              <p id="jLHT" class="f3 mb1 fwb">0.00 h</p>
               <p class="o9">Logged Hours</p>
             </li>
             <li class="mb4 c6">
-              <p class="f3 mb1 fwb"><span id="jLSN">0.00</span> h</p>
+              <p id="jLSN" class="f3 mb1 fwb">0.00 h</p>
               <p class="o9">Min Session</p>
             </li>
             <li class="mb4 c6">
-              <p class="f3 mb1 fwb"><span id="jLSX">0.00</span> h</p>
+              <p id="jLSX" class="f3 mb1 fwb">0.00 h</p>
               <p class="o9">Max Session</p>
             </li>
             <li class="mb4 c6">
-              <p class="f3 mb1 fwb"><span id="jASDT">0.00</span> h</p>
+              <p id="jASDT" class="f3 mb1 fwb">0.00 h</p>
               <p class="o9">Avg Session</p>
             </li>
             <li class="mb4 mb0-l c6">
-              <p class="f3 mb1 fwb"><span id="jLPT">0.00</span>%</p>
+              <p id="jLPT" class="f3 mb1 fwb">0.00%</p>
               <p class="o9">Log Percentage</p>
             </li>
             <li class="mb4 mb0-l c6">
@@ -600,7 +607,7 @@
     <input id="console" type="text" class="wf bg-0 blanc on bn p3" autofocus="autofocus" placeholder="Log.console" />
   </form>
 
-  <script src="data/user.js"></script>
+  <!-- <script src="data/user.js"></script> -->
   <script src="js/drop.js"></script>
   <script src="js/log.js"></script>
   <script src="js/ui.js"></script>
@@ -614,7 +621,57 @@
     const {dialog,app} = require('electron').remote
     const fs = require('fs')
     const ipcRenderer = require('electron').ipcRenderer
+    const Store = require('./js/store.js')
+    const path = require('path')
+
+    let dataPath = ''
+
+    if (localStorage.hasOwnProperty('logDataPath')) {
+      dataPath = localStorage.getItem('logDataPath')
+    } else {
+      dataPath = `${app.getPath('appData')}/log-data.json`
+      localStorage.setItem('logDataPath', dataPath)
+    }
+
+    const dataStore = new Store({
+      path: dataPath,
+      defaults: {
+        config: {
+          ui: {
+            bg: "#f8f8f8",
+            colour: "#202020",
+            accent: "#eb4e32",
+            colourMode: 'sector',
+            font: "sans-serif",
+            view: 28,
+            tableView: 50
+          },
+          system: {
+            calendar: "gregorian",
+            timeFormat: "24"
+          }
+        },
+        palette: {},
+        projectPalette: {},
+        log: []
+      }
+    })
+
+    var user = {
+      config: dataStore.get('config'),
+      palette: dataStore.get('palette'),
+      projectPalette: dataStore.get('projectPalette'),
+      log: dataStore.get('log')
+    }
+
+    Log.path = dataStore.path
+
     Log.init()
+
+    dataStore.set('config', user.config)
+    dataStore.set('palette', user.palette)
+    dataStore.set('projectPalette', user.projectPalette)
+    dataStore.set('log', user.log)
   </script>
 
 </body>

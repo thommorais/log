@@ -9,7 +9,6 @@ Log.console = {
    * @param {string} i - Input
    */
   parse(i) {
-
     let command = i.split(' ')[0].toLowerCase()
 
     switch (command) {
@@ -67,14 +66,26 @@ Log.console = {
 			string = fs.readFileSync(path[0], 'utf-8')
 		} catch (e) {
       notif = new window.Notification('An error occured while trying to load this file.')
+      return
 		}
+
+    // if (localStorage.hasOwnProperty('logDataPath')) {
+    //   Log.path = localStorage.getItem('logDataPath')
+    // } else {
+    //   Log.path = path[0]
+    //   localStorage.setItem('logDataPath', JSON.stringify(path[0]))
+    // }
+
+    Log.path = path[0]
+    localStorage.setItem('logDataPath', path[0])
+    dataStore.path = Log.path
 
     localStorage.setItem('user', string)
     user = JSON.parse(localStorage.getItem('user'))
 
     notif = new window.Notification('Your log data was successfully imported.')
 
-		Log.refresh()
+		Log.options.update()
   },
 
   /**
@@ -86,6 +97,7 @@ Log.console = {
 
     dialog.showSaveDialog((fileName) => {
       if (fileName === undefined) return
+
       fs.writeFile(fileName, data, (err) => {
         if (err) {
           notif = new window.Notification(`An error occured creating the file ${err.message}`)

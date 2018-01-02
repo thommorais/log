@@ -6,6 +6,12 @@ Log.options = {
    */
   update() {
     localStorage.setItem('user', JSON.stringify(user))
+
+    dataStore.set('config', user.config)
+    dataStore.set('palette', user.palette)
+    dataStore.set('projectPalette', user.projectPalette)
+    dataStore.set('log', user.log)
+
     Log.refresh()
   },
 
