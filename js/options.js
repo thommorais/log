@@ -46,7 +46,6 @@ Log.options = {
    * Set colour mode
    * @param {string} m - Mode
    */
-
   setColourMode(m) {
     if (m === 'sector' || m === 'project' || m === 'none') {
       user.config.ui.colourMode = m

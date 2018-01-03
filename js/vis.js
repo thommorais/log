@@ -14,10 +14,11 @@ Log.vis = {
     let lp = 0
 
     let addEntry = ({s, e, c, t}, row) => {
+      const es = Log.time.parse(s)
+      const width = Log.utils.calcWidth(Log.time.parse(e), es)
+      const dp = Log.utils.calcDP(es)
+
       let entry = document.createElement('div')
-      let es = Log.time.parse(s)
-      let width = Log.utils.calcWidth(Log.time.parse(e), es)
-      let dp = Log.utils.calcDP(es)
       let colour = ''
 
       if (mode === 'sector') {
@@ -53,7 +54,7 @@ Log.vis = {
     for (let i = 0, l = ent.length; i < l; i++) {
       if (ent[i].e === 'undefined') continue
 
-      let id = `${con}${Log.time.date(ent[i].s)}`
+      const id = `${con}${Log.time.date(ent[i].s)}`
 
       document.getElementById(id) === null && addRow(id)
 
@@ -74,7 +75,7 @@ Log.vis = {
 
     let addEntry = ({s, e, c, t}, row) => {
       let entry = document.createElement('div')
-      let height = Log.utils.calcWidth(Log.time.parse(e), Log.time.parse(s))
+      const height = Log.utils.calcWidth(Log.time.parse(e), Log.time.parse(s))
       let colour = ''
 
       if (mode === 'sector') {
@@ -135,8 +136,10 @@ Log.vis = {
    * @param {string=} con - Container
    * @param {string=} mode - Colour mode
    */
-  day(d = new Date(), con = 'dayChart', mode = Log.config.ui.colourMode) {
-    let ent = Log.data.getEntriesByDate(d)
+  day(d = new Date(), con = 'dayChart') {
+    const ent = Log.data.getEntriesByDate(d)
+    const mode = Log.config.ui.colourMode
+    let colour = ''
 
     if (ent.length === 0) return
 
@@ -144,11 +147,10 @@ Log.vis = {
       if (ent[i].e === 'undefined') continue
 
       let entry = document.createElement('div')
-      let es = Log.time.parse(ent[i].s)
-      let dp = Log.utils.calcDP(es)
-      let width = Log.utils.calcWidth(Log.time.parse(ent[i].e), es)
-      let margin = Log.utils.calcMargin(dp, lw, lp)
-      let colour = ''
+      const es = Log.time.parse(ent[i].s)
+      const dp = Log.utils.calcDP(es)
+      const width = Log.utils.calcWidth(Log.time.parse(ent[i].e), es)
+      const margin = Log.utils.calcMargin(dp, lw, lp)
 
       if (mode === 'sector') {
         colour = Log.palette[ent[i].c]
@@ -177,15 +179,14 @@ Log.vis = {
    * @param {string=} con - Container
    */
   peakChart(mode, peaks, con) {
-    if (peaks.length === 0) return
-    if (['hours', 'days'].indexOf(mode) < 0) return
+    if (peaks.length === 0 || ['hours', 'days'].indexOf(mode) < 0) return
 
-    let peak = Math.max(...peaks)
+    const peak = Math.max(...peaks)
 
     for (let i = 0, l = peaks.length; i < l; i++) {
       let col = document.createElement('div')
       let inn = document.createElement('div')
-      let id = `${con}-${i}`
+      const id = `${con}-${i}`
 
       col.className = 'dib hf psr'
       col.style.width = `${100 / peaks.length}%`
@@ -216,11 +217,11 @@ Log.vis = {
   list(mode, con, ent = Log.log) {
     if (ent.length === 0) return
 
-    let list = mode === 'sector' ? Log.data.listSectors(ent).sort() : Log.data.listProjects(ent).sort()
+    let list = mode === 'sec' ? Log.data.listSectors(ent).sort() : Log.data.listProjects(ent).sort()
     let temp = {}
 
     for (let i = 0, l = list.length; i < l; i++) {
-      temp[list[i]] = mode === 'sector' ? Log.data.sh(list[i], ent) : Log.data.ph(list[i], ent)
+      temp[list[i]] = mode === 'sec' ? Log.data.sh(list[i], ent) : Log.data.ph(list[i], ent)
     }
 
     let sorted = Object.keys(temp).sort(function(a,b){return temp[a]-temp[b]})
@@ -229,22 +230,23 @@ Log.vis = {
     let sor = []
 
     for (let key in sorted) {
-      let perc = mode === 'sector' ? Log.data.sh(sorted[key], ent) : Log.data.ph(sorted[key], ent)
+      let perc = mode === 'sec' ? Log.data.sh(sorted[key], ent) : Log.data.ph(sorted[key], ent)
 
       sor.push([sorted[key], perc])
     }
 
     list = sor
 
+    let colour = ''
+    let width = 0
+
     for (let i = 0, l = list.length; i < l; i++) {
-      let sh = mode === 'sector' ? Log.data.sh(list[i][0], ent) : Log.data.ph(list[i][0], ent)
+      const sh = mode === 'sec' ? Log.data.sh(list[i][0], ent) : Log.data.ph(list[i][0], ent)
       let li = document.createElement('li')
       let tl = document.createElement('span')
       let st = document.createElement('span')
       let br = document.createElement('div')
       let dt = document.createElement('div')
-      let colour = ''
-      let width = 0
 
       li.className = 'mb2 c-pt'
       tl.className = 'dib xw6 elip'
@@ -252,10 +254,10 @@ Log.vis = {
       br.className = 'wf sh1'
       dt.className = 'psr t0 hf lf'
 
-      if (mode === 'sector') {
+      if (mode === 'sec') {
         colour = Log.palette[list[i][0]]
         width = Log.data.sp(list[i][0], ent)
-      } else if (mode === 'project') {
+      } else if (mode === 'pro') {
         colour = Log.projectPalette[list[i][0]]
         width = Log.data.pp(list[i][0], ent)
       }
@@ -282,11 +284,11 @@ Log.vis = {
   focusBar(mode, ent = Log.log, con = 'focusBar') {
     if (ent.length === 0) return
 
-    let list = mode === 'sector' ? Log.data.listSectors(ent) : Log.data.listProjects(ent)
+    let list = mode === 'sec' ? Log.data.listSectors(ent) : Log.data.listProjects(ent)
     let temp = {}
 
     for (let i = 0, l = list.length; i < l; i++) {
-      temp[list[i]] = mode === 'sector' ? Log.data.sp(list[i], ent) : Log.data.pp(list[i], ent)
+      temp[list[i]] = mode === 'sec' ? Log.data.sp(list[i], ent) : Log.data.pp(list[i], ent)
     }
 
     let sorted = Object.keys(temp).sort(function(a,b){return temp[a]-temp[b]})
@@ -295,14 +297,14 @@ Log.vis = {
     let sor = []
 
     for (let key in sorted) {
-      let perc = mode === 'sector' ? Log.data.sp(sorted[key], ent) : Log.data.pp(sorted[key], ent)
+      let perc = mode === 'sec' ? Log.data.sp(sorted[key], ent) : Log.data.pp(sorted[key], ent)
 
       sor.push([sorted[key], perc])
     }
 
     for (let i = 0, l = sor.length; i < l; i++) {
       let item = document.createElement('div')
-      let colour = mode === 'sector' ? Log.palette[sor[i][0]] : Log.projectPalette[sor[i][0]]
+      const colour = mode === 'sec' ? Log.palette[sor[i][0]] : Log.projectPalette[sor[i][0]]
 
       item.className = 'psr t0 hf lf'
       item.style.backgroundColor = colour || Log.config.ui.colour
@@ -320,9 +322,9 @@ Log.vis = {
    */
   legend(mode, ent = Log.log, con = 'legend') {
     if (ent.length === 0) return
-    if (['sector', 'project'].indexOf(mode) < 0) return
+    if (['sec', 'pro'].indexOf(mode) < 0) return
 
-    let list = mode === 'sector' ? Log.data.listSectors(ent).sort() : Log.data.listProjects(ent).sort()
+    const list = mode === 'sec' ? Log.data.listSectors(ent).sort() : Log.data.listProjects(ent).sort()
 
     let addItem = i => {
       let item = document.createElement('li')
@@ -335,10 +337,10 @@ Log.vis = {
       code.className = 'dib sh3 sw3 brf mr2 lhs'
       name.className = 'dib'
 
-      if (mode === 'sector') {
+      if (mode === 'sec') {
         colour = Log.palette[i]
         perc = Log.data.sp(i, ent)
-      } else if (mode === 'project') {
+      } else if (mode === 'pro') {
         colour = Log.projectPalette[i]
         perc = Log.data.pp(i, ent)
       }
@@ -351,9 +353,7 @@ Log.vis = {
       document.getElementById(con).appendChild(item)
     }
 
-    for (let i = 0, l = list.length; i < l; i++) {
-      addItem(list[i])
-    }
+    list.map(e => addItem(e))
   },
 
   /**
@@ -365,15 +365,15 @@ Log.vis = {
   focusChart(mode, ent = Log.log, con = 'focusChart') {
     if (ent.length === 0) return
 
-    let set = Log.data.sortEntries(ent)
+    const set = Log.data.sortEntries(ent)
 
     let addItem = i => {
-      let list = mode === 'sector' ? Log.data.listSectors(i) : Log.data.listProjects(i)
+      const list = mode === 'sec' ? Log.data.listSectors(i) : Log.data.listProjects(i)
 
       let col = document.createElement('div')
       let inn = document.createElement('div')
       let cor = document.createElement('div')
-      let height = list === undefined ? 0 : 1 / list.length * 100
+      const height = list === undefined ? 0 : 1 / list.length * 100
 
       col.className = 'dib hf psr'
       col.style.width = `${100 / set.length}%`
@@ -387,8 +387,6 @@ Log.vis = {
       document.getElementById(con).appendChild(col)
     }
 
-    for (let i = 0, l = set.length; i < l; i++) {
-      addItem(set[i])
-    }
+    set.map(e => addItem(e))
   }
 }

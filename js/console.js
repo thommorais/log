@@ -9,7 +9,7 @@ Log.console = {
    * @param {string} i - Input
    */
   parse(i) {
-    let command = i.split(' ')[0].toLowerCase()
+    const command = i.split(' ')[0].toLowerCase()
 
     switch (command) {
       case 'start': case 'begin':
@@ -55,7 +55,7 @@ Log.console = {
    * Import user data
    */
   importUser() {
-    let path = dialog.showOpenDialog({properties: ['openFile']})
+    const path = dialog.showOpenDialog({properties: ['openFile']})
 
 		if (!path) return
 
@@ -68,13 +68,6 @@ Log.console = {
       notif = new window.Notification('An error occured while trying to load this file.')
       return
 		}
-
-    // if (localStorage.hasOwnProperty('logDataPath')) {
-    //   Log.path = localStorage.getItem('logDataPath')
-    // } else {
-    //   Log.path = path[0]
-    //   localStorage.setItem('logDataPath', JSON.stringify(path[0]))
-    // }
 
     Log.path = path[0]
     localStorage.setItem('logDataPath', path[0])
@@ -92,13 +85,13 @@ Log.console = {
    * Export user data
    */
   exportUser() {
-    let data = JSON.stringify(JSON.parse(localStorage.getItem('user')))
-    let notif
+    const data = JSON.stringify(JSON.parse(localStorage.getItem('user')))
 
     dialog.showSaveDialog((fileName) => {
       if (fileName === undefined) return
 
       fs.writeFile(fileName, data, (err) => {
+        let notif
         if (err) {
           notif = new window.Notification(`An error occured creating the file ${err.message}`)
 
@@ -132,7 +125,6 @@ Log.console = {
   startLog(s) {
     if (user.log.length !== 0 && user.log.slice(-1)[0].e === 'undefined') return
 
-    let start = Log.time.toHex(new Date())
     let p = []
     let indices = []
     let sect = ''
@@ -172,10 +164,10 @@ Log.console = {
       sect = p[0].substring(6, p[0].length).trim()
       proj = p[1].trim()
       desc = p[2].trim()
-    }
+    } else return
 
     user.log.push({
-      s: start,
+      s: Log.time.toHex(new Date()),
       e: 'undefined',
       c: sect,
       t: proj,
@@ -205,7 +197,7 @@ Log.console = {
    * Resume a paused log entry
    */
   resume() {
-    let last = user.log.slice(-1)[0]
+    const last = user.log.slice(-1)[0]
 
     if (last.e === 'undefined') return
 
@@ -227,8 +219,8 @@ Log.console = {
    * @param {string} i - Input
    */
   set(i) {
-    let c = i.split(' ')
-    let a = c[1].toLowerCase()
+    const c = i.split(' ')
+    const a = c[1].toLowerCase()
 
     if (a === 'background' || a === 'bg') {
       Log.options.setBG(c[2])
@@ -275,9 +267,9 @@ Log.console = {
    * @param {string} i - Input
    */
   edit(i) {
-    let c = i.split(' ')
-    let a = c[2]
-    let id = Number(c[1]) - 1
+    const c = i.split(' ')
+    const a = c[2]
+    const id = Number(c[1]) - 1
 
     let proc = input => {
       let p = input.split('')
@@ -317,8 +309,9 @@ Log.console = {
   rename(s) {
     if (!s.includes('"')) return
 
-    let mode = s.split(' ')[1]
-    let p = s.split('')
+    const mode = s.split(' ')[1]
+    const p = s.split('')
+
     let indices = []
     let oldName = ''
     let newName = ''
@@ -334,7 +327,6 @@ Log.console = {
     }
 
     for (let i = indices[0] + 1; i < indices[1]; i++) oldName += p[i]
-
     for (let i = indices[2] + 1; i < indices[3]; i++) newName += p[i]
 
     if (mode === 'sector' || mode === 'sec') {
@@ -370,8 +362,8 @@ Log.console = {
    * Invert interface colours
    */
   invert() {
-    let bg = user.config.ui.bg
-    let c = user.config.ui.colour
+    const bg = user.config.ui.bg
+    const c = user.config.ui.colour
 
     user.config.ui.bg = c
     user.config.ui.colour = bg

@@ -26,8 +26,8 @@ Log.data = {
       let e = ent[i]
 
       if (Log.time.date(e.s) !== Log.time.date(e.e) && e.e !== 'undefined') {
-        let a = Log.time.convert(Log.time.parse(e.s))
-        let b = Log.time.convert(Log.time.parse(e.e))
+        const a = Log.time.convert(Log.time.parse(e.s))
+        const b = Log.time.convert(Log.time.parse(e.e))
 
         p.push({
           s: e.s,
@@ -54,16 +54,16 @@ Log.data = {
 
   /**
    * Get entries by date
-   * @param {Object} d - Date
+   * @param {Object=} d - Date
    * @returns {Object[]} Entries
    */
-  getEntriesByDate(d) {
+  getEntriesByDate(d = new Date()) {
     let ent = []
 
     for (let i = 0, l = Log.log.length; i < l; i++) {
       if (Log.log[i].e === 'undefined') continue
 
-      let a = Log.time.convert(Log.time.parse(Log.log[i].s))
+      const a = Log.time.convert(Log.time.parse(Log.log[i].s))
 
       a.getFullYear() === d.getFullYear()
       && a.getMonth() === d.getMonth()
@@ -97,9 +97,7 @@ Log.data = {
 
     for (let i = 0, l = span.length; i < l; i++) {
       let a = Log.data.getEntriesByDate(span[i])
-      for (let o = 0, ol = a.length; o < ol; o++) {
-        ent.push(a[o])
-      }
+      a.map(e => ent.push(e))
     }
 
     return ent
@@ -125,8 +123,9 @@ Log.data = {
     let entries = []
 
     for (let i = 0, l = ent.length; i < l; i++) {
-      if (ent[i].e !== 'undefined' && Log.time.convert(Log.time.parse(ent[i].s)).getDay() === d) {
-        entries.push(ent[i])
+      const e = ent[i]
+      if (e.e !== 'undefined' && Log.time.convert(Log.time.parse(e.s)).getDay() === d) {
+        entries.push(e)
       }
     }
 
@@ -145,8 +144,9 @@ Log.data = {
     let entries = []
 
     for (let i = 0, l = ent.length; i < l; i++) {
-      if (ent[i].e !== 'undefined' && ent[i].t === pro) {
-        entries.push(ent[i])
+      const e = ent[i]
+      if (e.e !== 'undefined' && e.t === pro) {
+        entries.push(e)
       }
     }
 
@@ -164,11 +164,11 @@ Log.data = {
 
     let entries = []
 
-    for (let i = 0, l = ent.length; i < l; i++) {
-      if (ent[i].e !== 'undefined' && ent[i].c === sec) {
-        entries.push(ent[i])
+    ent.map(e => {
+      if (e.e !== 'undefined' && e.c === sec) {
+        entries.push(e)
       }
-    }
+    })
 
     return entries
   },
@@ -181,26 +181,27 @@ Log.data = {
   sortEntries(ent = Log.log, end = new Date()) {
     if (ent.length === 0) return
 
-    let days = Log.time.listDates(
+    const days = Log.time.listDates(
       Log.time.convert(Log.time.parse(ent[0].s)), end
     )
+
     let list = []
     let slots = []
 
-    for (let i = 0, l = days.length; i < l; i++) {
+    days.map(e => {
       list.push(
         Log.time.date(Log.time.toHex(
-          new Date(days[i].getFullYear(), days[i].getMonth(), days[i].getDate(), 0, 0, 0)
+          new Date(e.getFullYear(), e.getMonth(), e.getDate(), 0, 0, 0)
         ))
       )
 
       slots.push([])
-    }
+    })
 
-    for (let i = 0, l = ent.length; i < l; i++) {
-      let index = list.indexOf(Log.time.date(ent[i].s))
-      if (index > -1) slots[index].push(ent[i])
-    }
+    ent.map(e => {
+      let index = list.indexOf(Log.time.date(e.s))
+      if (index > -1) slots[index].push(e)
+    })
 
     return slots
   },
@@ -229,11 +230,11 @@ Log.data = {
 
     let list = []
 
-    for (let i = 0, l = ent.length; i < l; i++) {
-      if (ent[i].e !== 'undefined' && list.indexOf(ent[i].t) === -1) {
-        list.push(ent[i].t)
+    ent.map(e => {
+      if (e.e !== 'undefined' && list.indexOf(e.t) === -1) {
+        list.push(e.t)
       }
-    }
+    })
 
     return list
   },
@@ -248,11 +249,11 @@ Log.data = {
 
     let list = []
 
-    for (let i = 0, l = ent.length; i < l; i++) {
-      if (ent[i].e !== 'undefined' && list.indexOf(ent[i].c) === -1) {
-        list.push(ent[i].c)
+    ent.map(e => {
+      if (e.e !== 'undefined' && list.indexOf(e.c) === -1) {
+        list.push(e.c)
       }
-    }
+    })
 
     return list
   },
@@ -267,11 +268,11 @@ Log.data = {
 
     let days = Array(7).fill(0)
 
-    for (let i = 0, l = ent.length; i < l; i++) {
-      if (ent[i].e === 'undefined') continue
-
-      days[Log.time.convert(Log.time.parse(ent[i].s)).getDay()] += Log.time.duration(ent[i].s, ent[i].e)
-    }
+    ent.map(e => {
+      if (e.e !== 'undefined') {
+        days[Log.time.convert(Log.time.parse(e.s)).getDay()] += Log.time.duration(e.s, e.e)
+      }
+    })
 
     return days
   },
@@ -299,9 +300,8 @@ Log.data = {
     for (let i = 0, l = ent.length; i < l; i++) {
       if (ent[i].e === 'undefined') continue
 
-      let es = Log.time.parse(ent[i].s)
+      const es = Log.time.parse(ent[i].s)
       let index = Log.time.convert(es).getHours()
-
       let time = Log.time.duration(ent[i].s, ent[i].e)
 
       if (time > 1) {
@@ -344,11 +344,11 @@ Log.data = {
 
     let list = []
 
-    for (let i = 0, l = ent.length; i < l; i++) {
-      if (ent[i].e === 'undefined') continue
-
-      list.push(Log.time.duration(ent[i].s, ent[i].e))
-    }
+    ent.map(e => {
+      if (e.e !== 'undefined') {
+        list.push(Log.time.duration(e.s, e.e))
+      }
+    })
 
     return list
   },
@@ -383,14 +383,14 @@ Log.data = {
 
     let c = 0
 
-    let avg = list.reduce(
+    let sum = list.reduce(
       (total, num) => {
         c++
         return total + num
       }, 0
     )
 
-    return avg / c
+    return sum / c
   },
 
   /**
@@ -411,13 +411,7 @@ Log.data = {
    */
   avgLh(ent = Log.cache.sortEntries) {
     if (ent.length === 0) return 0
-
-    let h = 0
-
-    for (let i = 0, l = ent.length; i < l; i++) {
-      h += Log.data.lh(ent[i])
-    }
-
+    let h = ent.reduce((sum, current) => sum + Log.data.lh(current), 0)
     return h / ent.length
   },
 
@@ -429,16 +423,14 @@ Log.data = {
   lp(ent = Log.log) {
     if (ent.length === 0) return 0
 
-    let e = Log.time.convert(Log.time.parse(ent[0].s))
-    let d = Log.time.convert(Log.time.parse(ent.slice(-1)[0].s))
-
-    let h = Log.data.lh(ent)
-    let n = Math.ceil((
+    const e = Log.time.convert(Log.time.parse(ent[0].s))
+    const d = Log.time.convert(Log.time.parse(ent.slice(-1)[0].s))
+    const n = Math.ceil((
               new Date(d.getFullYear(), d.getMonth(), d.getDate()) -
               new Date(e.getFullYear(), e.getMonth(), e.getDate())
             ) / 8.64e7)
 
-    return h / (24 * (n + 1)) * 100
+    return Log.data.lh(ent) / (24 * (n + 1)) * 100
   },
 
   /**
@@ -501,9 +493,9 @@ Log.data = {
 
     let streak = 0
 
-    for (let i = 0, l = ent.length; i < l; i++) {
-      streak = ent[i].length === 0 ? 0 : streak + 1
-    }
+    ent.map(e => {
+      streak = e.length === 0 ? 0 : streak + 1
+    })
 
     return streak
   },
@@ -520,15 +512,15 @@ Log.data = {
     let list = []
 
     if (mode === 'sector') {
-      for (let i = 0, l = ent.length; i < l; i++) {
-        let f = Log.data.sectorFocus(Log.data.listSectors(ent[i]))
+      ent.map(e => {
+        let f = Log.data.sectorFocus(Log.data.listSectors(e))
         if (f !== 0) list.push(f)
-      }
+      })
     } else if (mode === 'project') {
-      for (let i = 0, l = ent.length; i < l; i++) {
-        let f = Log.data.sectorFocus(Log.data.listProjects(ent[i]))
+      ent.map(e => {
+        let f = Log.data.sectorFocus(Log.data.listProjects(e))
         if (f !== 0) list.push(f)
-      }
+      })
     }
 
     return list
@@ -590,11 +582,11 @@ Log.data = {
      * @returns {string} Sector focus
      */
     sf() {
-      let ent = Log.data.getEntriesByDay(new Date().getDay())
+      const ent = Log.data.getEntriesByDay(new Date().getDay())
 
       if (ent.length === 0) return '-'
 
-      let s = Log.data.listSectors(ent)
+      const s = Log.data.listSectors(ent)
       let sf = 0
       let sfs = ''
 
@@ -611,11 +603,11 @@ Log.data = {
      * @returns {string} Project focus
      */
     pf() {
-      let ent = Log.data.getEntriesByDay(new Date().getDay())
+      const ent = Log.data.getEntriesByDay(new Date().getDay())
 
       if (ent.length === 0) return '-'
 
-      let p = Log.data.listProjects(ent)
+      const p = Log.data.listProjects(ent)
       let pf = 0
       let pfp = ''
 

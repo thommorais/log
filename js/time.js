@@ -15,7 +15,10 @@ Log.time = {
    * @param {number} t - Unix time
    */
   toHex(t) {
-    return (new Date(t.getFullYear(), t.getMonth(), t.getDate(), t.getHours(), t.getMinutes(), t.getSeconds()).getTime() / 1E3).toString(16)
+    return (new Date(
+      t.getFullYear(), t.getMonth(), t.getDate(),
+      t.getHours(), t.getMinutes(), t.getSeconds()
+    ).getTime() / 1E3).toString(16)
   },
 
   /**
@@ -33,8 +36,7 @@ Log.time = {
    * @returns {string} Datetime in Log format
    */
   convertDateTime(i) {
-    let m = i.split(' ')
-
+    const m = i.split(' ')
     return (+new Date(m[0], Number(m[1] - 1), m[2], m[3], m[4], m[5]).getTime() / 1E3).toString(16)
   },
 
@@ -44,13 +46,7 @@ Log.time = {
    * @returns {string} Timestamp
    */
   stamp(d) {
-    let f = Log.config.system.timeFormat
-
-    if (f === '24') {
-      return `${`0${d.getHours()}`.substr(-2)}:${`0${d.getMinutes()}`.substr(-2)}`
-    } else if (f === '12') {
-      return Log.time.twelveHours(d)
-    }
+    return Log.config.system.timeFormat === '24' ? `${`0${d.getHours()}`.substr(-2)}:${`0${d.getMinutes()}`.substr(-2)}` : Log.time.twelveHours(d)
   },
 
   /**
@@ -79,7 +75,7 @@ Log.time = {
    * @returns {string} Date
    */
   date(hex) {
-    let a = Log.time.convert(Log.time.parse(hex))
+    const a = Log.time.convert(Log.time.parse(hex))
     return `${a.getFullYear()}${a.getMonth()}${a.getDate()}`
   },
 
@@ -89,7 +85,7 @@ Log.time = {
    * @returns {string} Formatted date
    */
   displayDate(d) {
-    let f = Log.config.system.calendar
+    const f = Log.config.system.calendar
 
     if (f === 'gregorian') {
       let months = 'Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec'.split(' ')
@@ -111,8 +107,7 @@ Log.time = {
    * @returns {string} Elapsed time
    */
   timeago(t) {
-    let sec = ((new Date()) - t) / 1E3
-    let min = Math.abs(Math.floor(sec / 60))
+    const min = Math.abs(Math.floor(((new Date()) - t) / 1E3 / 60))
 
     if (min === 0) {
       return 'less than a minute ago'
@@ -152,7 +147,6 @@ Log.time = {
    * @returns {Object[]} List of dates
    */
   listDates(start, end) {
-    let interval = 1
     let list = []
     let current = new Date(start.getFullYear(), start.getMonth(), start.getDate(), 0, 0, 0)
 

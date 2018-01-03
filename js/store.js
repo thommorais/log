@@ -1,9 +1,6 @@
 class Store {
   constructor(opts) {
-    // const userDataPath = (electron.app || electron.remote.app).getPath('appData')
-
     this.path = opts.path
-
     this.data = parseDataFile(this.path, opts.defaults)
   }
 
