@@ -30,14 +30,11 @@ To use the console, simply type.
 - `set time 24` - Set the time format to 12- or 24-hours
 -  `rename {sector/project} "Old Name" "New Name"` - Rename a sector or project. This will update all entries that are filed under that sector or project
 
-### To-do
-- Create an app icon
-- Add ability to sort table columns
-- Pomodoro timer
-
 ### Development
 
 ```
+git clone git@github.com:joshavanier/log.git
+cd log
 npm install
 npm start
 ```
@@ -46,4 +43,4 @@ npm start
 
 Josh Avanier
 
-[![@joshavanier](https://joshavanier.github.io/badges/svg/twitter.svg)](https://twitter.com/joshavanier) [![joshavanier.com](https://joshavanier.github.io/badges/svg/website.svg)](https://joshavanier.com)
+[![@joshavanier](https://joshavanier.github.io/badges/svg/twitter.svg)](https://twitter.com/joshavanier) [![Memex](https://joshavanier.github.io/badges/svg/website.svg)](https://joshavanier.github.io)
