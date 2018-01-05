@@ -2,7 +2,7 @@ Log = window.Log || {}
 Log.options = {
 
   /**
-   * Update settings
+   * Update data and settings
    */
   update() {
     localStorage.setItem('user', JSON.stringify(user))
@@ -58,7 +58,7 @@ Log.options = {
    * @param {string} s - Input
    */
   setColourCode(s) {
-    let ch = s.split('')
+    const ch = s.split('')
     let indices = []
     let sec = ''
 
@@ -66,9 +66,7 @@ Log.options = {
       ch[i] === '"' && indices.push(i)
     }
 
-    for (let i = indices[0] + 1; i < indices[1]; i++) {
-      sec += ch[i]
-    }
+    for (let i = indices[0] + 1; i < indices[1]; i++) sec += ch[i]
 
     user.palette[sec] = s.substring(indices[1] + 1, s.length).trim()
     Log.options.update()

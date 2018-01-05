@@ -1,5 +1,3 @@
-const timer = require('headless-work-timer')
-
 Log = window.Log || {}
 Log.console = {
   history: [],
@@ -10,7 +8,6 @@ Log.console = {
    */
   parse(i) {
     const command = i.split(' ')[0].toLowerCase()
-
     switch (command) {
       case 'start': case 'begin':
         Log.console.startLog(i);
@@ -108,13 +105,14 @@ Log.console = {
    * @param {Object[]} s - Input array
    */
   startTomatoLog(s) {
-    Log.stopTimer = timer()()( (state, phaseChanged) => {
-      console.log(state)
+    const currentTimer = timer()()( (state, phaseChanged) => {
       if (phaseChanged) {
         state.phase === 'break' || state.phase === 'longBreak' ? Log.console.endLog() : Log.console.startLog(s)
+        state.phase === 'break' || state.phase === 'longBreak' ? Log.playSoundEffect('timerEnd') : Log.playSoundEffect('timerStart')
         let notif = new window.Notification(`Started ${state.phase}`)
       }
     })
+    Log.stopTimer = () => currentTimer.stop()
     Log.console.startLog(s)
   },
 
@@ -123,7 +121,7 @@ Log.console = {
    * @param {Object[]} s - Input array
    */
   startLog(s) {
-    if (user.log.length !== 0 && user.log.slice(-1)[0].e === 'undefined') return
+    if (isEmpty(user.log) && user.log.slice(-1)[0].e === 'undefined') return
 
     let p = []
     let indices = []
@@ -134,21 +132,10 @@ Log.console = {
     if (s.includes('"')) {
       p = s.split('')
 
-      for (let i = 0, l = p.length; i < l; i++) {
-        p[i] === '"' && indices.push(i)
-      }
-
-      for (let i = indices[0] + 1; i < indices[1]; i++) {
-        sect += p[i]
-      }
-
-      for (let i = indices[2] + 1; i < indices[3]; i++) {
-        proj += p[i]
-      }
-
-      for (let i = indices[4] + 1; i < indices[5]; i++) {
-        desc += p[i]
-      }
+      for (let i = 0, l = p.length; i < l; i++) p[i] === '"' && indices.push(i)
+      for (let i = indices[0] + 1; i < indices[1]; i++) sect += p[i]
+      for (let i = indices[2] + 1; i < indices[3]; i++) proj += p[i]
+      for (let i = indices[4] + 1; i < indices[5]; i++) desc += p[i]
     } else if (s.includes(';')) {
       p = s.split(';')
       sect = p[0].substring(6, p[0].length).trim()
@@ -222,31 +209,31 @@ Log.console = {
     const c = i.split(' ')
     const a = c[1].toLowerCase()
 
-    if (a === 'background' || a === 'bg') {
+    if (contains(a, 'background bg'))
       Log.options.setBG(c[2])
-    } else if (a === 'color' || a === 'colour' || a === 'text') {
+    else if (contains(a, 'color colour text'))
       Log.options.setColour(c[2])
-    } else if (a === 'highlight' || a === 'accent') {
+    else if (contains(a, 'highlight accent'))
       Log.options.setAccent(c[2])
-    } else if (a === 'font' || a === 'typeface' || a === 'type') {
+    else if (contains(a, 'font typeface type'))
       Log.options.setFont(c[2])
-    } else if (a === 'view') {
+    else if (contains(a, 'view'))
       Log.options.setView(c[2])
-    } else if (a === 'cal' || a === 'calendar') {
+    else if (contains(a, 'cal calendar'))
       Log.options.setCalendar(c[2])
-    } else if (a === 'timeformat' || a === 'time') {
+    else if (contains(a, 'timeformat time'))
       Log.options.setTimeFormat(c[2])
-    } else if (a === 'dateformat' || a === 'date') {
+    else if (contains(a, 'dateformat date'))
       Log.options.setDateFormat(c[2])
-    } else if (a === 'weekstart') {
+    else if (contains(a, 'weekstart'))
       Log.options.setWeekStart(c[2])
-    } else if (a === 'category' || a === 'sector' || a === 'cat' || a === 'sec') {
+    else if (contains(a, 'category sector cat sec'))
       Log.options.setColourCode(i)
-    } else if (a === 'project' || a === 'pro') {
+    else if (contains(a, 'project pro'))
       Log.options.setProjectColourCode(i)
-    } else if (a === 'colourmode' || a === 'colormode') {
+    else if (contains(a, 'colourmode colormode'))
       Log.options.setColourMode(c[2])
-    } else return
+    else return
   },
 
   /**
@@ -271,33 +258,28 @@ Log.console = {
     const a = c[2]
     const id = Number(c[1]) - 1
 
-    let proc = input => {
-      let p = input.split('')
+    const proc = input => {
+      const p = input.split('')
       let indices = []
       let key = ''
 
-      for (let i = 0, l = p.length; i < l; i++) {
-        p[i] === '"' && indices.push(i)
-      }
-
-      for (let i = indices[0] + 1; i < indices[1]; i++) {
-        key += p[i]
-      }
+      for (let i = 0, l = p.length; i < l; i++) p[i] === '"' && indices.push(i)
+      for (let i = indices[0] + 1; i < indices[1]; i++) key += p[i]
 
       return key.trim()
     }
 
-    if (a === 'sec' || a === 'sector') {
+    if (contains(a, 'sec sector'))
       user.log[id].c = proc(i)
-    } else if (a === 'title' || a === 'pro' || a === 'project') {
+    else if (contains(a, 'title pro project'))
       user.log[id].t = proc(i)
-    } else if (a === 'desc' || a === 'dsc' || a === 'description') {
+    else if (contains(a, 'desc dsc description'))
       user.log[id].d = proc(i)
-    } else if (a === 'start') {
+    else if (contains(a, 'start'))
       user.log[id].s = Log.time.convertDateTime(proc(i))
-    } else if (a === 'end') {
+    else if (contains(a, 'end'))
       user.log[id].e = Log.time.convertDateTime(proc(i))
-    } else return
+    else return
 
     Log.options.update()
   },
@@ -317,40 +299,29 @@ Log.console = {
     let newName = ''
     let notif
 
-    let notFound = mode => {
-      let message = mode === 'sector' ? `The sector "${oldName}" does not exist in your logs.` : `The project "${oldName}" does not exist in your logs.`
+    const notFound = mode => {
+      const message = mode === 'sector' ? `The sector "${oldName}" does not exist in your logs.` : `The project "${oldName}" does not exist in your logs.`
       notif = new window.Notification(message)
     }
 
-    for (let i = 0, l = p.length; i < l; i++) {
-      p[i] === '"' && indices.push(i)
-    }
-
+    for (let i = 0, l = p.length; i < l; i++) p[i] === '"' && indices.push(i)
     for (let i = indices[0] + 1; i < indices[1]; i++) oldName += p[i]
     for (let i = indices[2] + 1; i < indices[3]; i++) newName += p[i]
 
     if (mode === 'sector' || mode === 'sec') {
-      if (Log.data.getEntriesBySector(oldName).length === 0) {
+      if (isEmpty(Log.data.getEntriesBySector(oldName))) {
         notFound('sector')
         return
       }
 
-      for (let i = 0, l = user.log.length; i < l; i++) {
-        if (user.log[i].c === oldName) {
-          user.log[i].c = newName
-        }
-      }
+      user.log.map(e => {if (e.c === oldName) e.c = newName})
     } else if (mode === 'project' || mode === 'pro') {
-      if (Log.data.getEntriesByProject(oldName).length === 0) {
+      if (isEmpty(Log.data.getEntriesByProject(oldName))) {
         notFound('project')
         return
       }
 
-      for (let i = 0, l = user.log.length; i < l; i++) {
-        if (user.log[i].t === oldName) {
-          user.log[i].t = newName
-        }
-      }
+      user.log.map(e => {if (e.t === oldName) e.t = newName})
     } else return
 
     notif = new window.Notification(`The sector "${oldName}" has been renamed to "${newName}."`)

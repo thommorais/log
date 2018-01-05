@@ -1,6 +1,12 @@
 Log = window.Log || {}
 Log.vis = {
 
+  colourCode(mode, {c, t}) {
+    return mode === 'sector' ? Log.palette[c] :
+    mode === 'project' ? Log.projectPalette[t] :
+    mode === 'none' && Log.config.ui.colour
+  },
+
   /**
    * Display a line visualisation
    * @param {string} con - Container
@@ -8,58 +14,47 @@ Log.vis = {
    * @param {string=} mode - Colour mode
    */
   line(con, ent = Log.log, mode = Log.config.ui.colourMode) {
-    if (ent.length === 0) return
+    if (isEmpty(ent)) return
 
     let lw = 0
     let lp = 0
 
-    let addEntry = ({s, e, c, t}, row) => {
+    const addEntry = ({s, e, c, t}, row) => {
+      const div = create('div')
+      const col = Log.vis.colourCode(mode, {c, t})
       const es = Log.time.parse(s)
-      const width = Log.utils.calcWidth(Log.time.parse(e), es)
+      const wd = Log.utils.calcWidth(Log.time.parse(e), es)
       const dp = Log.utils.calcDP(es)
 
-      let entry = document.createElement('div')
-      let colour = ''
+      div.className = 'psr t0 sh1 mb2 lf'
+      div.style.width = `${wd}%`
+      div.style.marginLeft = `${Log.utils.calcMargin(dp, lw, lp)}%`
+      div.style.backgroundColor = col || Log.config.ui.colour
 
-      if (mode === 'sector') {
-        colour = Log.palette[c]
-      } else if (mode === 'project') {
-        colour = Log.projectPalette[t]
-      } else if (mode === 'none') {
-        colour = Log.config.ui.colour
-      }
+      append(row, div)
 
-      entry.className = 'psr t0 sh1 mb2 lf'
-      entry.style.width = `${width}%`
-      entry.style.marginLeft = `${Log.utils.calcMargin(dp, lw, lp)}%`
-      entry.style.backgroundColor = colour || Log.config.ui.colour
-
-      document.getElementById(row).appendChild(entry)
-
-      lw = width
+      lw = wd
       lp = dp
     }
 
-    let addRow = id => {
+    const addRow = id => {
       lw = 0
       lp = 0
 
-      let row = document.createElement('div')
+      const row = create('div')
       row.className = 'db wf sh1 mt2 mb3'
       row.id = id
 
-      document.getElementById(con).appendChild(row)
+      append(con, row)
     }
 
-    for (let i = 0, l = ent.length; i < l; i++) {
-      if (ent[i].e === 'undefined') continue
-
-      const id = `${con}${Log.time.date(ent[i].s)}`
-
-      document.getElementById(id) === null && addRow(id)
-
-      addEntry(ent[i], id)
-    }
+    ent.map(e => {
+      if (e.e !== 'undefined') {
+        const id = `${con}${Log.time.date(e.s)}`
+        document.getElementById(id) === null && addRow(id)
+        addEntry(e, id)
+      }
+    })
   },
 
   /**
@@ -69,51 +64,41 @@ Log.vis = {
    * @param {string=} mode - Colour mode
    */
   bar(con, ent = Log.log, mode = Log.config.ui.colourMode) {
-    if (ent.length === 0) return
+    if (isEmpty(ent)) return
 
     let lw = 0
 
-    let addEntry = ({s, e, c, t}, row) => {
-      let entry = document.createElement('div')
-      const height = Log.utils.calcWidth(Log.time.parse(e), Log.time.parse(s))
-      let colour = ''
+    const addEntry = ({s, e, c, t}, row) => {
+      const div = create('div')
+      const ht = Log.utils.calcWidth(Log.time.parse(e), Log.time.parse(s))
+      const col = Log.vis.colourCode(mode, {c, t})
 
-      if (mode === 'sector') {
-        colour = Log.palette[c]
-      } else if (mode === 'project') {
-        colour = Log.projectPalette[t]
-      } else if (mode === 'none') {
-        colour = Log.config.ui.colour
-      }
+      div.className = 'psa sw1'
+      div.style.height = `${ht}%`
+      div.style.bottom = `${lw}%`
+      div.style.backgroundColor = col || Log.config.ui.colour
 
-      entry.className = 'psa sw1'
-      entry.style.height = `${height}%`
-      entry.style.bottom = `${lw}%`
-      entry.style.backgroundColor = colour || Log.config.ui.colour
+      append(row, div)
 
-      document.getElementById(row).appendChild(entry)
-
-      lw += height
+      lw += ht
     }
 
-    let newCol = id => {
+    const newCol = id => {
       lw = 0
 
-      let col = document.createElement('div')
-      let inn = document.createElement('div')
+      const col = create('div')
+      const inn = create('div')
 
       col.className = 'dib hf psr'
       col.style.width = `${100 / Log.config.ui.view}%`
-
       inn.className = 'sw1 hf cn bb'
       inn.id = id
 
       col.appendChild(inn)
-
-      document.getElementById(con).appendChild(col)
+      append(con, col)
     }
 
-    let sort = Log.data.sortEntries(ent)
+    const sort = Log.data.sortEntries(ent)
 
     for (let i = 0, l = sort.length; i < l; i++) {
       let id = `${con}-${i}`
@@ -122,12 +107,38 @@ Log.vis = {
 
       for (let o = 0, l = sort[i].length; o < l; o++) {
         if (sort[i][o].e === 'undefined') continue
-
         o === 0 && (lw = 0)
-
         addEntry(sort[i][o], id)
       }
     }
+  },
+
+  avgChart() {
+    let ent = Log.data.sortEntries()
+    let avgs = []
+
+    for (let i = 0, l = ent.length; i < l; i++) {
+      avgs.push(Log.data.avg(Log.data.listDurations(ent[i])))
+    }
+
+    let peak = Math.max(...avgs)
+
+    for (let i = 0, l = avgs.length; i < l; i++) {
+      let col = create('div')
+      let inn = create('div')
+      let entry = create('div')
+
+      col.className = 'dib hf psr'
+      col.style.width = `${100 / avgs.length}%`
+      inn.className = 'sw1 hf cn'
+      entry.className = 'psa sw1 bg-blanc b0'
+      entry.style.height = `${avgs[i] / peak * 100}%`
+
+      inn.appendChild(entry)
+      col.appendChild(inn)
+      append('avgChart', col)
+    }
+
   },
 
   /**
@@ -138,38 +149,32 @@ Log.vis = {
    */
   day(d = new Date(), con = 'dayChart') {
     const ent = Log.data.getEntriesByDate(d)
-    const mode = Log.config.ui.colourMode
-    let colour = ''
 
-    if (ent.length === 0) return
+    if (isEmpty(ent)) return
 
-    for (let i = 0, l = ent.length, lw = 0, lp = 0; i < l; i++) {
-      if (ent[i].e === 'undefined') continue
+    let lw = 0
+    let lp = 0
 
-      let entry = document.createElement('div')
-      const es = Log.time.parse(ent[i].s)
-      const dp = Log.utils.calcDP(es)
-      const width = Log.utils.calcWidth(Log.time.parse(ent[i].e), es)
-      const margin = Log.utils.calcMargin(dp, lw, lp)
+    ent.map(e => {
+      if (e.e !== 'undefined') {
+        const div = create('div')
+        const col = Log.vis.colourCode(Log.config.ui.colourMode, e)
+        const es = Log.time.parse(e.s)
+        const dp = Log.utils.calcDP(es)
+        const wd = Log.utils.calcWidth(Log.time.parse(e.e), es)
+        const mg = Log.utils.calcMargin(dp, lw, lp)
 
-      if (mode === 'sector') {
-        colour = Log.palette[ent[i].c]
-      } else if (mode === 'project') {
-        colour = Log.projectPalette[ent[i].t]
-      } else if (mode === 'none') {
-        colour = Log.config.ui.colour
+        div.className = 'nodrag psr t0 hf mb2 lf'
+        div.style.width = `${wd}%`
+        div.style.marginLeft = `${mg}%`
+        div.style.backgroundColor = col || Log.config.ui.colour
+
+        append(con, div)
+
+        lw = wd
+        lp = dp
       }
-
-      entry.className = 'nodrag psr t0 hf mb2 lf'
-      entry.style.width = `${width}%`
-      entry.style.marginLeft = `${margin}%`
-      entry.style.backgroundColor = colour || Log.config.ui.colour
-
-      document.getElementById(con).appendChild(entry)
-
-      lw = width
-      lp = dp
-    }
+    })
   },
 
   /**
@@ -179,13 +184,13 @@ Log.vis = {
    * @param {string=} con - Container
    */
   peakChart(mode, peaks, con) {
-    if (peaks.length === 0 || ['hours', 'days'].indexOf(mode) < 0) return
+    if (isEmpty(peaks) || ['hours', 'days'].indexOf(mode) < 0) return
 
     const peak = Math.max(...peaks)
 
     for (let i = 0, l = peaks.length; i < l; i++) {
-      let col = document.createElement('div')
-      let inn = document.createElement('div')
+      const col = create('div')
+      const inn = create('div')
       const id = `${con}-${i}`
 
       col.className = 'dib hf psr'
@@ -203,8 +208,8 @@ Log.vis = {
         inn.style.borderColor = i === (new Date).getDay() ? Log.config.ui.accent : Log.config.ui.colour
       }
 
-      document.getElementById(con).appendChild(col)
-      document.getElementById(id).appendChild(inn)
+      append(con, col)
+      append(id, inn)
     }
   },
 
@@ -214,65 +219,44 @@ Log.vis = {
    * @param {string} con - Container
    * @param {Object[]=} ent - Entries
    */
-  list(mode, con, ent = Log.log) {
-    if (ent.length === 0) return
+  list(mode, val, con, ent = Log.log) {
+    if (isEmpty(ent)) return
 
-    let list = mode === 'sec' ? Log.data.listSectors(ent).sort() : Log.data.listProjects(ent).sort()
-    let temp = {}
+    const list = Log.data.sortValues(ent, mode, val)
 
-    for (let i = 0, l = list.length; i < l; i++) {
-      temp[list[i]] = mode === 'sec' ? Log.data.sh(list[i], ent) : Log.data.ph(list[i], ent)
-    }
+    let col = ''
+    let wd = 0
 
-    let sorted = Object.keys(temp).sort(function(a,b){return temp[a]-temp[b]})
-    sorted = sorted.reverse()
+    list.map(e => {
+      const sh = mode === 'sec' ? Log.data.sh(e[0], ent) : Log.data.ph(e[0], ent)
+      const li = create('li')
+      const tl = create('span')
+      const st = create('span')
+      const br = create('div')
+      const dt = create('div')
 
-    let sor = []
-
-    for (let key in sorted) {
-      let perc = mode === 'sec' ? Log.data.sh(sorted[key], ent) : Log.data.ph(sorted[key], ent)
-
-      sor.push([sorted[key], perc])
-    }
-
-    list = sor
-
-    let colour = ''
-    let width = 0
-
-    for (let i = 0, l = list.length; i < l; i++) {
-      const sh = mode === 'sec' ? Log.data.sh(list[i][0], ent) : Log.data.ph(list[i][0], ent)
-      let li = document.createElement('li')
-      let tl = document.createElement('span')
-      let st = document.createElement('span')
-      let br = document.createElement('div')
-      let dt = document.createElement('div')
-
-      li.className = 'mb2 c-pt'
+      li.className = 'mb3 c-pt'
       tl.className = 'dib xw6 elip'
       st.className = 'rf'
       br.className = 'wf sh1'
       dt.className = 'psr t0 hf lf'
 
-      if (mode === 'sec') {
-        colour = Log.palette[list[i][0]]
-        width = Log.data.sp(list[i][0], ent)
-      } else if (mode === 'pro') {
-        colour = Log.projectPalette[list[i][0]]
-        width = Log.data.pp(list[i][0], ent)
-      }
+      mode === 'sec' ?
+      (col = Log.palette[e[0]], wd = Log.data.sp(e[0], ent)) :
+      (col = Log.projectPalette[e[0]], wd = Log.data.pp(e[0], ent))
 
-      dt.style.backgroundColor = colour || Log.config.ui.colour
-      dt.style.width = `${width}%`
-      st.innerHTML = `${list[i][1].toFixed(2)} h`
-      li.setAttribute('onclick', `Log.detail.${mode}('${list[i][0]}')`)
-      tl.innerHTML = list[i][0]
+      dt.style.backgroundColor = col || Log.config.ui.colour
+      dt.style.width = `${wd}%`
+      st.innerHTML = `${e[1].toFixed(2)} h`
+      li.setAttribute('onclick', `Log.detail.${mode}('${e[0]}')`)
+      tl.innerHTML = e[0]
 
       li.appendChild(tl)
       li.appendChild(st)
-
-      document.getElementById(con).appendChild(li)
-    }
+      br.appendChild(dt)
+      li.appendChild(br)
+      append(con, li)
+    })
   },
 
   /**
@@ -282,36 +266,20 @@ Log.vis = {
    * @param {string=} con - Container
    */
   focusBar(mode, ent = Log.log, con = 'focusBar') {
-    if (ent.length === 0) return
+    if (isEmpty(ent)) return
 
-    let list = mode === 'sec' ? Log.data.listSectors(ent) : Log.data.listProjects(ent)
-    let temp = {}
+    const sor = Log.data.sortValues(ent, mode)
 
-    for (let i = 0, l = list.length; i < l; i++) {
-      temp[list[i]] = mode === 'sec' ? Log.data.sp(list[i], ent) : Log.data.pp(list[i], ent)
-    }
+    sor.map(e => {
+      const itm = create('div')
+      const col = mode === 'sec' ? Log.palette[e[0]] : Log.projectPalette[e[0]]
 
-    let sorted = Object.keys(temp).sort(function(a,b){return temp[a]-temp[b]})
-    sorted = sorted.reverse()
+      itm.className = 'psr t0 hf lf'
+      itm.style.backgroundColor = col || Log.config.ui.colour
+      itm.style.width = `${e[1]}%`
 
-    let sor = []
-
-    for (let key in sorted) {
-      let perc = mode === 'sec' ? Log.data.sp(sorted[key], ent) : Log.data.pp(sorted[key], ent)
-
-      sor.push([sorted[key], perc])
-    }
-
-    for (let i = 0, l = sor.length; i < l; i++) {
-      let item = document.createElement('div')
-      const colour = mode === 'sec' ? Log.palette[sor[i][0]] : Log.projectPalette[sor[i][0]]
-
-      item.className = 'psr t0 hf lf'
-      item.style.backgroundColor = colour || Log.config.ui.colour
-      item.style.width = `${sor[i][1]}%`
-
-      document.getElementById(con).appendChild(item)
-    }
+      append(con, itm)
+    })
   },
 
   /**
@@ -321,39 +289,35 @@ Log.vis = {
    * @param {string=} con - Container
    */
   legend(mode, ent = Log.log, con = 'legend') {
-    if (ent.length === 0) return
+    if (isEmpty(ent)) return
+
     if (['sec', 'pro'].indexOf(mode) < 0) return
 
     const list = mode === 'sec' ? Log.data.listSectors(ent).sort() : Log.data.listProjects(ent).sort()
 
-    let addItem = i => {
-      let item = document.createElement('li')
-      let code = document.createElement('div')
-      let name = document.createElement('div')
-      let colour = ''
+    list.map(e => {
+      const item = create('li')
+      const code = create('div')
+      const name = create('div')
+
+      let col = ''
       let perc = 0
 
       item.className = 'c3 mb3 f6 lhc'
       code.className = 'dib sh3 sw3 brf mr2 lhs'
       name.className = 'dib'
 
-      if (mode === 'sec') {
-        colour = Log.palette[i]
-        perc = Log.data.sp(i, ent)
-      } else if (mode === 'pro') {
-        colour = Log.projectPalette[i]
-        perc = Log.data.pp(i, ent)
-      }
+      mode === 'sec' ?
+      (col = Log.palette[e], perc = Log.data.sp(e, ent)) :
+      (col = Log.projectPalette[e], perc = Log.data.pp(e, ent))
 
-      code.style.backgroundColor = colour || Log.config.ui.colour
-      name.innerHTML = `${i} (${perc.toFixed(2)}%)`
+      code.style.backgroundColor = col || Log.config.ui.colour
+      name.innerHTML = `${e} (${perc.toFixed(2)}%)`
 
       item.appendChild(code)
       item.appendChild(name)
-      document.getElementById(con).appendChild(item)
-    }
-
-    list.map(e => addItem(e))
+      append(con, item)
+    })
   },
 
   /**
@@ -363,17 +327,16 @@ Log.vis = {
    * @param {string=} con - Container
    */
   focusChart(mode, ent = Log.log, con = 'focusChart') {
-    if (ent.length === 0) return
+    if (isEmpty(ent)) return
 
     const set = Log.data.sortEntries(ent)
 
-    let addItem = i => {
-      const list = mode === 'sec' ? Log.data.listSectors(i) : Log.data.listProjects(i)
-
-      let col = document.createElement('div')
-      let inn = document.createElement('div')
-      let cor = document.createElement('div')
+    set.map(e => {
+      const list = mode === 'sec' ? Log.data.listSectors(e) : Log.data.listProjects(e)
       const height = list === undefined ? 0 : 1 / list.length * 100
+      const col = create('div')
+      const inn = create('div')
+      const cor = create('div')
 
       col.className = 'dib hf psr'
       col.style.width = `${100 / set.length}%`
@@ -384,9 +347,7 @@ Log.vis = {
 
       inn.appendChild(cor)
       col.appendChild(inn)
-      document.getElementById(con).appendChild(col)
-    }
-
-    set.map(e => addItem(e))
+      append(con, col)
+    })
   }
 }

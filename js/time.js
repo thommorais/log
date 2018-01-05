@@ -108,35 +108,14 @@ Log.time = {
    */
   timeago(t) {
     const min = Math.abs(Math.floor(((new Date()) - t) / 1E3 / 60))
-
-    if (min === 0) {
-      return 'less than a minute ago'
-    }
-
-    if (min === 1) {
-      return 'a minute ago'
-    }
-
-    if (min < 59) {
-      return `${min} minutes ago`
-    }
-
-    if (min < 1440) {
-      return `${Math.floor(min / 60)} hours ago`
-    }
-
-    if (min < 2880) {
-      return 'yesterday'
-    }
-
-    if (min < 86400) {
-      return `${Math.floor(min / 1440)} days ago`
-    }
-
-    if (min < 1051199) {
-      return `${Math.floor(min / 43200)} months ago`
-    }
-
+    if (min === 0) return 'less than a minute ago'
+    if (min === 1) return 'a minute ago'
+    if (min < 59) return `${min} minutes ago`
+    if (min === 60) return 'an hour ago'
+    if (min < 1440) return `${Math.floor(min / 60)} hours ago`
+    if (min < 2880) return 'yesterday'
+    if (min < 86400) return `${Math.floor(min / 1440)} days ago`
+    if (min < 1051199) return `${Math.floor(min / 43200)} months ago`
     return `over ${Math.floor(min / 525960)} years ago`
   },
 
