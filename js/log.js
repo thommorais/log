@@ -64,16 +64,7 @@ var Log = {
       }, 1E3)
     } else return
   },
-  /**
-   * Play a sound effect
-   * @param {string=} soundName - name of the sound file in /media
-   */
-  playSoundEffect(soundName) {
-    console.log('playing sound', soundName)
-    const audio = new Audio(__dirname + '/media/' + soundName + '.mp3')
-    audio.play()
-  },
-
+  
   /**
     * Play a sound effect
     * @param {string} soundName - name of the sound file in /media
