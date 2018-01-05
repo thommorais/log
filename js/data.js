@@ -23,27 +23,48 @@ Log.data = {
     let p = []
 
     ent.map(e => {
+      const sCol = user.palette[e.c] || user.config.ui.colour
+      const pCol = user.projectPalette[e.t] || user.config.ui.colour
+
       if (Log.time.date(e.s) !== Log.time.date(e.e) && e.e !== 'undefined') {
         const a = Log.time.convert(Log.time.parse(e.s))
         const b = Log.time.convert(Log.time.parse(e.e))
 
+        const ne = Log.time.toHex(new Date(a.getFullYear(), a.getMonth(), a.getDate(), 23, 59, 59))
+        const ns = Log.time.toHex(new Date(b.getFullYear(), b.getMonth(), b.getDate(), 0, 0, 0))
+
         p.push({
           s: e.s,
-          e: Log.time.toHex(new Date(a.getFullYear(), a.getMonth(), a.getDate(), 23, 59, 59)),
+          e: ne,
           c: e.c,
           t: e.t,
-          d: e.d
+          d: e.d,
+          dur: Number(Log.time.duration(e.s, ne).toFixed(2)),
+          sCol,
+          pCol
         })
 
         p.push({
-          s: Log.time.toHex(new Date(b.getFullYear(), b.getMonth(), b.getDate(), 0, 0, 0)),
+          s: ns,
           e: e.e,
           c: e.c,
           t: e.t,
-          d: e.d
+          d: e.d,
+          dur: Number(Log.time.duration(ns, e.e).toFixed(2)),
+          sCol,
+          pCol
         })
       } else {
-        p.push(e)
+        p.push({
+          s: e.s,
+          e: e.e,
+          c: e.c,
+          t: e.t,
+          d: e.d,
+          dur: Number(Log.time.duration(e.s, e.e).toFixed(2)),
+          sCol,
+          pCol
+        })
       }
     })
 
@@ -314,7 +335,7 @@ Log.data = {
 
     ent.map(e => {
       if (e.e !== 'undefined') {
-        days[Log.time.convert(Log.time.parse(e.s)).getDay()] += Log.time.duration(e.s, e.e)
+        days[Log.time.convert(Log.time.parse(e.s)).getDay()] += e.dur
       }
     })
 
@@ -345,7 +366,7 @@ Log.data = {
 
       const es = Log.time.parse(ent[i].s)
       let index = Log.time.convert(es).getHours()
-      let time = Log.time.duration(ent[i].s, ent[i].e)
+      let time = ent[i].dur
 
       if (time > 1) {
         let remainder = time - Math.floor(time)
@@ -388,7 +409,7 @@ Log.data = {
 
     ent.map(e => {
       if (e.e !== 'undefined') {
-        list.push(Log.time.duration(e.s, e.e))
+        list.push(e.dur)
       }
     })
 

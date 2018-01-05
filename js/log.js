@@ -64,7 +64,7 @@ var Log = {
       }, 1E3)
     } else return
   },
-  
+
   /**
     * Play a sound effect
     * @param {string} soundName - name of the sound file in /media
@@ -272,7 +272,7 @@ var Log = {
         tim.innerHTML = `${Log.time.stamp(Log.time.convert(Log.time.parse(e.s)))} &ndash; ${Log.time.stamp(Log.time.convert(Log.time.parse(e.e)))}`
         sec.innerHTML = e.c
         pro.innerHTML = e.t
-        dur.innerHTML = `${Log.time.duration(e.s, e.e).toFixed(2)} h`
+        dur.innerHTML = `${e.dur.toFixed(2)} h`
         ent.innerHTML = e.d
 
         li.appendChild(tim)
@@ -507,10 +507,10 @@ var Log = {
       log: dataStore.get('log') || []
     }
 
-    Log.log = Log.data.parse(user.log)
     Log.config = user.config
     Log.palette = user.palette
     Log.projectPalette = user.projectPalette
+    Log.log = Log.data.parse(user.log)
 
     document.getElementById('app').style.backgroundColor = Log.config.ui.bg
     document.getElementById('app').style.color = Log.config.ui.colour

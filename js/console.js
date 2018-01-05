@@ -91,7 +91,6 @@ Log.console = {
         let notif
         if (err) {
           notif = new window.Notification(`An error occured creating the file ${err.message}`)
-
           return
         } else {
           notif = new window.Notification('Your log data has been exported.')

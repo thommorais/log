@@ -19,12 +19,15 @@ Log.vis = {
     let lw = 0
     let lp = 0
 
-    const addEntry = ({s, e, c, t}, row) => {
+    const addEntry = ({s, e, c, t, sCol, pCol}, row) => {
       const div = create('div')
-      const col = Log.vis.colourCode(mode, {c, t})
       const es = Log.time.parse(s)
       const wd = Log.utils.calcWidth(Log.time.parse(e), es)
       const dp = Log.utils.calcDP(es)
+
+      const col = mode === 'sector' ? sCol :
+      mode === 'project' ? pCol :
+      mode === 'none' && Log.config.ui.colour
 
       div.className = 'psr t0 sh1 mb2 lf'
       div.style.width = `${wd}%`
@@ -68,10 +71,13 @@ Log.vis = {
 
     let lw = 0
 
-    const addEntry = ({s, e, c, t}, row) => {
+    const addEntry = ({s, e, c, t, sCol, pCol}, row) => {
       const div = create('div')
       const ht = Log.utils.calcWidth(Log.time.parse(e), Log.time.parse(s))
-      const col = Log.vis.colourCode(mode, {c, t})
+
+      const col = mode === 'sector' ? sCol :
+      mode === 'project' ? pCol :
+      mode === 'none' && Log.config.ui.colour
 
       div.className = 'psa sw1'
       div.style.height = `${ht}%`
@@ -155,14 +161,19 @@ Log.vis = {
     let lw = 0
     let lp = 0
 
+    const mode = Log.config.ui.colourMode
+
     ent.map(e => {
       if (e.e !== 'undefined') {
         const div = create('div')
-        const col = Log.vis.colourCode(Log.config.ui.colourMode, e)
         const es = Log.time.parse(e.s)
         const dp = Log.utils.calcDP(es)
         const wd = Log.utils.calcWidth(Log.time.parse(e.e), es)
         const mg = Log.utils.calcMargin(dp, lw, lp)
+
+        const col = mode === 'sector' ? e.sCol :
+        mode === 'project' ? e.pCol :
+        mode === 'none' && Log.config.ui.colour
 
         div.className = 'nodrag psr t0 hf mb2 lf'
         div.style.width = `${wd}%`
