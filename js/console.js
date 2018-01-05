@@ -108,13 +108,14 @@ Log.console = {
    * @param {Object[]} s - Input array
    */
   startTomatoLog(s) {
-    Log.stopTimer = timer()()( (state, phaseChanged) => {
-      console.log(state)
+    const currentTimer = timer()()( (state, phaseChanged) => {
       if (phaseChanged) {
         state.phase === 'break' || state.phase === 'longBreak' ? Log.console.endLog() : Log.console.startLog(s)
+        state.phase === 'break' || state.phase === 'longBreak' ? Log.playSoundEffect('timerEnd') : Log.playSoundEffect('timerStart')
         let notif = new window.Notification(`Started ${state.phase}`)
       }
     })
+    Log.stopTimer = () => currentTimer.stop()
     Log.console.startLog(s)
   },
 
