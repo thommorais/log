@@ -47,7 +47,7 @@ Log.options = {
    * @param {string} m - Mode
    */
   setColourMode(m) {
-    if (m === 'sector' || m === 'project' || m === 'none') {
+    if (contains(m, 'sector project none')) {
       user.config.ui.colourMode = m
       Log.options.update()
     }
@@ -62,9 +62,7 @@ Log.options = {
     let indices = []
     let sec = ''
 
-    for (let i = 0, l = ch.length; i < l; i++) {
-      ch[i] === '"' && indices.push(i)
-    }
+    ch.map((e, i) => e === '"' && indices.push(i))
 
     for (let i = indices[0] + 1; i < indices[1]; i++) sec += ch[i]
 
@@ -77,13 +75,11 @@ Log.options = {
    * @param {string} s - Input
    */
   setProjectColourCode(s) {
-    let ch = s.split('')
+    const ch = s.split('')
     let indices = []
     let sec = ''
 
-    for (let i = 0, l = ch.length; i < l; i++) {
-      ch[i] === '"' && indices.push(i)
-    }
+    ch.map((e, i) => e === '"' && indices.push(i))
 
     for (let i = indices[0] + 1; i < indices[1]; i++) {
       sec += ch[i]
@@ -116,7 +112,7 @@ Log.options = {
    * @param {string} c - Calendrical system
    */
   setCalendar(c) {
-    if (c === 'aequirys' || c === 'monocal' || c === 'desamber' || c === 'gregorian') {
+    if (contains(c, 'aequirys monocal desamber gregorian')) {
       user.config.system.calendar = c
       Log.options.update()
     }
@@ -127,7 +123,7 @@ Log.options = {
    * @param {string} f - Format
    */
   setTimeFormat(f) {
-    if (f === '24' || f === '12') {
+    if (contains(f, '24 12')) {
       user.config.system.timeFormat = f
       Log.options.update()
     }

@@ -29,41 +29,22 @@ Log.data = {
       if (Log.time.date(e.s) !== Log.time.date(e.e) && e.e !== 'undefined') {
         const a = Log.time.convert(Log.time.parse(e.s))
         const b = Log.time.convert(Log.time.parse(e.e))
-
         const ne = Log.time.toHex(new Date(a.getFullYear(), a.getMonth(), a.getDate(), 23, 59, 59))
         const ns = Log.time.toHex(new Date(b.getFullYear(), b.getMonth(), b.getDate(), 0, 0, 0))
 
         p.push({
-          s: e.s,
-          e: ne,
-          c: e.c,
-          t: e.t,
-          d: e.d,
-          dur: Number(Log.time.duration(e.s, ne).toFixed(2)),
-          sCol,
-          pCol
+          s: e.s, e: ne, c: e.c, t: e.t, d: e.d,
+          dur: Log.time.duration(e.s, ne), sCol, pCol
         })
 
         p.push({
-          s: ns,
-          e: e.e,
-          c: e.c,
-          t: e.t,
-          d: e.d,
-          dur: Number(Log.time.duration(ns, e.e).toFixed(2)),
-          sCol,
-          pCol
+          s: ns, e: e.e, c: e.c, t: e.t, d: e.d,
+          dur: Log.time.duration(ns, e.e), sCol, pCol
         })
       } else {
         p.push({
-          s: e.s,
-          e: e.e,
-          c: e.c,
-          t: e.t,
-          d: e.d,
-          dur: Number(Log.time.duration(e.s, e.e).toFixed(2)),
-          sCol,
-          pCol
+          s: e.s, e: e.e, c: e.c, t: e.t, d: e.d,
+          dur: Log.time.duration(e.s, e.e), sCol, pCol
         })
       }
     })
@@ -243,10 +224,17 @@ Log.data = {
     return sort
   },
 
+  /**
+   * Sort array of objects by values
+   * @param {Object[]} ent - Entries
+   * @param {string} mode - Sector or project
+   * @param {string} hp - Hour or percentage
+   * @returns {Object[]} Array of objects sorted by values
+   */
   sortValues(ent, mode, hp) {
     if (!isValidArray(ent)) return
 
-    let list = mode === 'sec' ? Log.data.listSectors(ent) : Log.data.listProjects(ent)
+    const list = mode === 'sec' ? Log.data.listSectors(ent) : Log.data.listProjects(ent)
     let temp = []
 
     list.map(e => {
@@ -256,14 +244,6 @@ Log.data = {
         temp[e] = mode === 'sec' ? Log.data.sp(e, ent) : Log.data.pp(e, ent)
       }
     })
-
-    for (let i = 0, l = list.length; i < l; i++) {
-      if (hp === 'hours') {
-        temp[list[i]] = mode === 'sec' ? Log.data.sh(list[i], ent) : Log.data.ph(list[i], ent)
-      } else {
-        temp[list[i]] = mode === 'sec' ? Log.data.sp(list[i], ent) : Log.data.pp(list[i], ent)
-      }
-    }
 
     let sorted = Object.keys(temp).sort(function(a,b){return temp[a]-temp[b]})
     sorted = sorted.reverse()
@@ -361,29 +341,29 @@ Log.data = {
 
     let hours = Array(24).fill(0)
 
-    for (let i = 0, l = ent.length; i < l; i++) {
-      if (ent[i].e === 'undefined') continue
+    ent.map((e, i) => {
+      if (ent[i].e !== 'undefined') {
+        const es = Log.time.parse(e.s)
+        let index = Log.time.convert(es).getHours()
+        let time = e.dur
 
-      const es = Log.time.parse(ent[i].s)
-      let index = Log.time.convert(es).getHours()
-      let time = ent[i].dur
-
-      if (time > 1) {
-        let remainder = time - Math.floor(time)
-        hours[index] += remainder
-        time -= remainder
-        index++
-
-        while (time > 0) {
-          time -= 1
-          hours[index] += time
+        if (time > 1) {
+          let remainder = time - Math.floor(time)
+          hours[index] += remainder
+          time -= remainder
           index++
-          if (index > 23) break
+
+          while (time > 0) {
+            time -= 1
+            hours[index] += time
+            index++
+            if (index > 23) break
+          }
+        } else {
+          hours[index] += time
         }
-      } else {
-        hours[index] += time
       }
-    }
+    })
 
     return hours
   },
@@ -422,7 +402,7 @@ Log.data = {
    * @returns {number} Minimum value
    */
   min(v) {
-    if (!isNumArray(v)) return '-'
+    if (!isNumArray(v) || v === undefined) return '-'
     return isEmpty(v) ? 0 : Math.min(...v)
   },
 
@@ -432,7 +412,7 @@ Log.data = {
    * @returns {number} Maximum value
    */
   max(v) {
-    if (!isNumArray(v)) return '-'
+    if (!isNumArray(v) || v === undefined) return '-'
     return isEmpty(v) ? 0 : Math.max(...v)
   },
 
@@ -442,12 +422,12 @@ Log.data = {
    * @returns {number} Average
    */
   avg(v) {
-    if (!isNumArray(v)) return '-'
+    if (!isNumArray(v) || v === undefined) return '-'
     return isEmpty(v) ? 0 : v.reduce((sum, num) => sum + num, 0) / v.length
   },
 
   total(v) {
-    return isEmpty(v) ? 0 : v.reduce((total, num) => total + num, 0)
+    return isEmpty(v) || v === undefined ? 0 : v.reduce((total, num) => total + num, 0)
   },
 
   /**
@@ -647,10 +627,10 @@ Log.data = {
       let sf = 0
       let sfs = ''
 
-      for (let i = 0, l = s.length; i < l; i++) {
-        let x = Log.data.sp(s[i], ent)
-        x > sf && (sf = x, sfs = s[i])
-      }
+      s.map(e => {
+        const x = Log.data.sp(e, ent)
+        x > sf && (sf = x, sfs = e)
+      })
 
       return sfs
     },
@@ -668,10 +648,10 @@ Log.data = {
       let pf = 0
       let pfp = ''
 
-      for (let i = 0, l = p.length; i < l; i++) {
-        let x = Log.data.pp(p[i], ent)
-        x > pf && (pf = x, pfp = p[i])
-      }
+      p.map(e => {
+        const x = Log.data.pp(e, ent)
+        x > pf && (pf = x, pfp = e)
+      })
 
       return pfp
     },
@@ -699,5 +679,95 @@ Log.data = {
     sd() {
       return Log.data.avg(Log.data.listDurations(Log.data.getEntriesByDay(new Date().getDay())))
     }
-  }
+  },
+
+  /**
+   * Generate data for bar chart
+   * @param {Object[]=} ent - Entries
+   * @param {string=} mode - Sector or project
+   * @returns {Object[]} Bar chart data
+   */
+  bar(ent = Log.log, mode = Log.config.ui.colourMode) {
+    if (!isValidArray(ent) || isEmpty(ent)) return
+
+    let data = []
+    let lw = 0
+
+    const addEntry = ({s, e, sCol, pCol, dur}, i) => {
+      const wh = Log.utils.calcWidth(Log.time.parse(e), Log.time.parse(s))
+      const col = mode === 'sector' ? sCol :
+      mode === 'project' ? pCol :
+      mode === 'none' && Log.config.ui.colour
+
+      data[i].push({
+        wh,
+        col,
+        pos: lw
+      })
+
+      lw += wh
+    }
+
+    const sort = Log.data.sortEntries(ent)
+
+    for (let i = 0, l = sort.length; i < l; i++) {
+      if (isEmpty(sort[i])) data.push([])
+      else {
+        data.push([])
+        for (let o = 0, l = sort[i].length; o < l; o++) {
+          if (sort[i][o].e === 'undefined') continue
+          o === 0 && (lw = 0)
+          addEntry(sort[i][o], i)
+        }
+      }
+    }
+
+    return data
+  },
+
+  /**
+   * Generate data for line visualisation
+   * @param {Object[]=} ent - Entries
+   * @param {string=} mode - Sector or project
+   * @returns {Object[]} Line visualisation data
+   */
+  line(ent = Log.log, mode = Log.config.ui.colourMode) {
+    if (!isValidArray(ent) || isEmpty(ent)) return
+
+    let data = []
+    let lp = 0
+
+    const addEntry = ({s, e, c, t, sCol, pCol}, i) => {
+      const es = Log.time.parse(s)
+      const wd = Log.utils.calcWidth(Log.time.parse(e), es)
+      const dp = Log.utils.calcDP(es)
+
+      const col = mode === 'sector' ? sCol :
+      mode === 'project' ? pCol :
+      mode === 'none' && Log.config.ui.colour
+
+      data[i].push({
+        wd,
+        mg: dp - lp,
+        col,
+      })
+
+      lp = wd + dp
+    }
+
+    const sort = Log.data.sortEntries(ent)
+
+    for (let i = 0, l = sort.length; i < l; i++) {
+      data.push([])
+      if (!isEmpty(sort[i])) {
+        for (let o = 0, l = sort[i].length; o < l; o++) {
+          if (sort[i][o].e === 'undefined') continue
+          o === 0 && (lp = 0)
+          addEntry(sort[i][o], i)
+        }
+      }
+    }
+
+    return data
+  },
 }

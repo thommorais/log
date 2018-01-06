@@ -131,7 +131,8 @@ Log.console = {
     if (s.includes('"')) {
       p = s.split('')
 
-      for (let i = 0, l = p.length; i < l; i++) p[i] === '"' && indices.push(i)
+      p.map((e, i) => e === '"' && indices.push(i))
+
       for (let i = indices[0] + 1; i < indices[1]; i++) sect += p[i]
       for (let i = indices[2] + 1; i < indices[3]; i++) proj += p[i]
       for (let i = indices[4] + 1; i < indices[5]; i++) desc += p[i]
@@ -262,7 +263,8 @@ Log.console = {
       let indices = []
       let key = ''
 
-      for (let i = 0, l = p.length; i < l; i++) p[i] === '"' && indices.push(i)
+      p.map((e, i) => e === '"' && indices.push(i))
+
       for (let i = indices[0] + 1; i < indices[1]; i++) key += p[i]
 
       return key.trim()
@@ -303,7 +305,8 @@ Log.console = {
       notif = new window.Notification(message)
     }
 
-    for (let i = 0, l = p.length; i < l; i++) p[i] === '"' && indices.push(i)
+    p.map((e, i) => e === '"' && indices.push(i))
+
     for (let i = indices[0] + 1; i < indices[1]; i++) oldName += p[i]
     for (let i = indices[2] + 1; i < indices[3]; i++) newName += p[i]
 

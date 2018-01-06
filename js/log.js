@@ -67,11 +67,10 @@ var Log = {
 
   /**
     * Play a sound effect
-    * @param {string} soundName - name of the sound file in /media
+    * @param {string} sound - name of the sound file in /media
     */
-  playSoundEffect(soundName) {
-    console.log('playing sound', soundName)
-    const audio = new Audio(`${__dirname}/media/${soundName}.mp3`)
+  playSoundEffect(sound) {
+    const audio = new Audio(`${__dirname}/media/${sound}.mp3`)
     audio.play()
   },
 
@@ -82,10 +81,11 @@ var Log = {
    * @param {string=} con - Container
    */
   display(ent = user.log, num = 50, con = 'logbook') {
+    if (!isValidArray(ent) || isEmpty(ent) || !isNumber(num) || !isString(con) || !exists(con)) return
+
     const entries = Log.utils.takeRight(ent, num).reverse()
 
-    for (let i = 0, l = entries.length; i < l; i++) {
-      const e = entries[i]
+    entries.map((e, i) => {
       const rw = document.getElementById(con).insertRow(i)
       const date = Log.time.convert(Log.time.parse(e.s))
 
@@ -93,18 +93,14 @@ var Log = {
       rw.insertCell(1).innerHTML = Log.time.displayDate(date)
       rw.insertCell(2).innerHTML = Log.time.stamp(date)
 
-      if (e.e === 'undefined') {
-        rw.insertCell(3).innerHTML = '-'
-        rw.insertCell(4).innerHTML = '-'
-      } else {
-        rw.insertCell(3).innerHTML = Log.time.stamp(Log.time.convert(Log.time.parse(e.e)))
-        rw.insertCell(4).innerHTML = `${Log.time.duration(e.s, e.e).toFixed(2)} h`
-      }
+      e.e === 'undefined' ?
+      (rw.insertCell(3).innerHTML = '-', rw.insertCell(4).innerHTML = '-') :
+      (rw.insertCell(3).innerHTML = Log.time.stamp(Log.time.convert(Log.time.parse(e.e))), rw.insertCell(4).innerHTML = `${Log.time.duration(e.s, e.e).toFixed(2)} h`)
 
       rw.insertCell(5).innerHTML = e.c
       rw.insertCell(6).innerHTML = e.t
       rw.insertCell(7).innerHTML = e.d
-    }
+    })
   },
 
   detail: {
@@ -116,7 +112,7 @@ var Log = {
     sec(sec = Log.cache.sectors.sort()[0]) {
       Log.detail.clear.sector()
 
-      if (sec === undefined || isEmpty(sec)) return
+      if (isUndefined(sec) || isEmpty(sec)) return
 
       const ent = Log.data.getEntriesBySector(sec, Log.data.getRecentEntries(Log.config.ui.view - 1))
       const his = Log.data.getEntriesBySector(sec)
@@ -141,15 +137,15 @@ var Log = {
       Log.vis.peakChart('hours', Log.data.peakHours(his), 'sPeakTimes')
       Log.vis.peakChart('days', Log.data.peakDays(his), 'sPeakDays')
 
-      if (ent.length !== 0) {
-        const mode = Log.config.ui.colourMe === 'none' ? 'none' : 'sector'
+      if (!isEmpty(ent)) {
+        const mode = Log.config.ui.colourMode === 'none' ? 'none' : 'project'
+        const focus = Log.data.listFocus('project', Log.data.sortEntries(ent))
+        const data = Log.data.bar(ent)
 
-        Log.vis.bar('sectorChart', ent, mode)
+        Log.vis.bar(data, 'sectorChart')
         Log.vis.focusChart('project', ent, 'sFocusChart')
 
-        const focus = Log.data.listFocus('project', Log.data.sortEntries(ent))
-
-        write('sAFH', Log.data.avg(focus).toFixed(2))
+        write('sFavg', Log.data.avg(focus).toFixed(2))
         write('sFmin', Log.data.min(focus).toFixed(2))
         write('sFmax', Log.data.max(focus).toFixed(2))
 
@@ -165,7 +161,7 @@ var Log = {
     pro(pro = Log.cache.projects.sort()[0]) {
       Log.detail.clear.project()
 
-      if (pro === undefined || isEmpty(pro)) return
+      if (isUndefined(pro) || isEmpty(pro)) return
 
       const ent = Log.data.getEntriesByProject(pro, Log.data.getRecentEntries(Log.config.ui.view - 1))
       const his = Log.data.getEntriesByProject(pro)
@@ -178,10 +174,10 @@ var Log = {
       write('projectLastUpdate', timeago)
 
       write('pEnt', his.length)
-      write('pLHH', Log.data.total(durations).toFixed(2))
-      write('pLSNH', Log.data.min(durations).toFixed(2))
-      write('pLSXH', Log.data.max(durations).toFixed(2))
-      write('pASD', Log.data.avg(durations).toFixed(2))
+      write('pLHH', `${Log.data.total(durations).toFixed(2)} h`)
+      write('pLSNH', `${Log.data.min(durations).toFixed(2)} h`)
+      write('pLSXH', `${Log.data.max(durations).toFixed(2)} h`)
+      write('pASD', `${Log.data.avg(durations).toFixed(2)} h`)
       write('pPHH', Log.data.peakHour(Log.data.peakHours(his)))
       write('pPDH', Log.data.peakDay(Log.data.peakDays(his)))
       write('pStreak', Log.data.streak(Log.data.sortEntries(his)))
@@ -189,14 +185,15 @@ var Log = {
       Log.vis.peakChart('hours', Log.data.peakHours(his), 'pPeakTimes')
       Log.vis.peakChart('days', Log.data.peakDays(his), 'pPeakDays')
 
-      if (ent.length !== 0) {
+      if (!isEmpty(ent)) {
         const mode = Log.config.ui.colourMode === 'none' ? 'none' : 'sector'
         const focus = Log.data.listFocus('sector', Log.data.sortEntries(ent))
+        const data = Log.data.bar(ent)
 
-        Log.vis.bar('projectChart', ent, mode)
+        Log.vis.bar(data, 'projectChart')
         Log.vis.focusChart('sector', ent, 'pFocusChart')
 
-        write('pAFH', Log.data.avg(focus).toFixed(2))
+        write('pFavg', Log.data.avg(focus).toFixed(2))
         write('pFmin', Log.data.min(focus).toFixed(2))
         write('pFmax', Log.data.max(focus).toFixed(2))
 
@@ -253,14 +250,15 @@ var Log = {
       write('jLPT', Log.data.lp(entries).toFixed(2))
       write('jfocusToday', Log.data.projectFocus(Log.data.listProjects(entries)).toFixed(2))
 
-      for (let i = 0, l = entries.length; i < l; i++) {
-        const e = entries[i]
-        let li = create('li')
-        let tim = create('span')
-        let sec = create('span')
-        let pro = create('span')
-        let dur = create('span')
-        let ent = create('p')
+      const l = entries.length
+
+      entries.map((e, i) => {
+        const li = create('li')
+        const tim = create('span')
+        const sec = create('span')
+        const pro = create('span')
+        const dur = create('span')
+        const ent = create('p')
 
         li.className = i !== l - 1 ? 'f6 lhc mb4' : 'f6 lhc'
         tim.className = 'mr3 o7'
@@ -282,7 +280,7 @@ var Log = {
         li.appendChild(ent)
 
         document.getElementById('journalEntries').appendChild(li)
-      }
+      })
     },
 
     /**
@@ -301,18 +299,18 @@ var Log = {
 
       if (isEmpty(entries)) return
 
-      for (let i = 0, l = entries.length; i < l; i++) {
-        if (isEmpty(entries[i])) continue
+      entries.map((e, i) => {
+        if (!isEmpty(entries[i])) {
+          let li = create('li')
+          let s = entries[i][0].s
 
-        let li = create('li')
-        let s = entries[i][0].s
+          li.className = 'lhd c-pt'
+          li.innerHTML = Log.time.displayDate(Log.time.convert(Log.time.parse(s)))
 
-        li.className = 'lhd c-pt'
-        li.innerHTML = Log.time.displayDate(Log.time.convert(Log.time.parse(s)))
-
-        li.setAttribute('onclick', `Log.journal.translate('${s}')`)
-        document.getElementById('journalNav').appendChild(li)
-      }
+          li.setAttribute('onclick', `Log.journal.translate('${s}')`)
+          document.getElementById('journalNav').appendChild(li)
+        }
+      })
     },
 
     translate(hex) {
@@ -324,7 +322,7 @@ var Log = {
 
     /**
      * Take the last n items of an array (from lodash)
-     * @param {Object[]} a - The array
+     * @param {Object[]} a - Array
      * @param {number=} n - Number of items
      * @returns {Object[]} An array with the last n items
      */
@@ -414,7 +412,7 @@ var Log = {
     write('fpf', '&mdash;')
     write('fsd', '0.00 h')
 
-    const el = 'phc pdc dayChart weekChart peakTimesHistory sectorBars projectBars sectorsList projectsList vis logbook focusChart sectorFocusBar sectorLegendSummary journalNav journalDay journalEntries'.split(' ')
+    const el = 'phc pdc dayChart weekChart peakTimesHistory sectorBars projectBars sectorsList projectsList visual logbook focusChart sectorFocusBar sectorLegendSummary journalNav journalDay journalEntries'.split(' ')
 
     el.map(e => clear(e))
   },
@@ -539,44 +537,35 @@ var Log = {
     const dur = Log.data.listDurations(en)
     const hLh = Log.data.total(Log.cache.durations)
 
-    const h = v => `${v.toFixed(2)} h`
-    const p = v => `${v.toFixed(2)}%`
-
-    if (Log.log.length > 1) {
-      Log.vis.peakChart('hours', Log.data.peakHours(Log.data.sortEntriesByDay()[new Date().getDay()]), 'phc')
-      Log.vis.peakChart('days', Log.cache.peakDays, 'pdc')
-    }
+    Log.vis.peakChart('hours', Log.data.peakHours(Log.data.sortEntriesByDay()[new Date().getDay()]), 'phc')
+    Log.vis.peakChart('days', Log.cache.peakDays, 'pdc')
 
     write('fsf', Log.data.forecast.sf())
     write('fpf', Log.data.forecast.pf())
-
     write('flh', `${Log.data.forecast.lh().toFixed(2)} h`)
     write('fsd', `${Log.data.forecast.sd().toFixed(2)} h`)
 
     Log.vis.day()
-    Log.vis.bar('weekChart', mn)
+    Log.vis.bar(Log.data.bar(mn), 'weekChart')
 
     Log.vis.list('sec', 'hours', 'sectorBars', en)
     Log.vis.list('pro', 'hours', 'projectBars', en)
 
-    write('LHT', h(Log.data.lh(en)))
-    write('LSN', h(Log.data.min(dur)))
-    write('LSX', h(Log.data.max(dur)))
-    write('ASDT', h(Log.data.avg(dur)))
-    write('LPT', p(Log.data.lp(en)))
-    write('FOC', Log.data.projectFocus(Log.data.listProjects(en)).toFixed(2))
+    write('LHT', `${Log.data.lh(en).toFixed(2)} h`)
+    write('LSN', `${Log.data.min(dur).toFixed(2)} h`)
+    write('LSX', `${Log.data.max(dur).toFixed(2)} h`)
+    write('ASDT', `${Log.data.avg(dur).toFixed(2)} h`)
+    write('LPT', `${Log.data.lp(en).toFixed(2)}%`)
+    write('FOC', Log.data.projectFocus(Log.data.listProjects(en)))
     write('ENC', en.length)
     write('STK', Log.data.streak())
 
-    clear('avgChart')
-    Log.vis.avgChart()
-
-    write('LHH', h(hLh))
-    write('LSNH', h(Log.data.min(Log.cache.durations)))
-    write('LSXH', h(Log.data.max(Log.cache.durations)))
-    write('ASD', h(Log.data.avg(Log.cache.durations)))
-    write('ALHH', h(Log.data.avgLh()))
-    write('LPH', p(Log.data.lp()))
+    write('LHH', hLh)
+    write('LSNH', Log.data.min(Log.cache.durations))
+    write('LSXH', Log.data.max(Log.cache.durations))
+    write('ASD', Log.data.avg(Log.cache.durations))
+    write('ALHH', Log.data.avgLh())
+    write('LPH', Log.data.lp())
     write('entCount', user.log.length)
     write('secCount', Log.cache.sectorCount)
     write('proCount', Log.cache.projectCount)
@@ -588,12 +577,12 @@ var Log = {
 
     Log.vis.focusChart('pro', mn)
 
-    write('AFH', Log.data.avg(Log.cache.projectFocus).toFixed(2))
-    write('Fmin', Log.data.min(Log.cache.projectFocus).toFixed(2))
-    write('Fmax', Log.data.max(Log.cache.projectFocus).toFixed(2))
+    write('Favg', Log.data.avg(Log.cache.projectFocus))
+    write('Fmin', Log.data.min(Log.cache.projectFocus))
+    write('Fmax', Log.data.max(Log.cache.projectFocus))
 
-    Log.vis.focusBar('sec', mn, 'sectorFocusBar')
-    Log.vis.legend('sec', undefined, 'sectorLegendSummary')
+    Log.vis.focusBar('sec', Log.log, 'sectorFocusBar')
+    Log.vis.legend('sec', Log.log, 'sectorLegendSummary')
 
     Log.detail.sec()
     Log.vis.list('sec', 'hours', 'sectorsList')
@@ -601,9 +590,9 @@ var Log = {
     Log.detail.pro()
     Log.vis.list('pro', 'hours', 'projectsList')
 
-    Log.vis.line('vis', mn)
+    Log.vis.line(Log.data.line(mn), 'visual')
 
-    Log.display(undefined, 100)
+    Log.display(Log.log, 100)
 
     Log.journal.display()
     Log.journal.nav()
