@@ -120,7 +120,7 @@ Log.console = {
    * @param {Object[]} s - Input array
    */
   startLog(s) {
-    if (isEmpty(user.log) && user.log.slice(-1)[0].e === 'undefined') return
+    if (user.log.slice(-1)[0].e === 'undefined') Log.console.endLog()
 
     let p = []
     let indices = []
