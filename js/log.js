@@ -457,6 +457,9 @@ var Log = {
       if (e.which >= 65 && e.which <= 90) {
         cmd.style.display = 'block'
         con.focus()
+	  } else if (e.which >= 48 && e.which <= 54 && (e.ctrlKey || e.metaKey)) {
+		Log.nav.index = e.which - 49
+		Log.tab(Log.nav.menu[Log.nav.index], 'sect', 'tab')
       } else if (e.key === 'Escape') {
         con.value = ''
         cmd.style.display = 'none'
@@ -494,6 +497,8 @@ var Log = {
       	Log.console.exportUser()
       	return
       }
+
+
     })
 
     var user = {
