@@ -7,11 +7,12 @@ Log.vis = {
    * @param {string} con - Container
    */
   line(data, con) {
+    if (isUndefined(data)) return
     if (isEmpty(data) || !isString(con) || !exists(con)) return
 
     const addEntry = ({col, mg, wd}, row) => {
       const div = create('div')
-      div.className = 'psr t0 sh1 mb2 lf'
+      div.className = 'psr t0 sh1 mb2 lf br3'
       div.style.width = `${wd}%`
       div.style.marginLeft = `${mg}%`
       div.style.backgroundColor = col
@@ -38,6 +39,9 @@ Log.vis = {
    * @param {string} con - Container
    */
   bar(data, con) {
+    Log.vis.gridLines(con)
+
+    if (isUndefined(data)) return
     if (isEmpty(data) || !isString(con) || !exists(con)) return
 
     const addEntry = ({col, pos, wh}, row) => {
@@ -99,7 +103,7 @@ Log.vis = {
         mode === 'project' ? e.pCol :
         mode === 'none' && Log.config.ui.colour
 
-        div.className = 'nodrag psr t0 hf mb2 lf'
+        div.className = 'nodrag psr t0 hf mb2 lf br3'
         div.style.width = `${wd}%`
         div.style.marginLeft = `${mg}%`
         div.style.backgroundColor = col || Log.config.ui.colour
@@ -119,20 +123,23 @@ Log.vis = {
    * @param {string=} con - Container
    */
   peakChart(mode, peaks, con) {
+    console.log(mode, peaks, con)
+    if (peaks === undefined) return
     if (isEmpty(peaks) || ['hours', 'days'].indexOf(mode) < 0 || !isString(con) || !exists(con)) return
 
     const peak = Math.max(...peaks)
 
     peaks.map((e, i) => {
       const col = create('div')
+      const out = create('div')
       const inn = create('div')
       const id = `${con}-${i}`
 
       col.className = 'dib hf psr'
       col.style.width = `${100 / peaks.length}%`
       col.id = id
-
-      inn.className = 'psa b0 sw1 bb'
+      out.className = 'sw1 hf cn bb'
+      inn.className = 'psa b0 sw1 br3'
       inn.style.height = `${e / peak * 100}%`
 
       if (mode === 'hours') {
@@ -143,8 +150,9 @@ Log.vis = {
         inn.style.borderColor = i === (new Date).getDay() ? Log.config.ui.accent : Log.config.ui.colour
       }
 
+      out.appendChild(inn)
       append(con, col)
-      append(id, inn)
+      append(id, out)
     })
   },
 
@@ -170,11 +178,11 @@ Log.vis = {
       const br = create('div')
       const dt = create('div')
 
-      li.className = 'mb3 c-pt'
+      li.className = 'mb4 c-pt'
       tl.className = 'dib xw6 elip'
       st.className = 'rf'
       br.className = 'wf sh1'
-      dt.className = 'psr t0 hf lf'
+      dt.className = 'psr t0 hf lf br3'
 
       mode === 'sec' ?
       (col = Log.palette[e[0]], wd = Log.data.sp(e[0], ent)) :
@@ -257,6 +265,8 @@ Log.vis = {
   focusChart(mode, ent = Log.log, con = 'focusChart') {
     if (!isValidArray(ent) || isEmpty(ent) || !isString(con) || !exists(con)) return
 
+    Log.vis.gridLines(con)
+
     const set = Log.data.sortEntries(ent)
 
     set.map(e => {
@@ -269,7 +279,7 @@ Log.vis = {
       col.className = 'dib hf psr'
       col.style.width = `${100 / set.length}%`
       inn.className = 'sw1 hf cn bb'
-      cor.className = 'psa sw1 b0 bg-noir'
+      cor.className = 'psa sw1 b0 bg-noir br3'
       cor.style.backgroundColor = Log.config.ui.colour
       cor.style.height = `${height}%`
 
@@ -277,5 +287,52 @@ Log.vis = {
       col.appendChild(inn)
       append(con, col)
     })
+  },
+
+  gridLines(con) {
+    const div100 = create('div')
+    const div75 = create('div')
+    const div50 = create('div')
+    const div25 = create ('div')
+    const div0 = create('div')
+
+    div100.className = 'psa wf c-3 bt o2'
+    div100.style.top = '0'
+    div75.className = 'psa wf c-3 bt o2'
+    div75.style.top = '25%'
+    div50.className = 'psa wf c-3 bt o2'
+    div50.style.bottom = '50%'
+    div25.className = 'psa wf c-3 bt o2'
+    div25.style.bottom = '25%'
+    div0.className = 'psa wf c-3 bt o2 b0'
+
+    append(con, div100)
+    append(con, div75)
+    append(con, div50)
+    append(con, div25)
+    append(con, div0)
+  },
+
+  pie(data, con) {
+    let canvas = document.getElementById(con)
+    let halfWidth = canvas.width * .5
+    let halfHeight = canvas.height * .5
+    let ctx = canvas.getContext('2d')
+    let lastend = 0
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height)
+
+    // console.log(data)
+
+    for(let i = 0, l = data.length; i < l; i++) {
+      // console.log(data[i].col)
+      ctx.fillStyle = data[i].col
+      ctx.beginPath()
+      ctx.moveTo(halfWidth, halfHeight)
+      ctx.arc(halfWidth, halfHeight, halfHeight, lastend, lastend + (data[i].arc), false)
+      ctx.lineTo(halfWidth, halfHeight)
+      ctx.fill()
+      lastend += data[i].arc
+    }
   }
 }
