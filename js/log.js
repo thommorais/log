@@ -83,9 +83,7 @@ var Log = {
   display(ent = user.log, num = 50, con = 'logbook') {
     if (!isValidArray(ent) || isEmpty(ent) || !isNumber(num) || !isString(con) || !exists(con)) return
 
-    const entries = Log.utils.takeRight(ent, num).reverse()
-
-    entries.map((e, i) => {
+    Log.utils.takeRight(ent, num).reverse().map((e, i) => {
       const rw = document.getElementById(con).insertRow(i)
       const date = Log.time.convert(Log.time.parse(e.s))
 
@@ -178,8 +176,8 @@ var Log = {
       write('pLSNH', `${Log.data.min(durations).toFixed(2)} h`)
       write('pLSXH', `${Log.data.max(durations).toFixed(2)} h`)
       write('pASD', `${Log.data.avg(durations).toFixed(2)} h`)
-      write('pPHH', Log.data.peakHour(Log.data.peakHours(his)))
-      write('pPDH', Log.data.peakDay(Log.data.peakDays(his)))
+      write('pPHH', `${Log.data.peakHour(Log.data.peakHours(his))}`)
+      write('pPDH', `${Log.data.peakDay(Log.data.peakDays(his))}`)
       write('pStreak', Log.data.streak(Log.data.sortEntries(his)))
 
       Log.vis.peakChart('hours', Log.data.peakHours(his), 'pPeakTimes')
@@ -548,17 +546,22 @@ var Log = {
     Log.vis.day()
     Log.vis.bar(Log.data.bar(mn), 'weekChart')
 
+    if (!isEmpty(en)) {
+      write('LHT', `${Log.data.lh(en).toFixed(2)} h`)
+      write('LSN', `${Log.data.min(dur).toFixed(2)} h`)
+      write('LSX', `${Log.data.max(dur).toFixed(2)} h`)
+      write('ASDT', `${Log.data.avg(dur).toFixed(2)} h`)
+      write('LPT', `${Log.data.lp(en).toFixed(2)}%`)
+      write('FOC', Log.data.projectFocus(Log.data.listProjects(en)))
+      write('ENC', en.length)
+      write('STK', Log.data.streak())
+
+      let now = Log.log.slice(-1)[0]
+      write('ongoing', `${now.d}`)
+    }
+
     Log.vis.list('sec', 'hours', 'sectorBars', en)
     Log.vis.list('pro', 'hours', 'projectBars', en)
-
-    write('LHT', `${Log.data.lh(en).toFixed(2)} h`)
-    write('LSN', `${Log.data.min(dur).toFixed(2)} h`)
-    write('LSX', `${Log.data.max(dur).toFixed(2)} h`)
-    write('ASDT', `${Log.data.avg(dur).toFixed(2)} h`)
-    write('LPT', `${Log.data.lp(en).toFixed(2)}%`)
-    write('FOC', Log.data.projectFocus(Log.data.listProjects(en)))
-    write('ENC', en.length)
-    write('STK', Log.data.streak())
 
     write('LHH', hLh)
     write('LSNH', Log.data.min(Log.cache.durations))
