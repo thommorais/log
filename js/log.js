@@ -455,54 +455,54 @@ var Log = {
       cmdIndex = 1
     })
 
-	if (!Log.keyEventInitialized) {
-	  Log.keyEventInitialized = true;
-	  document.addEventListener('keydown', function(e) {
-		if (e.which >= 65 && e.which <= 90) {
-		  cmd.style.display = 'block'
-		  con.focus()
-		} else if (e.which >= 48 && e.which <= 54 && (e.ctrlKey || e.metaKey)) {
-		  Log.nav.index = e.which - 49
-		  Log.tab(Log.nav.menu[Log.nav.index], 'sect', 'tab')
-		} else if (e.key === 'Escape') {
-		  con.value = ''
-		  cmd.style.display = 'none'
-		  cmdIndex = 1
-		} else if (e.which === 38) {
-		  cmd.style.display = 'block'
-		  con.focus()
-		  cmdIndex++
+  if (!Log.keyEventInitialized) {
+    Log.keyEventInitialized = true;
+    document.addEventListener('keydown', function(e) {
+    if (e.which >= 65 && e.which <= 90) {
+      cmd.style.display = 'block'
+      con.focus()
+    } else if (e.which >= 48 && e.which <= 54 && (e.ctrlKey || e.metaKey)) {
+      Log.nav.index = e.which - 49
+      Log.tab(Log.nav.menu[Log.nav.index], 'sect', 'tab')
+    } else if (e.key === 'Escape') {
+      con.value = ''
+      cmd.style.display = 'none'
+      cmdIndex = 1
+    } else if (e.which === 38) {
+      cmd.style.display = 'block'
+      con.focus()
+      cmdIndex++
 
-		  if (cmdIndex > Log.console.history.length) {
-		    cmdIndex = Log.console.history.length
-		  }
+      if (cmdIndex > Log.console.history.length) {
+        cmdIndex = Log.console.history.length
+      }
 
-		  con.value = Log.console.history[Log.console.history.length - cmdIndex]
-		} else if (e.which === 40) {
-		  cmd.style.display = 'block'
-		  con.focus()
-		  cmdIndex--
+      con.value = Log.console.history[Log.console.history.length - cmdIndex]
+    } else if (e.which === 40) {
+      cmd.style.display = 'block'
+      con.focus()
+      cmdIndex--
 
-		  if (cmdIndex < 1) cmdIndex = 1
-		  con.value = Log.console.history[Log.console.history.length - cmdIndex]
-		} else if (e.key === 'Tab') {
-		  e.preventDefault()
-		  Log.nav.horizontal()
-		}
+      if (cmdIndex < 1) cmdIndex = 1
+      con.value = Log.console.history[Log.console.history.length - cmdIndex]
+    } else if (e.key === 'Tab') {
+      e.preventDefault()
+      Log.nav.horizontal()
+    }
 
-		if (e.key === 'o' && (e.ctrlKey || e.metaKey)) {
-		  e.preventDefault()
-		  Log.console.importUser()
-		  return
-		}
+    if (e.key === 'o' && (e.ctrlKey || e.metaKey)) {
+      e.preventDefault()
+      Log.console.importUser()
+      return
+    }
 
-		if (e.key === 'e' && (e.ctrlKey || e.metaKey)) {
-		  e.preventDefault()
-		  Log.console.exportUser()
-		  return
-		}
-	  })
-	}
+    if (e.key === 'e' && (e.ctrlKey || e.metaKey)) {
+      e.preventDefault()
+      Log.console.exportUser()
+      return
+    }
+    })
+  }
 
     var user = {
       config: dataStore.get('config') || {},
