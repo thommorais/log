@@ -624,14 +624,20 @@ var Log = {
 
       let now = Log.log.slice(-1)[0]
       write('lastID', `${user.log.length}`)
-      write('lastStart', `${Log.time.stamp(Log.time.convert(Log.time.parse(now.s)))}`)
 
-      let nowEnd = now.e === 'undefined' ? '-' : Log.time.stamp(Log.time.convert(Log.time.parse(now.e)))
+      const date = Log.time.convert(Log.time.parse(now.s))
+      const startTime = Log.time.stamp(date)
+      const endTime = Log.time.stamp(Log.time.convert(Log.time.parse(now.e)))
 
-      write('lastEnd', `${nowEnd}`)
-      write('lastSector', `${now.c}`)
-      write('lastProject', `${now.t}`)
-      write('lastDescription', `${now.d}`)
+      if (now.e === 'undefined') {
+        write('lastTime', `${startTime}&ndash;`)
+      } else {
+        write('lastTime', `${startTime}&ndash;${endTime}`)
+      }
+
+      write('lastSector', now.c)
+      write('lastProject', now.t)
+      write('lastDescription', now.d)
 
     }
 
