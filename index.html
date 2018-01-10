@@ -7,14 +7,11 @@
   <meta name="author" content="Josh Avanier">
   <meta name="description" content="A log and time-tracking system">
   <link rel="stylesheet" href="css/macian.min.css">
-  <script src="utils/aequirys.min.js"></script>
-  <script src="utils/monocal.min.js"></script>
-  <script src="utils/desamber.js"></script>
 </head>
 <body id="app" class="noselect r p4 p4-m p5-l hf cn c-d">
 
   <header class="mb4 f6 lhc">
-    <h1 class="dib mr4 f5 upc tk">Log <span id="version"></span></h1>
+    <h1 class="dib mr3 f5 upc tk">Log <span id="version"></span></h1>
     <button id="b-ovw" class="pv1 tab on bg-cl of mr3" onclick="Log.tab('ovw', 'sect', 'tab')">Overview</button>
     <button id="b-lis" class="pv1 tab on bg-cl o5 mr3" onclick="Log.tab('lis', 'sect', 'tab')">Details</button>
     <button id="b-vis" class="pv1 tab on bg-cl o5 mr3" onclick="Log.tab('vis', 'sect', 'tab')">Visualisation</button>
@@ -78,7 +75,30 @@
         </ul>
       </div>
       <div class="c8 ph4-l hf-l oya-l">
-        <div id="weekChart" class="mb4 mt3 psr h4"></div>
+        <table class="mb3 wf bn f6 lhc">
+          <thead class="al">
+            <tr>
+              <th>ID</th>
+              <th>Start</th>
+              <th>End</th>
+              <th>Sector</th>
+              <th>Project</th>
+              <th>Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td id="lastID"></td>
+              <td id="lastStart"></td>
+              <td id="lastEnd"></td>
+              <td id="lastSector"></td>
+              <td id="lastProject"></td>
+              <td id="lastDescription"></td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div id="weekChart" class="mb4 psr h4"></div>
 
         <ul class="mb4 lsn f6 lhc r">
           <li class="mb3 c6 c3-m c3-l">
@@ -114,12 +134,6 @@
             <p class="o9">Streak</p>
           </li>
         </ul>
-
-        <div class="f6 lhc bt pt4">
-          <p>Ongoing: <span id="ongoing"></span></p>
-          <!-- <p>Last Entry: <span id="last"></span></p> -->
-        </div>
-
       </div>
       <div class="c2 hf-l f6 lhc">
         <h3 class="mb3 mt2 f5 fwn">Sectors</h3>
@@ -211,65 +225,89 @@
       <div id="sec" class="dn subsect hf r">
         <div class="nodrag c9 pr3-l hf-l oya-l">
           <h2 id="sectorTitle" class="mb0 f4 lht">Sector</h2>
-          <p id="sectorLastUpdate" class="mb3 f6 o7"></p>
-          <div id="sectorChart" class="psr h4 mb4"></div>
-          <h3 class="mb4 f6 fwn">Statistics</h3>
-          <ul class="mb5 lsn f6 lhc r">
-            <li class="mb4 c6 c3-m c3-l">
-              <p id="sLHH" class="f3 mb1 fwb">&mdash;</p>
-              <p class="o9">Logged Hours</p>
-            </li>
-            <li class="mb4 c6 c3-m c3-l">
-              <p id="sLSNH" class="f3 mb1 fwb">&mdash;</p>
-              <p class="o9">Min Session</p>
-            </li>
-            <li class="mb4 c6 c3-m c3-l">
-              <p id="sLSXH" class="f3 mb1 fwb">&mdash;</p>
-              <p class="o9">Max Session</p>
-            </li>
-            <li class="mb4 c6 c3-m c3-l">
-              <p id="sASD" class="f3 mb1 fwb">&mdash;</p>
-              <p class="o9">Avg Session</p>
-            </li>
-            <li class="mb4 mb0-l c6 c3-m c3-l">
-              <p id="sEnt" class="f3 mb1 fwb">&mdash;</p>
-              <p class="o9">Entries</p>
-            </li>
-            <li class="mb4 mb0-l c6 c3-m c3-l">
-              <p id="sStreak" class="f3 mb1 fwb">&mdash;</p>
-              <p class="o9">Streak</p>
-            </li>
-            <li class="mb4 mb0-l c6 c3-m c3-l">
-              <p id="sPHH" class="f3 mb1 fwb">&mdash;</p>
-              <p class="o9">Peak Hour</p>
-            </li>
-            <li class="mb4 mb0-l c6 c3-m c3-l">
-              <p id="sPDH" class="f3 mb1 fwb">&mdash;</p>
-              <p class="o9">Peak Day</p>
-            </li>
-          </ul>
-          <h3 class="mb3 f6 fwn">Peaks</h3>
-          <div id="sPeakTimes" class="dib mb3 mb5-l pr4-l lf h2 w5"></div>
-          <div id="sPeakDays" class="dib mb5 pl4-l lf h2 w5"></div>
-          <h3 class="mb3 f6 fwn">Focus</h3>
-          <div id="sFocusChart" class="psr mb4 wf h1"></div>
-          <ul class="mb4 lsn f6 lhc r">
-            <li class="c6 c3-m c3-l">
-              <p id="sFavg" class="f3 mb1 fwb">&mdash;</p>
-              <p class="o9">Avg Focus</p>
-            </li>
-            <li class="c6 c3-m c3-l">
-              <p id="sFmin" class="f3 mb1 fwb">&mdash;</p>
-              <p class="o9">Min Focus</p>
-            </li>
-            <li class="c6 c3-m c3-l">
-              <p id="sFmax" class="f3 mb1 fwb">&mdash;</p>
-              <p class="o9">Max Focus</p>
-            </li>
-          </ul>
-          <h3 class="mb3 f6 fwn">Sector Focus</h3>
-          <div id="projectDetailFocus" class="mb3 wf sh2"></div>
-          <ul id="projectLegend" class="lsn r"></ul>
+          <p id="sectorLastUpdate" class="mb2 f6 o7"></p>
+
+          <div class="mb3 lhc">
+            <button id="b-secStat" class="pv1 sectab on bg-cl of mr3" onclick="Log.tab('secStat', 'secsect', 'sectab')">Statistics</button>
+            <button id="b-secEnt" class="pv1 sectab on bg-cl o5 mr3" onclick="Log.tab('secEnt', 'secsect', 'sectab')">Entries</button>
+          </div>
+
+          <div id="secStat" class="secsect hf">
+            <!-- <h3 class="mb4 f6 fwn">Statistics</h3> -->
+            <div id="sectorChart" class="psr h4 mb4"></div>
+            <ul class="mb5 lsn f6 lhc r">
+              <li class="mb4 c6 c3-m c3-l">
+                <p id="sLHH" class="f3 mb1 fwb">&mdash;</p>
+                <p class="o9">Logged Hours</p>
+              </li>
+              <li class="mb4 c6 c3-m c3-l">
+                <p id="sLSNH" class="f3 mb1 fwb">&mdash;</p>
+                <p class="o9">Min Session</p>
+              </li>
+              <li class="mb4 c6 c3-m c3-l">
+                <p id="sLSXH" class="f3 mb1 fwb">&mdash;</p>
+                <p class="o9">Max Session</p>
+              </li>
+              <li class="mb4 c6 c3-m c3-l">
+                <p id="sASD" class="f3 mb1 fwb">&mdash;</p>
+                <p class="o9">Avg Session</p>
+              </li>
+              <li class="mb4 mb0-l c6 c3-m c3-l">
+                <p id="sEnt" class="f3 mb1 fwb">&mdash;</p>
+                <p class="o9">Entries</p>
+              </li>
+              <li class="mb4 mb0-l c6 c3-m c3-l">
+                <p id="sStreak" class="f3 mb1 fwb">&mdash;</p>
+                <p class="o9">Streak</p>
+              </li>
+              <li class="mb4 mb0-l c6 c3-m c3-l">
+                <p id="sPHH" class="f3 mb1 fwb">&mdash;</p>
+                <p class="o9">Peak Hour</p>
+              </li>
+              <li class="mb4 mb0-l c6 c3-m c3-l">
+                <p id="sPDH" class="f3 mb1 fwb">&mdash;</p>
+                <p class="o9">Peak Day</p>
+              </li>
+            </ul>
+            <h3 class="mb3 f6 fwn">Peaks</h3>
+            <div id="sPeakTimes" class="dib mb3 mb5-l pr4-l lf h2 w5"></div>
+            <div id="sPeakDays" class="dib mb5 pl4-l lf h2 w5"></div>
+            <h3 class="mb3 f6 fwn">Focus</h3>
+            <div id="sFocusChart" class="psr mb4 wf h1"></div>
+            <ul class="mb4 lsn f6 lhc r">
+              <li class="c6 c3-m c3-l">
+                <p id="sFavg" class="f3 mb1 fwb">&mdash;</p>
+                <p class="o9">Avg Focus</p>
+              </li>
+              <li class="c6 c3-m c3-l">
+                <p id="sFmin" class="f3 mb1 fwb">&mdash;</p>
+                <p class="o9">Min Focus</p>
+              </li>
+              <li class="c6 c3-m c3-l">
+                <p id="sFmax" class="f3 mb1 fwb">&mdash;</p>
+                <p class="o9">Max Focus</p>
+              </li>
+            </ul>
+            <h3 class="mb3 f6 fwn">Sector Focus</h3>
+            <div id="projectDetailFocus" class="mb3 wf sh2"></div>
+            <ul id="projectLegend" class="lsn r"></ul>
+          </div>
+
+          <div id="secEnt" class="dn secsect">
+            <table class="wf bn">
+              <thead>
+                <tr class="f6 al">
+                  <th>ID</th>
+                  <th>Date</th>
+                  <th>Time</th>
+                  <th>Duration</th>
+                  <th>Project</th>
+                  <th>Description</th>
+                </tr>
+              </thead>
+              <tbody id="secLogbook" class="nodrag f6"></tbody>
+            </table>
+          </div>
         </div>
         <div class="c3 pl4-l hf-l oya-l">
           <ul id="sectorsList" class="nodrag lsn f6 lhc"></ul>
@@ -279,65 +317,89 @@
       <div id="pro" class="dn subsect hf r">
         <div class="nodrag c9 pr3-l hf-l oya-l">
           <h2 id="projectTitle" class="mb0 f4 lht">Project</h2>
-          <p id="projectLastUpdate" class="mb3 f6 o7"></p>
-          <div id="projectChart" class="psr h4 mb4"></div>
-          <h3 class="mb4 f6 fwn">Statistics</h3>
-          <ul class="mb5 lsn f6 lhc r">
-            <li class="mb4 c6 c3-m c3-l">
-              <p id="pLHH" class="f3 mb1 fwb">&mdash;</p>
-              <p class="o9">Logged Hours</p>
-            </li>
-            <li class="mb4 c6 c3-m c3-l">
-              <p id="pLSNH" class="f3 mb1 fwb">&mdash;</p>
-              <p class="o9">Min Session</p>
-            </li>
-            <li class="mb4 c6 c3-m c3-l">
-              <p id="pLSXH" class="f3 mb1 fwb">&mdash;</p>
-              <p class="o9">Max Session</p>
-            </li>
-            <li class="mb4 c6 c3-m c3-l">
-              <p id="pASD" class="f3 mb1 fwb">&mdash;</p>
-              <p class="o9">Avg Session</p>
-            </li>
-            <li class="mb4 mb0-l c6 c3-m c3-l">
-              <p id="pEnt" class="f3 mb1 fwb">&mdash;</p>
-              <p class="o9">Entries</p>
-            </li>
-            <li class="mb4 mb0-l c6 c3-m c3-l">
-              <p id="pStreak" class="f3 mb1 fwb">&mdash;</p>
-              <p class="o9">Streak</p>
-            </li>
-            <li class="mb4 mb0-l c6 c3-m c3-l">
-              <p id="pPHH" class="f3 mb1 fwb">&mdash;</p>
-              <p class="o9">Peak Hour</p>
-            </li>
-            <li class="mb4 mb0-l c6 c3-m c3-l">
-              <p id="pPDH" class="f3 mb1 fwb">&mdash;</p>
-              <p class="o9">Peak Day</p>
-            </li>
-          </ul>
-          <h3 class="mb4 f6 fwn">Peaks</h3>
-          <div id="pPeakTimes" class="dib mb3 mb5-l pr3-l lf h2 w5"></div>
-          <div id="pPeakDays" class="dib mb5 pl3-l lf h2 w5"></div>
-          <h3 class="mb4 f6 fwn">Focus</h3>
-          <div id="pFocusChart" class="psr mb4 wf h1"></div>
-          <ul class="mb5 lsn f6 lhc r">
-            <li class="c6 c3-m c3-l">
-              <p id="pFavg" class="f3 mb1 fwb">&mdash;</p>
-              <p class="o9">Avg Focus</p>
-            </li>
-            <li class="c6 c3-m c3-l">
-              <p id="pFmin" class="f3 mb1 fwb">&mdash;</p>
-              <p class="o9">Min Focus</p>
-            </li>
-            <li class="c6 c3-m c3-l">
-              <p id="pFmax" class="f3 mb1 fwb">&mdash;</p>
-              <p class="o9">Max Focus</p>
-            </li>
-          </ul>
-          <h3 class="mb4 f6 fwn">Sector Focus</h3>
-          <div id="sectorDetailFocus" class="mb3 wf sh2"></div>
-          <ul id="sectorLegend" class="lsn r"></ul>
+          <p id="projectLastUpdate" class="mb2 f6 o7"></p>
+
+          <div class="mb3 lhc">
+            <button id="b-proStat" class="pv1 protab on bg-cl of mr3" onclick="Log.tab('proStat', 'prosect', 'protab')">Statistics</button>
+            <button id="b-proEnt" class="pv1 protab on bg-cl o5 mr3" onclick="Log.tab('proEnt', 'prosect', 'protab')">Entries</button>
+          </div>
+
+          <div id="proStat" class="prosect hf">
+            <div id="projectChart" class="psr h4 mb4"></div>
+            <!-- <h3 class="mb4 f6 fwn">Statistics</h3> -->
+            <ul class="mb5 lsn f6 lhc r">
+              <li class="mb4 c6 c3-m c3-l">
+                <p id="pLHH" class="f3 mb1 fwb">&mdash;</p>
+                <p class="o9">Logged Hours</p>
+              </li>
+              <li class="mb4 c6 c3-m c3-l">
+                <p id="pLSNH" class="f3 mb1 fwb">&mdash;</p>
+                <p class="o9">Min Session</p>
+              </li>
+              <li class="mb4 c6 c3-m c3-l">
+                <p id="pLSXH" class="f3 mb1 fwb">&mdash;</p>
+                <p class="o9">Max Session</p>
+              </li>
+              <li class="mb4 c6 c3-m c3-l">
+                <p id="pASD" class="f3 mb1 fwb">&mdash;</p>
+                <p class="o9">Avg Session</p>
+              </li>
+              <li class="mb4 mb0-l c6 c3-m c3-l">
+                <p id="pEnt" class="f3 mb1 fwb">&mdash;</p>
+                <p class="o9">Entries</p>
+              </li>
+              <li class="mb4 mb0-l c6 c3-m c3-l">
+                <p id="pStreak" class="f3 mb1 fwb">&mdash;</p>
+                <p class="o9">Streak</p>
+              </li>
+              <li class="mb4 mb0-l c6 c3-m c3-l">
+                <p id="pPHH" class="f3 mb1 fwb">&mdash;</p>
+                <p class="o9">Peak Hour</p>
+              </li>
+              <li class="mb4 mb0-l c6 c3-m c3-l">
+                <p id="pPDH" class="f3 mb1 fwb">&mdash;</p>
+                <p class="o9">Peak Day</p>
+              </li>
+            </ul>
+            <h3 class="mb4 f6 fwn">Peaks</h3>
+            <div id="pPeakTimes" class="dib mb3 mb5-l pr3-l lf h2 w5"></div>
+            <div id="pPeakDays" class="dib mb5 pl3-l lf h2 w5"></div>
+            <h3 class="mb4 f6 fwn">Focus</h3>
+            <div id="pFocusChart" class="psr mb4 wf h1"></div>
+            <ul class="mb5 lsn f6 lhc r">
+              <li class="c6 c3-m c3-l">
+                <p id="pFavg" class="f3 mb1 fwb">&mdash;</p>
+                <p class="o9">Avg Focus</p>
+              </li>
+              <li class="c6 c3-m c3-l">
+                <p id="pFmin" class="f3 mb1 fwb">&mdash;</p>
+                <p class="o9">Min Focus</p>
+              </li>
+              <li class="c6 c3-m c3-l">
+                <p id="pFmax" class="f3 mb1 fwb">&mdash;</p>
+                <p class="o9">Max Focus</p>
+              </li>
+            </ul>
+            <h3 class="mb4 f6 fwn">Sector Focus</h3>
+            <div id="sectorDetailFocus" class="mb3 wf sh2"></div>
+            <ul id="sectorLegend" class="lsn r"></ul>
+          </div>
+
+          <div id="proEnt" class="dn prosect">
+            <table class="wf bn">
+              <thead>
+                <tr class="f6 al">
+                  <th>ID</th>
+                  <th>Date</th>
+                  <th>Time</th>
+                  <th>Duration</th>
+                  <th>Project</th>
+                  <th>Description</th>
+                </tr>
+              </thead>
+              <tbody id="proLogbook" class="nodrag f6"></tbody>
+            </table>
+          </div>
         </div>
         <div class="c3 pl4-l hf-l oya-l">
           <ul id="projectsList" class="nodrag lsn f6 lhc"></ul>
@@ -381,8 +443,7 @@
         <tr class="f6 al">
           <th>ID</th>
           <th>Date</th>
-          <th>Start</th>
-          <th>End</th>
+          <th>Time</th>
           <th>Duration</th>
           <th>Sector</th>
           <th>Project</th>
@@ -618,6 +679,10 @@
     const Store = require('./js/store.js')
     const path = require('path')
     const timer = require('headless-work-timer')
+
+    const Aequirys = require('./utils/aequirys.min.js')
+    const Monocal = require('./utils/monocal.min.js')
+    const Desamber = require('./utils/desamber.js')
 
     write('version', app.getVersion())
 

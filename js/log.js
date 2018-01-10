@@ -89,17 +89,23 @@ var Log = {
       const rw = document.getElementById(con).insertRow(i)
       const date = Log.time.convert(Log.time.parse(e.s))
 
-      rw.insertCell(0).innerHTML = user.log.length - i
+      rw.insertCell(0).innerHTML = e.id
       rw.insertCell(1).innerHTML = Log.time.displayDate(date)
-      rw.insertCell(2).innerHTML = Log.time.stamp(date)
 
-      e.e === 'undefined' ?
-      (rw.insertCell(3).innerHTML = '-', rw.insertCell(4).innerHTML = '-') :
-      (rw.insertCell(3).innerHTML = Log.time.stamp(Log.time.convert(Log.time.parse(e.e))), rw.insertCell(4).innerHTML = `${Log.time.duration(e.s, e.e).toFixed(2)} h`)
+      const startTime = Log.time.stamp(date)
+      const endTime = Log.time.stamp(Log.time.convert(Log.time.parse(e.e)))
 
-      rw.insertCell(5).innerHTML = e.c
-      rw.insertCell(6).innerHTML = e.t
-      rw.insertCell(7).innerHTML = e.d
+      if (e.e === 'undefined') {
+        rw.insertCell(2).innerHTML = `${startTime}`
+        rw.insertCell(3).innerHTML = '&ndash;'
+      } else {
+        rw.insertCell(2).innerHTML = `${startTime}&ndash;${endTime}`
+        rw.insertCell(3).innerHTML = `${Log.time.duration(e.s, e.e).toFixed(2)} h`
+      }
+
+      rw.insertCell(4).innerHTML = e.c
+      rw.insertCell(5).innerHTML = e.t
+      rw.insertCell(6).innerHTML = e.d
     })
   },
 
@@ -152,6 +158,34 @@ var Log = {
         Log.vis.focusBar('pro', ent, 'projectDetailFocus')
         Log.vis.legend('pro', ent, 'projectLegend')
       }
+
+      const con = 'secLogbook'
+
+      if (!isValidArray(ent) || isEmpty(ent) || !exists(con)) return
+
+      // console.log(Log.data.getEntriesBySector(sec))
+
+      Log.utils.takeRight(Log.data.getEntriesBySector(sec), 100).reverse().map((e, i) => {
+        const rw = document.getElementById(con).insertRow(i)
+        const date = Log.time.convert(Log.time.parse(e.s))
+
+        const startTime = Log.time.stamp(date)
+        const endTime = Log.time.stamp(Log.time.convert(Log.time.parse(e.e)))
+
+        rw.insertCell(0).innerHTML = e.id
+        rw.insertCell(1).innerHTML = Log.time.displayDate(date)
+
+        if (e.e === 'undefined') {
+          rw.insertCell(2).innerHTML = `${startTime}`
+          rw.insertCell(3).innerHTML = '&ndash;'
+        } else {
+          rw.insertCell(2).innerHTML = `${startTime}&ndash;${endTime}`
+          rw.insertCell(3).innerHTML = `${Log.time.duration(e.s, e.e).toFixed(2)} h`
+        }
+
+        rw.insertCell(4).innerHTML = e.t
+        rw.insertCell(5).innerHTML = e.d
+      })
     },
 
     /**
@@ -200,6 +234,30 @@ var Log = {
         Log.vis.focusBar('sec', ent, 'sectorDetailFocus')
         Log.vis.legend('sec', ent, 'sectorLegend')
       }
+
+      const con = 'proLogbook'
+
+      Log.utils.takeRight(Log.data.getEntriesByProject(pro), 100).reverse().map((e, i) => {
+        const rw = document.getElementById(con).insertRow(i)
+        const date = Log.time.convert(Log.time.parse(e.s))
+
+        const startTime = Log.time.stamp(date)
+        const endTime = Log.time.stamp(Log.time.convert(Log.time.parse(e.e)))
+
+        rw.insertCell(0).innerHTML = e.id
+        rw.insertCell(1).innerHTML = Log.time.displayDate(date)
+
+        if (e.e === 'undefined') {
+          rw.insertCell(2).innerHTML = `${startTime}`
+          rw.insertCell(3).innerHTML = '&ndash;'
+        } else {
+          rw.insertCell(2).innerHTML = `${startTime}&ndash;${endTime}`
+          rw.insertCell(3).innerHTML = `${Log.time.duration(e.s, e.e).toFixed(2)} h`
+        }
+
+        rw.insertCell(4).innerHTML = e.c
+        rw.insertCell(5).innerHTML = e.d
+      })
     },
 
     clear: {
@@ -208,7 +266,7 @@ var Log = {
        * Clear sector details
        */
       sector() {
-        const el = 'sectorTitle sectorChart sPeakTimes sPeakDays projectDetailFocus projectLegend sFocusChart'.split(' ')
+        const el = 'sectorTitle sectorChart sPeakTimes sPeakDays projectDetailFocus projectLegend sFocusChart secLogbook'.split(' ')
         el.map(e => clear(e))
       },
 
@@ -216,7 +274,7 @@ var Log = {
        * Clear project details
        */
       project() {
-        const el = 'projectTitle projectLastUpdate projectChart sectorDetailFocus sectorLegend pPeakTimes pPeakDays pFocusChart'.split(' ')
+        const el = 'projectTitle projectLastUpdate projectChart sectorDetailFocus sectorLegend pPeakTimes pPeakDays pFocusChart proLogbook'.split(' ')
         el.map(e => clear(e))
       }
     }
@@ -300,9 +358,9 @@ var Log = {
       if (isEmpty(entries)) return
 
       entries.map((e, i) => {
-        if (!isEmpty(entries[i])) {
-          let li = create('li')
-          let s = entries[i][0].s
+        if (!isEmpty(e)) {
+          const li = create('li')
+          const s = e[0].s
 
           li.className = 'lhd c-pt'
           li.innerHTML = Log.time.displayDate(Log.time.convert(Log.time.parse(s)))
@@ -565,7 +623,16 @@ var Log = {
       write('STK', Log.data.streak())
 
       let now = Log.log.slice(-1)[0]
-      write('ongoing', `${now.d}`)
+      write('lastID', `${user.log.length}`)
+      write('lastStart', `${Log.time.stamp(Log.time.convert(Log.time.parse(now.s)))}`)
+
+      let nowEnd = now.e === 'undefined' ? '-' : Log.time.stamp(Log.time.convert(Log.time.parse(now.e)))
+
+      write('lastEnd', `${nowEnd}`)
+      write('lastSector', `${now.c}`)
+      write('lastProject', `${now.t}`)
+      write('lastDescription', `${now.d}`)
+
     }
 
     Log.vis.list('sec', 'hours', 'sectorBars', en)

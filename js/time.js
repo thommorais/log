@@ -93,7 +93,7 @@ Log.time = {
 
       return `${date} ${months[d.getMonth()]} ${d.getFullYear().toString().substr(-2)}`
     } else if (f === 'monocal') {
-      return MONO.short(MONO.convert(d))
+      return Monocal.short(Monocal.convert(d))
     } else if (f === 'aequirys') {
       return Aequirys.display(Aequirys.convert(d))
     } else if (f === 'desamber') {

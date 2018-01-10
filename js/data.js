@@ -22,7 +22,7 @@ Log.data = {
 
     let p = []
 
-    ent.map(e => {
+    ent.map((e, i) => {
       const sCol = user.palette[e.c] || user.config.ui.colour
       const pCol = user.projectPalette[e.t] || user.config.ui.colour
 
@@ -33,17 +33,17 @@ Log.data = {
         const ns = Log.time.toHex(new Date(b.getFullYear(), b.getMonth(), b.getDate(), 0, 0, 0))
 
         p.push({
-          s: e.s, e: ne, c: e.c, t: e.t, d: e.d,
+          id: i + 1, s: e.s, e: ne, c: e.c, t: e.t, d: e.d,
           dur: Log.time.duration(e.s, ne), sCol, pCol
         })
 
         p.push({
-          s: ns, e: e.e, c: e.c, t: e.t, d: e.d,
+          id: i + 1, s: ns, e: e.e, c: e.c, t: e.t, d: e.d,
           dur: Log.time.duration(ns, e.e), sCol, pCol
         })
       } else {
         p.push({
-          s: e.s, e: e.e, c: e.c, t: e.t, d: e.d,
+          id: i + 1, s: e.s, e: e.e, c: e.c, t: e.t, d: e.d,
           dur: Log.time.duration(e.s, e.e), sCol, pCol
         })
       }
