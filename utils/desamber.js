@@ -58,4 +58,6 @@ var Desamber = {
 			d: this.day(a)
 		}
 	}
-};
+}
+
+module.exports = Desamber

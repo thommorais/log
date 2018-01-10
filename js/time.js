@@ -93,7 +93,7 @@ Log.time = {
 
       return `${date} ${months[d.getMonth()]} ${d.getFullYear().toString().substr(-2)}`
     } else if (f === 'monocal') {
-      return MONO.short(MONO.convert(d))
+      return Monocal.short(Monocal.convert(d))
     } else if (f === 'aequirys') {
       return Aequirys.display(Aequirys.convert(d))
     } else if (f === 'desamber') {
@@ -145,5 +145,15 @@ Log.time = {
    */
   duration(a, b) {
     return (Log.time.parse(b) - Log.time.parse(a)) / 3600
+  },
+
+  /**
+   * Returns a timestamp `duration` seconds after `start`
+   * @param {string} start - hexadecimal timestamp
+   * @param {number} duration - length to offset by (seconds)
+   * @returns {string} end - hexadecimal timestamp
+   */
+  offset(start, duration) {
+    return (Log.time.parse(start) + duration).toString(16)
   }
 }

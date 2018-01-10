@@ -57,17 +57,17 @@ Log.console = {
   importUser() {
     const path = dialog.showOpenDialog({properties: ['openFile']})
 
-		if (!path) return
+    if (!path) return
 
     let string = ''
     let notif
 
-		try {
-			string = fs.readFileSync(path[0], 'utf-8')
-		} catch (e) {
+    try {
+      string = fs.readFileSync(path[0], 'utf-8')
+    } catch (e) {
       notif = new window.Notification('An error occured while trying to load this file.')
       return
-		}
+    }
 
     Log.path = path[0]
     localStorage.setItem('logDataPath', path[0])
@@ -78,7 +78,7 @@ Log.console = {
 
     notif = new window.Notification('Your log data was successfully imported.')
 
-		Log.options.update()
+    Log.options.update()
   },
 
   /**
@@ -283,7 +283,10 @@ Log.console = {
       user.log[id].s = Log.time.convertDateTime(proc(i))
     else if (contains(a, 'end'))
       user.log[id].e = Log.time.convertDateTime(proc(i))
-    else return
+    else if (contains('duration dur')) {
+      let duration = parseInt(proc(i), 10) * 60 || 0
+      user.log[id].e = Log.time.offset(user.log[id].s, duration)
+    } else return
 
     Log.options.update()
   },

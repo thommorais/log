@@ -89,17 +89,23 @@ var Log = {
       const rw = document.getElementById(con).insertRow(i)
       const date = Log.time.convert(Log.time.parse(e.s))
 
-      rw.insertCell(0).innerHTML = user.log.length - i
+      rw.insertCell(0).innerHTML = e.id
       rw.insertCell(1).innerHTML = Log.time.displayDate(date)
-      rw.insertCell(2).innerHTML = Log.time.stamp(date)
 
-      e.e === 'undefined' ?
-      (rw.insertCell(3).innerHTML = '-', rw.insertCell(4).innerHTML = '-') :
-      (rw.insertCell(3).innerHTML = Log.time.stamp(Log.time.convert(Log.time.parse(e.e))), rw.insertCell(4).innerHTML = `${Log.time.duration(e.s, e.e).toFixed(2)} h`)
+      const startTime = Log.time.stamp(date)
+      const endTime = Log.time.stamp(Log.time.convert(Log.time.parse(e.e)))
 
-      rw.insertCell(5).innerHTML = e.c
-      rw.insertCell(6).innerHTML = e.t
-      rw.insertCell(7).innerHTML = e.d
+      if (e.e === 'undefined') {
+        rw.insertCell(2).innerHTML = `${startTime}`
+        rw.insertCell(3).innerHTML = '&ndash;'
+      } else {
+        rw.insertCell(2).innerHTML = `${startTime}&ndash;${endTime}`
+        rw.insertCell(3).innerHTML = `${Log.time.duration(e.s, e.e).toFixed(2)} h`
+      }
+
+      rw.insertCell(4).innerHTML = e.c
+      rw.insertCell(5).innerHTML = e.t
+      rw.insertCell(6).innerHTML = e.d
     })
   },
 
@@ -152,6 +158,34 @@ var Log = {
         Log.vis.focusBar('pro', ent, 'projectDetailFocus')
         Log.vis.legend('pro', ent, 'projectLegend')
       }
+
+      const con = 'secLogbook'
+
+      if (!isValidArray(ent) || isEmpty(ent) || !exists(con)) return
+
+      // console.log(Log.data.getEntriesBySector(sec))
+
+      Log.utils.takeRight(Log.data.getEntriesBySector(sec), 100).reverse().map((e, i) => {
+        const rw = document.getElementById(con).insertRow(i)
+        const date = Log.time.convert(Log.time.parse(e.s))
+
+        const startTime = Log.time.stamp(date)
+        const endTime = Log.time.stamp(Log.time.convert(Log.time.parse(e.e)))
+
+        rw.insertCell(0).innerHTML = e.id
+        rw.insertCell(1).innerHTML = Log.time.displayDate(date)
+
+        if (e.e === 'undefined') {
+          rw.insertCell(2).innerHTML = `${startTime}`
+          rw.insertCell(3).innerHTML = '&ndash;'
+        } else {
+          rw.insertCell(2).innerHTML = `${startTime}&ndash;${endTime}`
+          rw.insertCell(3).innerHTML = `${Log.time.duration(e.s, e.e).toFixed(2)} h`
+        }
+
+        rw.insertCell(4).innerHTML = e.t
+        rw.insertCell(5).innerHTML = e.d
+      })
     },
 
     /**
@@ -200,6 +234,30 @@ var Log = {
         Log.vis.focusBar('sec', ent, 'sectorDetailFocus')
         Log.vis.legend('sec', ent, 'sectorLegend')
       }
+
+      const con = 'proLogbook'
+
+      Log.utils.takeRight(Log.data.getEntriesByProject(pro), 100).reverse().map((e, i) => {
+        const rw = document.getElementById(con).insertRow(i)
+        const date = Log.time.convert(Log.time.parse(e.s))
+
+        const startTime = Log.time.stamp(date)
+        const endTime = Log.time.stamp(Log.time.convert(Log.time.parse(e.e)))
+
+        rw.insertCell(0).innerHTML = e.id
+        rw.insertCell(1).innerHTML = Log.time.displayDate(date)
+
+        if (e.e === 'undefined') {
+          rw.insertCell(2).innerHTML = `${startTime}`
+          rw.insertCell(3).innerHTML = '&ndash;'
+        } else {
+          rw.insertCell(2).innerHTML = `${startTime}&ndash;${endTime}`
+          rw.insertCell(3).innerHTML = `${Log.time.duration(e.s, e.e).toFixed(2)} h`
+        }
+
+        rw.insertCell(4).innerHTML = e.c
+        rw.insertCell(5).innerHTML = e.d
+      })
     },
 
     clear: {
@@ -208,7 +266,7 @@ var Log = {
        * Clear sector details
        */
       sector() {
-        const el = 'sectorTitle sectorChart sPeakTimes sPeakDays projectDetailFocus projectLegend sFocusChart'.split(' ')
+        const el = 'sectorTitle sectorChart sPeakTimes sPeakDays projectDetailFocus projectLegend sFocusChart secLogbook'.split(' ')
         el.map(e => clear(e))
       },
 
@@ -216,7 +274,7 @@ var Log = {
        * Clear project details
        */
       project() {
-        const el = 'projectTitle projectLastUpdate projectChart sectorDetailFocus sectorLegend pPeakTimes pPeakDays pFocusChart'.split(' ')
+        const el = 'projectTitle projectLastUpdate projectChart sectorDetailFocus sectorLegend pPeakTimes pPeakDays pFocusChart proLogbook'.split(' ')
         el.map(e => clear(e))
       }
     }
@@ -300,9 +358,9 @@ var Log = {
       if (isEmpty(entries)) return
 
       entries.map((e, i) => {
-        if (!isEmpty(entries[i])) {
-          let li = create('li')
-          let s = entries[i][0].s
+        if (!isEmpty(e)) {
+          const li = create('li')
+          const s = e[0].s
 
           li.className = 'lhd c-pt'
           li.innerHTML = Log.time.displayDate(Log.time.convert(Log.time.parse(s)))
@@ -455,54 +513,54 @@ var Log = {
       cmdIndex = 1
     })
 
-	if (!Log.keyEventInitialized) {
-	  Log.keyEventInitialized = true;
-	  document.addEventListener('keydown', function(e) {
-		if (e.which >= 65 && e.which <= 90) {
-		  cmd.style.display = 'block'
-		  con.focus()
-		} else if (e.which >= 48 && e.which <= 54 && (e.ctrlKey || e.metaKey)) {
-		  Log.nav.index = e.which - 49
-		  Log.tab(Log.nav.menu[Log.nav.index], 'sect', 'tab')
-		} else if (e.key === 'Escape') {
-		  con.value = ''
-		  cmd.style.display = 'none'
-		  cmdIndex = 1
-		} else if (e.which === 38) {
-		  cmd.style.display = 'block'
-		  con.focus()
-		  cmdIndex++
+  if (!Log.keyEventInitialized) {
+    Log.keyEventInitialized = true;
+    document.addEventListener('keydown', function(e) {
+    if (e.which >= 65 && e.which <= 90) {
+      cmd.style.display = 'block'
+      con.focus()
+    } else if (e.which >= 48 && e.which <= 54 && (e.ctrlKey || e.metaKey)) {
+      Log.nav.index = e.which - 49
+      Log.tab(Log.nav.menu[Log.nav.index], 'sect', 'tab')
+    } else if (e.key === 'Escape') {
+      con.value = ''
+      cmd.style.display = 'none'
+      cmdIndex = 1
+    } else if (e.which === 38) {
+      cmd.style.display = 'block'
+      con.focus()
+      cmdIndex++
 
-		  if (cmdIndex > Log.console.history.length) {
-		    cmdIndex = Log.console.history.length
-		  }
+      if (cmdIndex > Log.console.history.length) {
+        cmdIndex = Log.console.history.length
+      }
 
-		  con.value = Log.console.history[Log.console.history.length - cmdIndex]
-		} else if (e.which === 40) {
-		  cmd.style.display = 'block'
-		  con.focus()
-		  cmdIndex--
+      con.value = Log.console.history[Log.console.history.length - cmdIndex]
+    } else if (e.which === 40) {
+      cmd.style.display = 'block'
+      con.focus()
+      cmdIndex--
 
-		  if (cmdIndex < 1) cmdIndex = 1
-		  con.value = Log.console.history[Log.console.history.length - cmdIndex]
-		} else if (e.key === 'Tab') {
-		  e.preventDefault()
-		  Log.nav.horizontal()
-		}
+      if (cmdIndex < 1) cmdIndex = 1
+      con.value = Log.console.history[Log.console.history.length - cmdIndex]
+    } else if (e.key === 'Tab') {
+      e.preventDefault()
+      Log.nav.horizontal()
+    }
 
-		if (e.key === 'o' && (e.ctrlKey || e.metaKey)) {
-		  e.preventDefault()
-		  Log.console.importUser()
-		  return
-		}
+    if (e.key === 'o' && (e.ctrlKey || e.metaKey)) {
+      e.preventDefault()
+      Log.console.importUser()
+      return
+    }
 
-		if (e.key === 'e' && (e.ctrlKey || e.metaKey)) {
-		  e.preventDefault()
-		  Log.console.exportUser()
-		  return
-		}
-	  })
-	}
+    if (e.key === 'e' && (e.ctrlKey || e.metaKey)) {
+      e.preventDefault()
+      Log.console.exportUser()
+      return
+    }
+    })
+  }
 
     var user = {
       config: dataStore.get('config') || {},
@@ -565,7 +623,22 @@ var Log = {
       write('STK', Log.data.streak())
 
       let now = Log.log.slice(-1)[0]
-      write('ongoing', `${now.d}`)
+      write('lastID', `${user.log.length}`)
+
+      const date = Log.time.convert(Log.time.parse(now.s))
+      const startTime = Log.time.stamp(date)
+      const endTime = Log.time.stamp(Log.time.convert(Log.time.parse(now.e)))
+
+      if (now.e === 'undefined') {
+        write('lastTime', `${startTime}&ndash;`)
+      } else {
+        write('lastTime', `${startTime}&ndash;${endTime}`)
+      }
+
+      write('lastSector', now.c)
+      write('lastProject', now.t)
+      write('lastDescription', now.d)
+
     }
 
     Log.vis.list('sec', 'hours', 'sectorBars', en)
