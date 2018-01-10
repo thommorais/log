@@ -280,7 +280,10 @@ Log.console = {
       user.log[id].s = Log.time.convertDateTime(proc(i))
     else if (contains(a, 'end'))
       user.log[id].e = Log.time.convertDateTime(proc(i))
-    else return
+    else if (contains('duration dur')) {
+      let duration = parseInt(proc(i), 10) * 60 || 0
+      user.log[id].e = Log.time.offset(user.log[id].s, duration)
+    } else return
 
     Log.options.update()
   },

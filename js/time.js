@@ -145,5 +145,15 @@ Log.time = {
    */
   duration(a, b) {
     return (Log.time.parse(b) - Log.time.parse(a)) / 3600
+  },
+
+  /**
+   * Returns a timestamp `duration` seconds after `start`
+   * @param {string} start - hexadecimal timestamp
+   * @param {number} duration - length to offset by (seconds)
+   * @returns {string} end - hexadecimal timestamp
+   */
+  offset(start, duration) {
+    return (Log.time.parse(start) + duration).toString(16)
   }
 }
