@@ -495,11 +495,11 @@ var Log = {
 
     const cmd = document.getElementById('cmd')
     const con = document.getElementById('console')
-    let cmdIndex = 1
+    let cmdIndex = 0
 
     cmd.addEventListener('submit', function() {
       if (con.value !== '') {
-        Log.console.history.push(con.value)
+        if (cmdIndex != 1) Log.console.history.push(con.value)
 
         if (Log.console.history.length >= 100) Log.console.history.shift()
 
@@ -510,7 +510,7 @@ var Log = {
 
       con.value = ''
       cmd.style.display = 'none'
-      cmdIndex = 1
+      cmdIndex = 0
     })
 
   if (!Log.keyEventInitialized) {
@@ -525,7 +525,7 @@ var Log = {
     } else if (e.key === 'Escape') {
       con.value = ''
       cmd.style.display = 'none'
-      cmdIndex = 1
+      cmdIndex = 0
     } else if (e.which === 38) {
       cmd.style.display = 'block'
       con.focus()
