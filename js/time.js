@@ -134,7 +134,7 @@ Log.time = {
       current = Date.prototype.addDays.call(current, 1)
     }
 
-     return list
+    return list
   },
 
   /**
