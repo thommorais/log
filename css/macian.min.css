@@ -17,7 +17,7 @@
 body {
   max-width: 1500px;
   -webkit-app-region: drag;
-  animation: fadein 0.5s
+  animation: fadein 0.7862s
 }
 
 input[type="submit"],
