@@ -337,29 +337,26 @@ Log.data = {
   peakHours(ent = Log.log) {
     if (!isValidArray(ent)) return
 
-    let hours = Array(24).fill(0)
+    let hours = Array(25).fill(0)
 
-    ent.map((e, i) => {
+    ent.map(e => {
       if (e.e !== 'undefined') {
         const es = Log.time.parse(e.s)
         let index = Log.time.convert(es).getHours()
-        let time = e.dur
+        let time = Number(e.dur.toFixed(2))
+        let remainder = Number((time % 1).toFixed(2))
+        let block = time - remainder
 
-        if (time > 1) {
-          let remainder = time - Math.floor(time)
-          hours[index] += remainder
-          time -= remainder
-          index++
+        hours[index] += block - (block - 1)
+        index++
 
-          while (time > 0) {
-            time -= 1
-            hours[index] += time
-            index++
-            if (index > 23) break
-          }
-        } else {
-          hours[index] += time
+        while(block > 1) {
+          block--
+          hours[index++] += block - (block - 1)
+          if (index > 24) break
         }
+
+        hours[index++] += remainder
       }
     })
 

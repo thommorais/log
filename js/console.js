@@ -180,6 +180,9 @@ Log.console = {
    * End a log entry
    */
   endLog() {
+    if (isUndefined(Log.log)) return
+    if (isEmpty(Log.log)) return
+
     let last = user.log.slice(-1)[0]
     if (last.e !== 'undefined') return
     last.e = Log.time.toHex(new Date())
@@ -194,6 +197,9 @@ Log.console = {
    * Resume a paused log entry
    */
   resume() {
+    if (isUndefined(Log.log)) return
+    if (isEmpty(Log.log)) return
+
     const last = user.log.slice(-1)[0]
 
     if (last.e === 'undefined') return
@@ -251,6 +257,8 @@ Log.console = {
    * @param {string} i - Input
    */
   delete(i) {
+    if (isUndefined(Log.log)) return
+    if (isEmpty(Log.log)) return
     // all except first word are entry indices
     const ascendingUniqueIndices = i.split(' ').slice(1).filter( /* uniq */ (v, i, self) => self.indexOf(v) === i).sort()
     // remove all indices. We start from the highest to avoid the shifting of indices after removal.
@@ -264,6 +272,7 @@ Log.console = {
    * @param {string} i - Input
    */
   edit(i) {
+    if (isEmpty(user.log)) return
     const c = i.split(' ')
     const a = c[2]
     const id = Number(c[1]) - 1
@@ -290,8 +299,8 @@ Log.console = {
       user.log[id].s = Log.time.convertDateTime(proc(i))
     else if (contains(a, 'end'))
       user.log[id].e = Log.time.convertDateTime(proc(i))
-    else if (contains('duration dur')) {
-      let duration = parseInt(proc(i), 10) * 60 || 0
+    else if (contains(a, 'duration dur')) {
+      const duration = parseInt(proc(i), 10) * 60 || 0
       user.log[id].e = Log.time.offset(user.log[id].s, duration)
     } else return
 
@@ -306,6 +315,9 @@ Log.console = {
     if (!s.includes('"')) return
 
     const mode = s.split(' ')[1]
+
+    if (!contains(mode, 'sec sector pro project')) return
+
     const p = s.split('')
 
     let indices = []
@@ -319,6 +331,11 @@ Log.console = {
     }
 
     p.map((e, i) => e === '"' && indices.push(i))
+
+    if (indices[0] === undefined) return
+    if (indices[1] === undefined) return
+    if (indices[2] === undefined) return
+    if (indices[3] === undefined) return
 
     for (let i = indices[0] + 1; i < indices[1]; i++) oldName += p[i]
     for (let i = indices[2] + 1; i < indices[3]; i++) newName += p[i]

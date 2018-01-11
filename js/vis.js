@@ -123,8 +123,6 @@ Log.vis = {
    * @param {string=} con - Container
    */
   peakChart(mode, peaks, con) {
-    Log.vis.gridLines(con)
-
     if (isUndefined(peaks)) return
     if (isEmpty(peaks) || ['hours', 'days'].indexOf(mode) < 0 || !isString(con) || !exists(con)) return
 
@@ -267,8 +265,6 @@ Log.vis = {
   focusChart(mode, ent = Log.log, con = 'focusChart') {
     if (!isValidArray(ent) || isEmpty(ent) || !isString(con) || !exists(con)) return
 
-    Log.vis.gridLines(con)
-
     const set = Log.data.sortEntries(ent)
 
     set.map(e => {
@@ -298,20 +294,20 @@ Log.vis = {
     const div25 = create ('div')
     const div0 = create('div')
 
-    div100.className = 'psa wf c-3 bt o2'
+    div100.className = 'psa wf bt o1'
     div100.style.top = '0'
-    div75.className = 'psa wf c-3 bt o2'
+    div75.className = 'psa wf bt o1'
     div75.style.top = '25%'
-    div50.className = 'psa wf c-3 bt o2'
+    div50.className = 'psa wf bt o1'
     div50.style.bottom = '50%'
-    div25.className = 'psa wf c-3 bt o2'
+    div25.className = 'psa wf bt o1'
     div25.style.bottom = '25%'
-    div0.className = 'psa wf c-3 bt o2 b0'
+    div0.className = 'psa wf bt o1 b0'
 
     append(con, div100)
-    // append(con, div75)
+    append(con, div75)
     append(con, div50)
-    // append(con, div25)
+    append(con, div25)
     append(con, div0)
   },
 

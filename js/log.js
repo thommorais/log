@@ -497,7 +497,7 @@ var Log = {
     clearInterval(Log.clock)
     write('timer', '00:00')
 
-    'phc pdc dayChart weekChart peakTimesHistory sectorBars projectBars sectorsList projectsList visual logbook focusChart sectorFocusBar sectorLegendSummary journalNav journalDay journalEntries'.split(' ').map(e => clear(e))
+    'phc pdc dayChart weekChart peakTimesHistory peakDaysHistory sectorBars projectBars sectorsList projectsList visual logbook focusChart sectorFocusBar sectorLegendSummary journalNav journalDay journalEntries'.split(' ').map(e => clear(e))
   },
 
   nav: {
@@ -529,7 +529,7 @@ var Log = {
 
   init() {
     if (localStorage.hasOwnProperty('logHistory')) {
-      Log.console.history = JSON.parse(localStorage.getItem('logHistory'))
+      Log.console.history = JSON.parse(localStorage.getItem('logHistory')) || []
     } else {
       Log.console.history = []
       localStorage.setItem('logHistory', JSON.stringify(Log.console.history))
@@ -646,9 +646,11 @@ var Log = {
     Log.vis.peakChart('hours', Log.data.peakHours(Log.data.sortEntriesByDay()[new Date().getDay()]), 'phc')
     Log.vis.peakChart('days', Log.cache.peakDays, 'pdc')
 
-    write('fsf', Log.data.forecast.sf())
-    write('flh', `${Log.data.forecast.lh().toFixed(2)} h`)
-    write('fsd', `${Log.data.forecast.sd().toFixed(2)} h`)
+    if (Log.log.length !== 1) {
+      write('fsf', Log.data.forecast.sf())
+      write('flh', `${Log.data.forecast.lh().toFixed(2)} h`)
+      write('fsd', `${Log.data.forecast.sd().toFixed(2)} h`)
+    }
 
     Log.vis.day()
     Log.vis.bar(Log.data.bar(mn), 'weekChart')
@@ -701,10 +703,14 @@ var Log = {
 
     Log.vis.focusBar('sec', Log.log, 'sectorFocusBar')
     Log.vis.legend('sec', Log.log, 'sectorLegendSummary')
-    Log.detail.sec(Log.data.sortValues(Log.log, 'sec', 'hours')[0][0])
-    Log.vis.list('sec', 'hours', 'sectorsList')
-    Log.detail.pro(Log.data.sortValues(Log.log, 'pro', 'hours')[0][0])
-    Log.vis.list('pro', 'hours', 'projectsList')
+
+    if (Log.log.length !== 1) {
+      Log.detail.sec(Log.data.sortValues(Log.log, 'sec', 'hours')[0][0])
+      Log.vis.list('sec', 'hours', 'sectorsList')
+      Log.detail.pro(Log.data.sortValues(Log.log, 'pro', 'hours')[0][0])
+      Log.vis.list('pro', 'hours', 'projectsList')
+    }
+
     Log.vis.line(Log.data.line(mn), 'visual')
     Log.display(Log.log, 100)
     Log.journal.display()
