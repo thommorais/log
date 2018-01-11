@@ -89,8 +89,15 @@ var Log = {
       const rw = document.getElementById(con).insertRow(i)
       const date = Log.time.convert(Log.time.parse(e.s))
 
-      rw.insertCell(0).innerHTML = e.id
-      rw.insertCell(1).innerHTML = Log.time.displayDate(date)
+      const idCell = rw.insertCell(0)
+      idCell.className = 'pl0'
+      idCell.innerHTML = e.id
+
+      const dateCell = rw.insertCell(1)
+      dateCell.className = 'c-pt'
+      dateCell.innerHTML = Log.time.displayDate(date)
+
+      dateCell.setAttribute('onclick', `Log.nav.toJournal('${e.s}')`)
 
       const startTime = Log.time.stamp(date)
       const endTime = Log.time.stamp(Log.time.convert(Log.time.parse(e.e)))
@@ -103,8 +110,18 @@ var Log = {
         rw.insertCell(3).innerHTML = `${Log.time.duration(e.s, e.e).toFixed(2)} h`
       }
 
-      rw.insertCell(4).innerHTML = e.c
-      rw.insertCell(5).innerHTML = e.t
+      const secCell = rw.insertCell(4)
+      const proCell = rw.insertCell(5)
+
+      secCell.className = 'c-pt'
+      proCell.className = 'c-pt'
+
+      secCell.setAttribute('onclick', `Log.nav.toSectorDetail('${e.c}')`)
+
+      proCell.setAttribute('onclick', `Log.nav.toProjectDetail('${e.t}')`)
+
+      secCell.innerHTML = e.c
+      proCell.innerHTML = e.t
       rw.insertCell(6).innerHTML = e.d
     })
   },
@@ -169,7 +186,9 @@ var Log = {
         const startTime = Log.time.stamp(date)
         const endTime = Log.time.stamp(Log.time.convert(Log.time.parse(e.e)))
 
-        rw.insertCell(0).innerHTML = e.id
+        const idCell = rw.insertCell(0)
+        idCell.className = 'pl0'
+        idCell.innerHTML = e.id
         rw.insertCell(1).innerHTML = Log.time.displayDate(date)
 
         if (e.e === 'undefined') {
@@ -180,7 +199,11 @@ var Log = {
           rw.insertCell(3).innerHTML = `${Log.time.duration(e.s, e.e).toFixed(2)} h`
         }
 
-        rw.insertCell(4).innerHTML = e.t
+        const proCell = rw.insertCell(4)
+        proCell.className = 'c-pt'
+        proCell.setAttribute('onclick', `Log.nav.toProjectDetail('${e.t}')`)
+        proCell.innerHTML = e.t
+
         rw.insertCell(5).innerHTML = e.d
       })
     },
@@ -241,7 +264,9 @@ var Log = {
         const startTime = Log.time.stamp(date)
         const endTime = Log.time.stamp(Log.time.convert(Log.time.parse(e.e)))
 
-        rw.insertCell(0).innerHTML = e.id
+        const idCell = rw.insertCell(0)
+        idCell.className = 'pl0'
+        idCell.innerHTML = e.id
         rw.insertCell(1).innerHTML = Log.time.displayDate(date)
 
         if (e.e === 'undefined') {
@@ -252,7 +277,14 @@ var Log = {
           rw.insertCell(3).innerHTML = `${Log.time.duration(e.s, e.e).toFixed(2)} h`
         }
 
-        rw.insertCell(4).innerHTML = e.c
+        const secCell = rw.insertCell(4)
+
+        secCell.className = 'c-pt'
+
+        secCell.setAttribute('onclick', `Log.nav.toSectorDetail('${e.c}')`)
+
+        secCell.innerHTML = e.c
+
         rw.insertCell(5).innerHTML = e.d
       })
     },
@@ -475,6 +507,23 @@ var Log = {
     horizontal() {
       Log.nav.index = Log.nav.index === 5 ? 0 : Log.nav.index + 1
       Log.tab(Log.nav.menu[Log.nav.index], 'sect', 'tab')
+    },
+
+    toJournal(hex) {
+      Log.tab('jou', 'sect', 'tab')
+      Log.journal.translate(hex)
+    },
+
+    toSectorDetail(sec) {
+      Log.tab('lis', 'sect', 'tab')
+      Log.tab('sec', 'subsect', 'subtab', true)
+      Log.detail.sec(sec)
+    },
+
+    toProjectDetail(pro) {
+      Log.tab('lis', 'sect', 'tab')
+      Log.tab('pro', 'subsect', 'subtab', true)
+      Log.detail.pro(pro)
     }
   },
 
