@@ -9,17 +9,22 @@ Log.console = {
   parse(i) {
     const command = i.split(' ')[0].toLowerCase()
     switch (command) {
-      case 'start': case 'begin':
+      case 'start':
+      case 'begin':
         Log.console.startLog(i);
         break;
-      case 'pomodoro': case 'tomato':
+      case 'pomodoro':
+      case 'tomato':
         Log.console.startTomatoLog(i);
         break;
-      case 'stop': case 'end': case 'pause':
+      case 'stop':
+      case 'end':
+      case 'pause':
         Log.console.endLog();
         Log.stopTimer ? Log.stopTimer() : 'noop'
         break;
-      case 'resume': case 'continue':
+      case 'resume':
+      case 'continue':
         Log.console.resume();
         break;
       case 'edit':
@@ -43,6 +48,9 @@ Log.console = {
       case 'invert':
         Log.console.invert();
         break;
+      case 'quit': case 'exit':
+        app.quit();
+        break;
       default:
         return
     }
@@ -52,7 +60,9 @@ Log.console = {
    * Import user data
    */
   importUser() {
-    const path = dialog.showOpenDialog({properties: ['openFile']})
+    const path = dialog.showOpenDialog({
+      properties: ['openFile']
+    })
 
     if (!path) return
 
@@ -104,7 +114,7 @@ Log.console = {
    * @param {Object[]} s - Input array
    */
   startTomatoLog(s) {
-    const currentTimer = timer()()( (state, phaseChanged) => {
+    const currentTimer = timer()()((state, phaseChanged) => {
       if (phaseChanged) {
         state.phase === 'break' || state.phase === 'longBreak' ? Log.console.endLog() : Log.console.startLog(s)
         state.phase === 'break' || state.phase === 'longBreak' ? Log.playSoundEffect('timerEnd') : Log.playSoundEffect('timerStart')
@@ -244,7 +254,7 @@ Log.console = {
     // all except first word are entry indices
     const ascendingUniqueIndices = i.split(' ').slice(1).filter( /* uniq */ (v, i, self) => self.indexOf(v) === i).sort()
     // remove all indices. We start from the highest to avoid the shifting of indices after removal.
-    ascendingUniqueIndices.reverse().forEach( index => user.log.splice(Number(index) - 1, 1))
+    ascendingUniqueIndices.reverse().forEach(index => user.log.splice(Number(index) - 1, 1))
 
     Log.options.update()
   },
@@ -319,14 +329,18 @@ Log.console = {
         return
       }
 
-      user.log.map(e => {if (e.c === oldName) e.c = newName})
+      user.log.map(e => {
+        if (e.c === oldName) e.c = newName
+      })
     } else if (mode === 'project' || mode === 'pro') {
       if (isEmpty(Log.data.getEntriesByProject(oldName))) {
         notFound('project')
         return
       }
 
-      user.log.map(e => {if (e.t === oldName) e.t = newName})
+      user.log.map(e => {
+        if (e.t === oldName) e.t = newName
+      })
     } else return
 
     notif = new window.Notification(`The sector "${oldName}" has been renamed to "${newName}."`)
