@@ -6,7 +6,7 @@
   "main": "./main.js",
   "license": "MIT",
   "scripts": {
-    "start": "electron ."
+    "start": "electron . dev"
   },
   "devDependencies": {
     "electron": "^1.8.1",
