@@ -260,9 +260,20 @@ Log.console = {
     if (isUndefined(Log.log)) return
     if (isEmpty(Log.log)) return
     // all except first word are entry indices
-    const ascendingUniqueIndices = i.split(' ').slice(1).filter( /* uniq */ (v, i, self) => self.indexOf(v) === i).sort()
-    // remove all indices. We start from the highest to avoid the shifting of indices after removal.
-    ascendingUniqueIndices.reverse().forEach(index => user.log.splice(Number(index) - 1, 1))
+	const words = i.split(' ').slice(1)
+	if (words[0] == 'project') {
+		user.log.forEach((entry, id) => {
+			if (entry.t == words[1]) user.log.splice(id, 1)
+		})
+	} else if (words[0] == 'sector') {
+		user.log.forEach((entry, id) => {
+			if (entry.c == words[1]) user.log.splice(id, 1)
+		})
+	} else {
+		const ascendingUniqueIndices = words.filter( /* uniq */ (v, i, self) => self.indexOf(v) === i).sort()
+		// remove all indices. We start from the highest to avoid the shifting of indices after removal.
+		ascendingUniqueIndices.reverse().forEach(index => user.log.splice(Number(index) - 1, 1))
+	}
 
     Log.options.update()
   },
