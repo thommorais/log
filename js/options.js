@@ -6,12 +6,10 @@ Log.options = {
    */
   update() {
     localStorage.setItem('user', JSON.stringify(user))
-
     dataStore.set('config', user.config)
     dataStore.set('palette', user.palette)
     dataStore.set('projectPalette', user.projectPalette)
     dataStore.set('log', user.log)
-
     Log.refresh()
   },
 
@@ -81,9 +79,7 @@ Log.options = {
 
     ch.map((e, i) => e === '"' && indices.push(i))
 
-    for (let i = indices[0] + 1; i < indices[1]; i++) {
-      sec += ch[i]
-    }
+    for (let i = indices[0] + 1; i < indices[1]; i++) sec += ch[i]
 
     user.projectPalette[sec] = s.substring(indices[1] + 1, s.length).trim()
     Log.options.update()

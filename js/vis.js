@@ -28,7 +28,7 @@ Log.vis = {
 
     data.map((e, i) => {
       const id = `${con}${i}`
-      document.getElementById(id) === null && addRow(id)
+      isNull(document.getElementById(id)) && addRow(id)
       !isEmpty(e) && e.map(o => addEntry(o, id))
     })
   },
@@ -68,7 +68,7 @@ Log.vis = {
 
     data.map((e, i) => {
       const id = `${con}${i}`
-      document.getElementById(id) === null && addCol(id)
+      isNull(document.getElementById(id)) && addCol(id)
       e.map(o => addEntry(o, id))
     })
   },
@@ -123,11 +123,10 @@ Log.vis = {
    * @param {string=} con - Container
    */
   peakChart(mode, peaks, con) {
-    console.log(mode, peaks, con)
-    if (peaks === undefined) return
+    if (isUndefined(peaks)) return
     if (isEmpty(peaks) || ['hours', 'days'].indexOf(mode) < 0 || !isString(con) || !exists(con)) return
 
-    const peak = Math.max(...peaks)
+    const peak = Log.data.max(peaks)
 
     peaks.map((e, i) => {
       const col = create('div')
@@ -159,6 +158,7 @@ Log.vis = {
   /**
    * List sectors or projects
    * @param {string} mode - Sector or project
+   * @param {string} val - Hours or percentages
    * @param {string} con - Container
    * @param {Object[]=} ent - Entries
    */
@@ -265,8 +265,6 @@ Log.vis = {
   focusChart(mode, ent = Log.log, con = 'focusChart') {
     if (!isValidArray(ent) || isEmpty(ent) || !isString(con) || !exists(con)) return
 
-    Log.vis.gridLines(con)
-
     const set = Log.data.sortEntries(ent)
 
     set.map(e => {
@@ -296,15 +294,15 @@ Log.vis = {
     const div25 = create ('div')
     const div0 = create('div')
 
-    div100.className = 'psa wf c-3 bt o2'
+    div100.className = 'psa wf bt o1'
     div100.style.top = '0'
-    div75.className = 'psa wf c-3 bt o2'
+    div75.className = 'psa wf bt o1'
     div75.style.top = '25%'
-    div50.className = 'psa wf c-3 bt o2'
+    div50.className = 'psa wf bt o1'
     div50.style.bottom = '50%'
-    div25.className = 'psa wf c-3 bt o2'
+    div25.className = 'psa wf bt o1'
     div25.style.bottom = '25%'
-    div0.className = 'psa wf c-3 bt o2 b0'
+    div0.className = 'psa wf bt o1 b0'
 
     append(con, div100)
     append(con, div75)
@@ -322,10 +320,7 @@ Log.vis = {
 
     ctx.clearRect(0, 0, canvas.width, canvas.height)
 
-    // console.log(data)
-
-    for(let i = 0, l = data.length; i < l; i++) {
-      // console.log(data[i].col)
+    for (let i = 0, l = data.length; i < l; i++) {
       ctx.fillStyle = data[i].col
       ctx.beginPath()
       ctx.moveTo(halfWidth, halfHeight)

@@ -5,8 +5,6 @@ function test(n, t, e) {
 
 let a = [1, 2, 3, 4, 5]
 
-console.info('If you see red, you dead')
-
 test('Min value [num]', Log.data.min(a), 1)
 test('Max value [num]', Log.data.max(a), 5)
 test('Avg value [num]', Log.data.avg(a), 3)
