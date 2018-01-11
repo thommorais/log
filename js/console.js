@@ -48,9 +48,9 @@ Log.console = {
       case 'invert':
         Log.console.invert();
         break;
-      case 'quit': case 'exit':
-        app.quit();
-        break;
+	  case 'quit': case 'exit':
+	  	app.quit();
+	  	break;
       default:
         return
     }

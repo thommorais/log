@@ -2,7 +2,7 @@ const {app, BrowserWindow, webFrame} = require('electron')
 const path = require('path')
 const url = require('url')
 
-require('electron-reload')(__dirname)
+if (process.argv[2] && process.argv[2] == "dev") require('electron-reload')(__dirname)
 
 var win
 
