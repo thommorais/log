@@ -540,8 +540,9 @@ var Log = {
     let cmdIndex = 0
 
     cmd.addEventListener('submit', function() {
+	  cmdIndex = 0
       if (con.value !== '') {
-        if (cmdIndex != 1) Log.console.history.push(con.value)
+        if (con.value != Log.console.history[Log.console.history.length - 1]) Log.console.history.push(con.value)
 
         if (Log.console.history.length >= 100) Log.console.history.shift()
 
@@ -552,7 +553,6 @@ var Log = {
 
       con.value = ''
       cmd.style.display = 'none'
-      cmdIndex = 0
     })
 
     if (!Log.keyEventInitialized) {
