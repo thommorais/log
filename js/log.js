@@ -660,7 +660,7 @@ var Log = {
       write('LSX', `${Log.data.max(dur).toFixed(2)} h`)
       write('ASDT', `${Log.data.avg(dur).toFixed(2)} h`)
       write('LPT', `${Log.data.lp(en).toFixed(2)}%`)
-      write('FOC', Log.data.projectFocus(Log.data.listProjects(en)))
+      write('FOC', Log.data.projectFocus(Log.data.listProjects(en)).toFixed(2))
       write('ENC', en.length)
       write('STK', Log.data.streak())
 
