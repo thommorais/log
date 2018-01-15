@@ -3,7 +3,7 @@
  * A log and time-tracking system
  *
  * @author Josh Avanier
- * @version 1.0.2
+ * @version 1.0.4
  * @license MIT
  */
 
