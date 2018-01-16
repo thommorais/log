@@ -8,10 +8,10 @@ window.addEventListener('drop', function(e) {
   e.preventDefault()
   e.stopPropagation()
 
-  let files = e.dataTransfer.files
+  const files = e.dataTransfer.files
 
   for (let file_id in files) {
-    let file = files[file_id]
+    const file = files[file_id]
 
     if (file.name.indexOf('.json') === -1) {
       console.log('skipped', file)
@@ -22,7 +22,7 @@ window.addEventListener('drop', function(e) {
     let reader = new FileReader()
 
     reader.onload = (e) => {
-      let o = JSON.parse(e.target.result)
+      const o = JSON.parse(e.target.result)
 
       user.config.ui.bg = o.config.ui.bg || '#f8f8f8'
       user.config.ui.colour = o.config.ui.colour || '#202020'

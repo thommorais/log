@@ -78,9 +78,9 @@ var Log = {
 
   /**
    * Display a log table
-   * @param {Object[]=} ent - Entries
-   * @param {number=} num - Number of entries to show
-   * @param {string=} con - Container
+   * @param {Object[]} [ent=user.log] - Entries
+   * @param {number} [num=50] - Number of entries to show
+   * @param {string} [con='logbook'] - Container
    */
   display(ent = user.log, num = 50, con = 'logbook') {
     if (!isValidArray(ent) || isEmpty(ent) || !isNumber(num) || !isString(con) || !exists(con)) return
@@ -117,7 +117,6 @@ var Log = {
       proCell.className = 'c-pt'
 
       secCell.setAttribute('onclick', `Log.nav.toSectorDetail('${e.c}')`)
-
       proCell.setAttribute('onclick', `Log.nav.toProjectDetail('${e.t}')`)
 
       secCell.innerHTML = e.c
@@ -311,7 +310,7 @@ var Log = {
 
     /**
      * Display entries from a date
-     * @param {Object=} hex - Hex code
+     * @param {Object} [hex=new Date()] - Hex code
      */
     display(date = new Date()) {
       if (!isObject(date)) return
@@ -332,7 +331,7 @@ var Log = {
       write('jLSN', `${Log.data.min(durations).toFixed(2)} h`)
       write('jLSX', `${Log.data.max(durations).toFixed(2)} h`)
       write('jASDT', `${Log.data.avg(durations).toFixed(2)} h`)
-      write('jLPT', Log.data.lp(entries).toFixed(2))
+      write('jLPT', `${Log.data.lp(entries).toFixed(2)}%`)
       write('jfocusToday', Log.data.projectFocus(Log.data.listProjects(entries)).toFixed(2))
 
       const l = entries.length
@@ -412,7 +411,7 @@ var Log = {
     /**
      * Take the last n items of an array (from lodash)
      * @param {Object[]} a - Array
-     * @param {number=} n - Number of items
+     * @param {number} [n=1] - Number of items
      * @returns {Object[]} An array with the last n items
      */
     takeRight(a, n = 1) {
@@ -669,7 +668,9 @@ var Log = {
       const startTime = Log.time.stamp(date)
       const endTime = Log.time.stamp(Log.time.convert(Log.time.parse(now.e)))
 
-      now.e === 'undefined' ? write('lastTime', `${startTime}&ndash;`) : write('lastTime', `${startTime}&ndash;${endTime}`)
+      now.e === 'undefined' ?
+      write('lastTime', `${startTime}&ndash;`) :
+      write('lastTime', `${startTime}&ndash;${endTime}`)
 
       write('lastID', user.log.length)
       write('lastSector', now.c)

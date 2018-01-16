@@ -56,12 +56,10 @@ Log.vis = {
     const addCol = id => {
       const col = create('div')
       const inn = create('div')
-
       col.className = 'dib hf psr'
       col.style.width = `${100 / Log.config.ui.view}%`
       inn.className = 'sw1 hf cn bb'
       inn.id = id
-
       col.appendChild(inn)
       append(con, col)
     }
@@ -98,7 +96,6 @@ Log.vis = {
         const dp = Log.utils.calcDP(es)
         const wd = Log.utils.calcWidth(Log.time.parse(e.e), es)
         const mg = Log.utils.calcMargin(dp, lw, lp)
-
         const col = mode === 'sector' ? e.sCol :
         mode === 'project' ? e.pCol :
         mode === 'none' && Log.config.ui.colour

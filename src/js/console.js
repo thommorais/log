@@ -118,7 +118,7 @@ Log.console = {
       if (phaseChanged) {
         state.phase === 'break' || state.phase === 'longBreak' ? Log.console.endLog() : Log.console.startLog(s)
         state.phase === 'break' || state.phase === 'longBreak' ? Log.playSoundEffect('timerEnd') : Log.playSoundEffect('timerStart')
-        let notif = new window.Notification(`Started ${state.phase}`)
+        const notif = new window.Notification(`Started ${state.phase}`)
       }
     })
     Log.stopTimer = () => currentTimer.stop()
@@ -171,7 +171,7 @@ Log.console = {
       d: desc
     })
 
-    let notif = new window.Notification(`Log started: ${sect} - ${proj} - ${desc}`)
+    const notif = new window.Notification(`Log started: ${sect} - ${proj} - ${desc}`)
 
     Log.options.update()
   },
@@ -188,7 +188,7 @@ Log.console = {
     last.e = Log.time.toHex(new Date())
     clearInterval(timer)
 
-    let notif = new window.Notification(`Log ended: ${last.c} - ${last.t} - ${last.d}`)
+    const notif = new window.Notification(`Log ended: ${last.c} - ${last.t} - ${last.d}`)
 
     Log.options.update()
   },
@@ -212,7 +212,7 @@ Log.console = {
       d: last.d
     })
 
-    let notif = new window.Notification(`Log resumed: ${last.c} - ${last.t} - ${last.d}`)
+    const notif = new window.Notification(`Log resumed: ${last.c} - ${last.t} - ${last.d}`)
 
     Log.options.update()
   },
@@ -260,22 +260,22 @@ Log.console = {
     if (isUndefined(Log.log)) return
     if (isEmpty(Log.log)) return
     // all except first word are entry indices
-	const words = i.split(' ').slice(1)
-	if (words[0] == 'project') {
-		user.log.forEach((entry, id) => {
-			if (entry.t == words[1]) user.log.splice(id, 1)
-		})
-	} else if (words[0] == 'sector') {
-		user.log.forEach((entry, id) => {
-			if (entry.c == words[1]) user.log.splice(id, 1)
-		})
-	} else {
-		const ascendingUniqueIndices = words.filter( /* uniq */ (v, i, self) => self.indexOf(v) === i).sort()
-		// remove all indices. We start from the highest to avoid the shifting of indices after removal.
-		ascendingUniqueIndices.reverse().forEach(index => user.log.splice(Number(index) - 1, 1))
-	}
+  	const words = i.split(' ').slice(1)
+  	if (words[0] == 'project') {
+  		user.log.forEach((entry, id) => {
+  			if (entry.t == words[1]) user.log.splice(id, 1)
+  		})
+  	} else if (words[0] == 'sector') {
+  		user.log.forEach((entry, id) => {
+  			if (entry.c == words[1]) user.log.splice(id, 1)
+  		})
+  	} else {
+  		const ascendingUniqueIndices = words.filter( /* uniq */ (v, i, self) => self.indexOf(v) === i).sort()
+  		// remove all indices. We start from the highest to avoid the shifting of indices after removal.
+  		ascendingUniqueIndices.reverse().forEach(index => user.log.splice(Number(index) - 1, 1))
+  	}
 
-    Log.options.update()
+      Log.options.update()
   },
 
   /**
@@ -351,24 +351,20 @@ Log.console = {
     for (let i = indices[0] + 1; i < indices[1]; i++) oldName += p[i]
     for (let i = indices[2] + 1; i < indices[3]; i++) newName += p[i]
 
-    if (mode === 'sector' || mode === 'sec') {
+    if (contains(mode, 'sector sec')) {
       if (isEmpty(Log.data.getEntriesBySector(oldName))) {
         notFound('sector')
         return
       }
 
-      user.log.map(e => {
-        if (e.c === oldName) e.c = newName
-      })
-    } else if (mode === 'project' || mode === 'pro') {
+      user.log.map(e => {if (e.c === oldName) e.c = newName})
+    } else if (contains(mode, 'project pro')) {
       if (isEmpty(Log.data.getEntriesByProject(oldName))) {
         notFound('project')
         return
       }
 
-      user.log.map(e => {
-        if (e.t === oldName) e.t = newName
-      })
+      user.log.map(e => {if (e.t === oldName) e.t = newName})
     } else return
 
     notif = new window.Notification(`The sector "${oldName}" has been renamed to "${newName}."`)

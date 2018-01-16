@@ -11,10 +11,10 @@
   "devDependencies": {
     "electron": "^1.8.1",
     "electron-prebuilt": "^1.4.13",
-    "electron-reload": "^1.2.2"
+    "electron-reload": "^1.2.2",
+    "electron-packager": "^8.4.0"
   },
   "dependencies": {
-    "electron-packager": "^8.4.0",
     "headless-work-timer": "0.0.3",
     "aequirys": "1.0.2"
   }
