@@ -6,7 +6,10 @@
   "main": "./main.js",
   "license": "MIT",
   "scripts": {
-    "start": "electron . dev"
+    "start": "electron . dev",
+    "build_osx": "electron-packager . Log --platform=darwin --arch=x64 --out ~/Desktop/ --overwrite; echo 'Built for macOS'",
+    "build_linux": "electron-packager . Log --platform=linux  --arch=x64 --out ~/Desktop/ --overwrite; echo 'Built for Linux'",
+    "build_win": "electron-packager . Log --platform=win32  --arch=x64 --out ~/Desktop/ --overwrite; echo 'Built for Windows'"
   },
   "devDependencies": {
     "electron": "^1.8.1",
