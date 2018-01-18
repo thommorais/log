@@ -8,6 +8,7 @@ Log.console = {
    */
   parse(i) {
     const command = i.split(' ')[0].toLowerCase()
+    let params = []
 
     switch (command) {
       case 'start':
@@ -28,8 +29,10 @@ Log.console = {
       case 'continue':
         Log.console.resume();
         break;
+
       case 'edit':
-        Log.console.edit(i);
+        params = Log.console.getParams(i)
+        Log.console.edit(params[1], params[2], params[3]);
         break;
       case 'delete':
         Log.console.delete(i);
@@ -44,7 +47,8 @@ Log.console = {
         Log.console.exportUser();
         break;
       case 'rename':
-        Log.console.rename(i);
+        params = Log.console.getParams(i)
+        Log.console.rename(params[1], params[2], params[3]);
         break;
       case 'invert':
         Log.console.invert();
@@ -56,6 +60,37 @@ Log.console = {
       default:
         return
     }
+  },
+
+  /**
+   * Get quoted parameters from string
+   * @param {string} s - String
+   * @return {Object[]} Parameters
+   */
+  getParams(s) {
+    if (!isString(s)) return
+    if (!s.includes('"')) return
+
+    const quote = s.indexOf('"') - 1
+    const part = s.slice(0, quote).split(' ')
+    const p = s.split('')
+    let params = []
+    let ind = []
+    let param = ''
+
+    part.map(e => !e.includes('"') && params.push(e))
+    p.map((e, i) => e === '"' && ind.push(i))
+
+    for (let i = 0, l = ind.length; i < l; i++) {
+      param = ''
+      for (let o = ind[i] + 1; o < ind[i + 1]; o++) {
+        param += p[o]
+      }
+      params.push(param)
+      i++
+    }
+
+    return params
   },
 
   /**
@@ -284,38 +319,27 @@ Log.console = {
 
   /**
    * Edit a log
-   * @param {string} i - Input
+   * @param {string} id - Entry ID
+   * @param {string} attr - Entry attribute
+   * @param {string} value - Value
    */
-  edit(i) {
+  edit(id, attr, value) {
     if (isEmpty(user.log)) return
-    const c = i.split(' ')
-    const a = c[2]
-    const id = Number(c[1]) - 1
 
-    const proc = input => {
-      const p = input.split('')
-      let indices = []
-      let key = ''
+    id = Number(id) - 1
 
-      p.map((e, i) => e === '"' && indices.push(i))
-
-      for (let i = indices[0] + 1; i < indices[1]; i++) key += p[i]
-
-      return key.trim()
-    }
-
-    if (contains(a, 'sec sector'))
-      user.log[id].c = proc(i)
-    else if (contains(a, 'title pro project'))
-      user.log[id].t = proc(i)
-    else if (contains(a, 'desc dsc description'))
-      user.log[id].d = proc(i)
-    else if (contains(a, 'start'))
-      user.log[id].s = Log.time.convertDateTime(proc(i))
-    else if (contains(a, 'end'))
-      user.log[id].e = Log.time.convertDateTime(proc(i))
-    else if (contains(a, 'duration dur')) {
-      const duration = parseInt(proc(i), 10) * 60 || 0
+    if (contains(attr, 'sec sector'))
+      user.log[id].c = value
+    else if (contains(attr, 'title pro project'))
+      user.log[id].t = value
+    else if (contains(attr, 'desc dsc description'))
+      user.log[id].d = value
+    else if (contains(attr, 'start'))
+      user.log[id].s = Log.time.convertDateTime(value)
+    else if (contains(attr, 'end'))
+      user.log[id].e = Log.time.convertDateTime(value)
+    else if (contains(attr, 'duration dur')) {
+      const duration = parseInt(value, 10) * 60 || 0
       user.log[id].e = Log.time.offset(user.log[id].s, duration)
     } else return
 
@@ -324,54 +348,35 @@ Log.console = {
 
   /**
    * Rename a sector or project
-   * @param {Object[]} s - Input
+   * @param {string} mode - Sector or project
+   * @param {string} old - Old name
+   * @param {string} val - New name
    */
-  rename(s) {
-    if (!s.includes('"')) return
-
-    const mode = s.split(' ')[1]
-
+  rename(mode, old, val) {
     if (!contains(mode, 'sec sector pro project')) return
 
-    const p = s.split('')
-
-    let indices = []
-    let oldName = ''
-    let newName = ''
-    let notif
-
     const notFound = mode => {
-      const message = mode === 'sector' ? `The sector "${oldName}" does not exist in your logs.` : `The project "${oldName}" does not exist in your logs.`
+      const message = mode === 'sector' ? `The sector "${old}" does not exist in your logs.` : `The project "${old}" does not exist in your logs.`
       notify(message)
     }
 
-    p.map((e, i) => e === '"' && indices.push(i))
-
-    if (indices[0] === undefined) return
-    if (indices[1] === undefined) return
-    if (indices[2] === undefined) return
-    if (indices[3] === undefined) return
-
-    for (let i = indices[0] + 1; i < indices[1]; i++) oldName += p[i]
-    for (let i = indices[2] + 1; i < indices[3]; i++) newName += p[i]
-
     if (contains(mode, 'sector sec')) {
-      if (isEmpty(Log.data.getEntriesBySector(oldName))) {
+      if (isEmpty(Log.data.getEntriesBySector(old))) {
         notFound('sector')
         return
       }
 
-      user.log.map(e => {if (e.c === oldName) e.c = newName})
+      user.log.map(e => {if (e.c === old) e.c = val})
     } else if (contains(mode, 'project pro')) {
-      if (isEmpty(Log.data.getEntriesByProject(oldName))) {
+      if (isEmpty(Log.data.getEntriesByProject(old))) {
         notFound('project')
         return
       }
 
-      user.log.map(e => {if (e.t === oldName) e.t = newName})
+      user.log.map(e => {if (e.t === old) e.t = val})
     } else return
 
-    notify(`The sector "${oldName}" has been renamed to "${newName}."`)
+    notify(`The sector "${old}" has been renamed to "${val}."`)
 
     Log.options.update.all()
   },
