@@ -18,10 +18,10 @@ window.addEventListener('drop', function(e) {
       continue
     }
 
-    let path = file.path
-    let reader = new FileReader()
+    const path = file.path
+    const reader = new FileReader()
 
-    reader.onload = (e) => {
+    reader.onload = e => {
       const o = JSON.parse(e.target.result)
 
       user.config.ui.bg = o.config.ui.bg || '#f8f8f8'

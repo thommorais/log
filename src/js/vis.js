@@ -94,8 +94,8 @@ Log.vis = {
         const div = create('div')
         const es = Log.time.parse(e.s)
         const dp = Log.utils.calcDP(es)
-        const wd = Log.utils.calcWidth(Log.time.parse(e.e), es)
-        const mg = Log.utils.calcMargin(dp, lw, lp)
+        const wd = (Log.time.parse(e.e) - es) / 86400 * 100
+        const mg = dp - (lw + lp)
         const col = mode === 'sector' ? e.sCol :
         mode === 'project' ? e.pCol :
         mode === 'none' && Log.config.ui.colour
@@ -165,10 +165,10 @@ Log.vis = {
     const list = Log.data.sortValues(ent, mode, val)
 
     let col = ''
+    let sh = 0
     let wd = 0
 
     list.map(e => {
-      const sh = mode === 'sec' ? Log.data.sh(e[0], ent) : Log.data.ph(e[0], ent)
       const li = create('li')
       const tl = create('span')
       const st = create('span')
@@ -181,9 +181,19 @@ Log.vis = {
       br.className = 'wf sh1'
       dt.className = 'psr t0 hf lf br3'
 
-      mode === 'sec' ?
-      (col = Log.palette[e[0]], wd = Log.data.sp(e[0], ent)) :
-      (col = Log.projectPalette[e[0]], wd = Log.data.pp(e[0], ent))
+      if (mode === 'sec') {
+        col = Log.palette[e[0]]
+        sh = Log.data.sh(e[0], ent)
+        wd = Log.data.sp(e[0], ent)
+      } else {
+        col = Log.projectPalette[e[0]]
+        sh = Log.data.ph(e[0], ent)
+        wd = Log.data.pp(e[0], ent)
+      }
+
+      if (Log.config.ui.colourMode === 'none') {
+        col = Log.config.ui.colour
+      }
 
       dt.style.backgroundColor = col || Log.config.ui.colour
       dt.style.width = `${wd}%`
@@ -208,9 +218,7 @@ Log.vis = {
   focusBar(mode, ent = Log.log, con = 'focusBar') {
     if (!isValidArray(ent) || isEmpty(ent) || !isString(con) || !exists(con)) return
 
-    const sorted = Log.data.sortValues(ent, mode)
-
-    sorted.map(e => {
+    Log.data.sortValues(ent, mode).map(e => {
       const itm = create('div')
       const col = mode === 'sec' ? Log.palette[e[0]] : Log.projectPalette[e[0]]
 
@@ -231,9 +239,7 @@ Log.vis = {
   legend(mode, ent = Log.log, con = 'legend') {
     if (!isValidArray(ent) || isEmpty(ent) || !isString(con) || !exists(con) || ['sec', 'pro'].indexOf(mode) < 0) return
 
-    const sorted = Log.data.sortValues(ent, mode)
-
-    sorted.map(e => {
+    Log.data.sortValues(ent, mode).map(e => {
       const item = create('li')
       const code = create('div')
       const name = create('div')
@@ -263,6 +269,7 @@ Log.vis = {
     if (!isValidArray(ent) || isEmpty(ent) || !isString(con) || !exists(con)) return
 
     const set = Log.data.sortEntries(ent)
+    const setLength = set.length
 
     set.map(e => {
       const list = mode === 'sec' ? Log.data.listSectors(e) : Log.data.listProjects(e)
@@ -272,7 +279,7 @@ Log.vis = {
       const cor = create('div')
 
       col.className = 'dib hf psr'
-      col.style.width = `${100 / set.length}%`
+      col.style.width = `${100 / setLength}%`
       inn.className = 'sw1 hf cn bb'
       cor.className = 'psa sw1 b0 bg-noir br3'
       cor.style.backgroundColor = Log.config.ui.colour
@@ -284,6 +291,10 @@ Log.vis = {
     })
   },
 
+  /**
+   * Create chart lines
+   * @param {string} con - Container
+   */
   gridLines(con) {
     const div100 = create('div')
     const div75 = create('div')
@@ -306,25 +317,5 @@ Log.vis = {
     append(con, div50)
     append(con, div25)
     append(con, div0)
-  },
-
-  pie(data, con) {
-    let canvas = document.getElementById(con)
-    let halfWidth = canvas.width * .5
-    let halfHeight = canvas.height * .5
-    let ctx = canvas.getContext('2d')
-    let lastend = 0
-
-    ctx.clearRect(0, 0, canvas.width, canvas.height)
-
-    for (let i = 0, l = data.length; i < l; i++) {
-      ctx.fillStyle = data[i].col
-      ctx.beginPath()
-      ctx.moveTo(halfWidth, halfHeight)
-      ctx.arc(halfWidth, halfHeight, halfHeight, lastend, lastend + (data[i].arc), false)
-      ctx.lineTo(halfWidth, halfHeight)
-      ctx.fill()
-      lastend += data[i].arc
-    }
   }
 }

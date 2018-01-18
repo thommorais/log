@@ -15,3 +15,35 @@ const exists = e => document.getElementById(e) !== null
 const hide = e => document.getElementById(e).style.display = 'none'
 const show = e => document.getElementById(e).style.display = 'block'
 const isNull = e => e === null
+
+const notify = m => {
+  new window.Notification(m)
+}
+
+/**
+ * Take the last n items of an array (from lodash)
+ * @param {Object[]} a - Array
+ * @param {number} [n=1] - Number of items
+ * @returns {Object[]} An array with the last n items
+ */
+const takeRight = (a, n = 1) => {
+  const l = a == null ? 0 : a.length
+  let slice = (a, s, e) => {
+    let l = a == null ? 0 : a.length
+    if (!l) return []
+    s = s == null ? 0 : s
+    e = e === undefined ? l : e
+    if (s < 0) s = -s > l ? 0 : (l + s)
+    e = e > l ? l : e
+    if (e < 0) e += l
+    l = s > e ? 0 : ((e - s) >>> 0)
+    s >>>= 0
+    let i = -1
+    const r = new Array(l)
+    while (++i < l) r[i] = a[i + s]
+    return r
+  }
+  if (!l) return []
+  n = l - n
+  return slice(a, n < 0 ? 0 : n, l)
+}

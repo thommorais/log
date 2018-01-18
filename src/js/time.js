@@ -40,13 +40,30 @@ Log.time = {
     return (+new Date(m[0], Number(m[1] - 1), m[2], m[3], m[4], m[5]).getTime() / 1E3).toString(16)
   },
 
+  decimal(time) {
+    const d = new Date(time)
+    const ms = time - d.setHours(0, 0, 0, 0)
+    return parseInt(ms / 864 * 10)
+  },
+
+  toDecimal(sec) {
+    return parseInt((sec / 864) * 100)
+  },
+
   /**
    * Create a timestamp
    * @param {Object} d - Date
    * @returns {string} Timestamp
    */
   stamp(d) {
-    return Log.config.system.timeFormat === '24' ? `${`0${d.getHours()}`.substr(-2)}:${`0${d.getMinutes()}`.substr(-2)}` : Log.time.twelveHours(d)
+    if (Log.config.system.timeFormat === '24') {
+      return `${`0${d.getHours()}`.substr(-2)}:${`0${d.getMinutes()}`.substr(-2)}`
+    } else if (Log.config.system.timeFormat === '12') {
+      return Log.time.twelveHours(d)
+    } else {
+      let t = `${Log.time.decimal(d)}`
+      return `${t.substr(0,(t.length-3))}:${t.substr(-3)}`
+    }
   },
 
   /**
@@ -145,6 +162,10 @@ Log.time = {
    */
   duration(a, b) {
     return (Log.time.parse(b) - Log.time.parse(a)) / 3600
+  },
+
+  durationSeconds(a, b) {
+    return Log.time.parse(b) - Log.time.parse(a)
   },
 
   /**

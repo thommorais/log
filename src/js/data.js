@@ -109,7 +109,7 @@ Log.data = {
 
   /**
    * Get entries from the last n days
-   * @param {number} n - The number of days
+   * @param {number} n - Number of days
    * @returns {Object[]} Entries
    */
   getRecentEntries(n) {
@@ -123,7 +123,8 @@ Log.data = {
    * @returns {Object[]} Entries
    */
   getEntriesByDay(d, ent = Log.log) {
-    if (!isNumber(d) || !isValidArray(ent)) return
+    if (!isNumber(d) || d < 0 || d > 6 || !isValidArray(ent)) return
+    if (!isObject(ent[0])) return
 
     let entries = []
 
@@ -689,7 +690,7 @@ Log.data = {
     let lw = 0
 
     const addEntry = ({s, e, sCol, pCol, dur}, i) => {
-      const wh = Log.utils.calcWidth(Log.time.parse(e), Log.time.parse(s))
+      const wh = (Log.time.parse(e) - Log.time.parse(s)) / 86400 * 100
       const col = mode === 'sector' ? sCol :
       mode === 'project' ? pCol :
       mode === 'none' && Log.config.ui.colour
@@ -734,7 +735,7 @@ Log.data = {
 
     const addEntry = ({s, e, c, t, sCol, pCol}, i) => {
       const es = Log.time.parse(s)
-      const wd = Log.utils.calcWidth(Log.time.parse(e), es)
+      const wd = (Log.time.parse(e) - es) / 86400 * 100
       const dp = Log.utils.calcDP(es)
 
       const col = mode === 'sector' ? sCol :

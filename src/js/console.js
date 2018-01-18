@@ -8,6 +8,7 @@ Log.console = {
    */
   parse(i) {
     const command = i.split(' ')[0].toLowerCase()
+
     switch (command) {
       case 'start':
       case 'begin':
@@ -48,9 +49,10 @@ Log.console = {
       case 'invert':
         Log.console.invert();
         break;
-	  case 'quit': case 'exit':
-	  	app.quit();
-	  	break;
+  	  case 'quit':
+      case 'exit':
+  	  	app.quit();
+        break;
       default:
         return
     }
@@ -72,7 +74,7 @@ Log.console = {
     try {
       string = fs.readFileSync(path[0], 'utf-8')
     } catch (e) {
-      notif = new window.Notification('An error occured while trying to load this file.')
+      notify('An error occured while trying to load this file.')
       return
     }
 
@@ -83,9 +85,9 @@ Log.console = {
     localStorage.setItem('user', string)
     user = JSON.parse(localStorage.getItem('user'))
 
-    notif = new window.Notification('Your log data was successfully imported.')
+    notify('Your log data was successfully imported.')
 
-    Log.options.update()
+    Log.options.update.all()
   },
 
   /**
@@ -100,10 +102,10 @@ Log.console = {
       fs.writeFile(fileName, data, (err) => {
         let notif
         if (err) {
-          notif = new window.Notification(`An error occured creating the file ${err.message}`)
+          notify(`An error occured creating the file ${err.message}`)
           return
         } else {
-          notif = new window.Notification('Your log data has been exported.')
+          notify('Your log data has been exported.')
         }
       })
     })
@@ -118,7 +120,7 @@ Log.console = {
       if (phaseChanged) {
         state.phase === 'break' || state.phase === 'longBreak' ? Log.console.endLog() : Log.console.startLog(s)
         state.phase === 'break' || state.phase === 'longBreak' ? Log.playSoundEffect('timerEnd') : Log.playSoundEffect('timerStart')
-        const notif = new window.Notification(`Started ${state.phase}`)
+        notify(`Started ${state.phase}`)
       }
     })
     Log.stopTimer = () => currentTimer.stop()
@@ -171,9 +173,9 @@ Log.console = {
       d: desc
     })
 
-    const notif = new window.Notification(`Log started: ${sect} - ${proj} - ${desc}`)
+    notify(`Started log: ${sect} - ${proj} - ${desc}`)
 
-    Log.options.update()
+    Log.options.update.log()
   },
 
   /**
@@ -183,14 +185,14 @@ Log.console = {
     if (isUndefined(Log.log)) return
     if (isEmpty(Log.log)) return
 
-    let last = user.log.slice(-1)[0]
+    const last = user.log.slice(-1)[0]
     if (last.e !== 'undefined') return
     last.e = Log.time.toHex(new Date())
     clearInterval(timer)
 
-    const notif = new window.Notification(`Log ended: ${last.c} - ${last.t} - ${last.d}`)
+    notify(`Ended log: ${last.c} - ${last.t} - ${last.d}`)
 
-    Log.options.update()
+    Log.options.update.log()
   },
 
   /**
@@ -212,9 +214,9 @@ Log.console = {
       d: last.d
     })
 
-    const notif = new window.Notification(`Log resumed: ${last.c} - ${last.t} - ${last.d}`)
+    notify(`Log resumed: ${last.c} - ${last.t} - ${last.d}`)
 
-    Log.options.update()
+    Log.options.update.log()
   },
 
   /**
@@ -259,15 +261,17 @@ Log.console = {
   delete(i) {
     if (isUndefined(Log.log)) return
     if (isEmpty(Log.log)) return
+
     // all except first word are entry indices
   	const words = i.split(' ').slice(1)
-  	if (words[0] == 'project') {
+
+    if (words[0] === 'project') {
   		user.log.forEach((entry, id) => {
-  			if (entry.t == words[1]) user.log.splice(id, 1)
+  			if (entry.t === words[1]) user.log.splice(id, 1)
   		})
-  	} else if (words[0] == 'sector') {
+  	} else if (words[0] === 'sector') {
   		user.log.forEach((entry, id) => {
-  			if (entry.c == words[1]) user.log.splice(id, 1)
+  			if (entry.c === words[1]) user.log.splice(id, 1)
   		})
   	} else {
   		const ascendingUniqueIndices = words.filter( /* uniq */ (v, i, self) => self.indexOf(v) === i).sort()
@@ -275,7 +279,7 @@ Log.console = {
   		ascendingUniqueIndices.reverse().forEach(index => user.log.splice(Number(index) - 1, 1))
   	}
 
-      Log.options.update()
+      Log.options.update.all()
   },
 
   /**
@@ -315,7 +319,7 @@ Log.console = {
       user.log[id].e = Log.time.offset(user.log[id].s, duration)
     } else return
 
-    Log.options.update()
+    Log.options.update.all()
   },
 
   /**
@@ -338,7 +342,7 @@ Log.console = {
 
     const notFound = mode => {
       const message = mode === 'sector' ? `The sector "${oldName}" does not exist in your logs.` : `The project "${oldName}" does not exist in your logs.`
-      notif = new window.Notification(message)
+      notify(message)
     }
 
     p.map((e, i) => e === '"' && indices.push(i))
@@ -367,9 +371,9 @@ Log.console = {
       user.log.map(e => {if (e.t === oldName) e.t = newName})
     } else return
 
-    notif = new window.Notification(`The sector "${oldName}" has been renamed to "${newName}."`)
+    notify(`The sector "${oldName}" has been renamed to "${newName}."`)
 
-    Log.options.update()
+    Log.options.update.all()
   },
 
   /**
@@ -378,10 +382,8 @@ Log.console = {
   invert() {
     const bg = user.config.ui.bg
     const c = user.config.ui.colour
-
     user.config.ui.bg = c
     user.config.ui.colour = bg
-
-    Log.options.update()
+    Log.options.update.config()
   }
 }
