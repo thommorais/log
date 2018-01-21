@@ -260,7 +260,7 @@ var Log = {
         const data = Log.data.bar(ent)
 
         Log.vis.bar(data, 'projectChart')
-        Log.vis.focusChart('sector', ent, 'pFocusChart')
+        Log.vis.focusChart('sec', ent, 'pFocusChart')
 
         write('pFavg', Log.data.avg(focus).toFixed(2))
         write('pFmin', Log.data.min(focus).toFixed(2))

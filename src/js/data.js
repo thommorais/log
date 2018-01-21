@@ -549,7 +549,7 @@ Log.data = {
       })
     } else if (mode === 'project') {
       ent.map(e => {
-        let f = Log.data.sectorFocus(Log.data.listProjects(e))
+        let f = Log.data.projectFocus(Log.data.listProjects(e))
         if (f !== 0) list.push(f)
       })
     }
