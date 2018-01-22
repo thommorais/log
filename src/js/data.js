@@ -1,11 +1,11 @@
 Date.prototype.subtractDays = function(days) {
-  let date = new Date(this.valueOf())
+  const date = new Date(this.valueOf())
   date.setDate(date.getDate() - days)
   return date
 }
 
 Date.prototype.addDays = function(days) {
-  let date = new Date(this.valueOf())
+  const date = new Date(this.valueOf())
   date.setDate(date.getDate() + days)
   return date
 }
@@ -29,8 +29,13 @@ Log.data = {
       if (Log.time.date(e.s) !== Log.time.date(e.e) && e.e !== 'undefined') {
         const a = Log.time.convert(Log.time.parse(e.s))
         const b = Log.time.convert(Log.time.parse(e.e))
-        const ne = Log.time.toHex(new Date(a.getFullYear(), a.getMonth(), a.getDate(), 23, 59, 59))
-        const ns = Log.time.toHex(new Date(b.getFullYear(), b.getMonth(), b.getDate(), 0, 0, 0))
+
+        const ne = Log.time.toHex(
+          new Date(a.getFullYear(), a.getMonth(), a.getDate(), 23, 59, 59)
+        )
+        const ns = Log.time.toHex(
+          new Date(b.getFullYear(), b.getMonth(), b.getDate(), 0, 0, 0)
+        )
 
         p.push({
           id: i + 1, s: e.s, e: ne, c: e.c, t: e.t, d: e.d,
@@ -99,10 +104,7 @@ Log.data = {
       return dates
     })(ps, pe)
 
-    span.map(i => {
-      let a = Log.data.getEntriesByDate(i)
-      a.map(e => ent.push(e))
-    })
+    span.map(i => Log.data.getEntriesByDate(i).map(e => ent.push(e)))
 
     return ent
   },
@@ -144,16 +146,11 @@ Log.data = {
    * @returns {Object[]} Entries
    */
   getEntriesByProject(pro, ent = Log.log) {
-    if (!isString(pro) || isEmpty(pro) || !isValidArray(ent) || !hasEntries(ent)) return
+    if (!isString(pro) || isEmpty(pro) ||
+    !isValidArray(ent) || !hasEntries(ent)) return
 
     let entries = []
-
-    ent.map(e => {
-      if (e.e !== 'undefined' && e.t === pro) {
-        entries.push(e)
-      }
-    })
-
+    ent.map(e => e.e !== 'undefined' && e.t === pro && entries.push(e))
     return entries
   },
 
@@ -164,14 +161,11 @@ Log.data = {
    * @returns {Object[]} Entries
    */
   getEntriesBySector(sec, ent = Log.log) {
-    if (!isString(sec) || isEmpty(sec) || !isValidArray(ent) || !hasEntries(ent)) return
+    if (!isString(sec) || isEmpty(sec) ||
+    !isValidArray(ent) || !hasEntries(ent)) return
 
     let entries = []
-
-    ent.map(e => {
-      if (e.e !== 'undefined' && e.c === sec) entries.push(e)
-    })
-
+    ent.map(e => e.e !== 'undefined' && e.c === sec && entries.push(e))
     return entries
   },
 
@@ -196,13 +190,12 @@ Log.data = {
           new Date(e.getFullYear(), e.getMonth(), e.getDate(), 0, 0, 0)
         ))
       )
-
       slots.push([])
     })
 
     ent.map(e => {
       const index = list.indexOf(Log.time.date(e.s))
-      if (index > -1) slots[index].push(e)
+      index > -1 && slots[index].push(e)
     })
 
     return slots
@@ -215,11 +208,7 @@ Log.data = {
   sortEntriesByDay(ent = Log.log) {
     if (!isValidArray(ent) || !hasEntries(ent)) return
     let sort = []
-
-    for (let i = 0; i < 7; i++) {
-      sort.push(Log.data.getEntriesByDay(i, ent))
-    }
-
+    for (let i = 0; i < 7; i++) sort.push(Log.data.getEntriesByDay(i, ent))
     return sort
   },
 
@@ -237,14 +226,12 @@ Log.data = {
     let temp = []
 
     list.map(e => {
-      if (hp === 'hours') {
-        temp[e] = mode === 'sec' ? Log.data.sh(e, ent) : Log.data.ph(e, ent)
-      } else {
-        temp[e] = mode === 'sec' ? Log.data.sp(e, ent) : Log.data.pp(e, ent)
-      }
+      temp[e] = hp === 'hours' ?
+      (mode === 'sec' ? Log.data.sh(e, ent) : Log.data.ph(e, ent)) :
+      (mode === 'sec' ? Log.data.sp(e, ent) : Log.data.pp(e, ent))
     })
 
-    let sorted = Object.keys(temp).sort(function(a,b){return temp[a]-temp[b]})
+    let sorted = Object.keys(temp).sort((a, b) => temp[a] - temp[b])
     sorted = sorted.reverse()
 
     let sor = []
@@ -252,11 +239,9 @@ Log.data = {
     for (let key in sorted) {
       let perc = 0
 
-      if (hp === 'hours') {
-        perc = mode === 'sec' ? Log.data.sh(sorted[key], ent) : Log.data.ph(sorted[key], ent)
-      } else {
-        perc = mode === 'sec' ? Log.data.sp(sorted[key], ent) : Log.data.pp(sorted[key], ent)
-      }
+      perc = hp === 'hours' ?
+      (mode === 'sec' ? Log.data.sh(sorted[key], ent) : Log.data.ph(sorted[key], ent)) :
+      (mode === 'sec' ? Log.data.sp(sorted[key], ent) : Log.data.pp(sorted[key], ent))
 
       sor.push([sorted[key], perc])
     }
@@ -272,15 +257,9 @@ Log.data = {
   listProjects(ent = Log.log) {
     if (!isValidArray(ent)) return
 
-    let list = []
-
-    ent.map(e => {
-      if (e.e !== 'undefined' && list.indexOf(e.t) === -1) {
-        list.push(e.t)
-      }
-    })
-
-    return list
+    let l = []
+    ent.map(e => e.e !== 'undefined' && l.indexOf(e.t) === -1 && l.push(e.t))
+    return l
   },
 
   /**
@@ -291,15 +270,9 @@ Log.data = {
   listSectors(ent = Log.log) {
     if (!isValidArray(ent)) return
 
-    let list = []
-
-    ent.map(e => {
-      if (e.e !== 'undefined' && list.indexOf(e.c) === -1) {
-        list.push(e.c)
-      }
-    })
-
-    return list
+    let l = []
+    ent.map(e => e.e !== 'undefined' && l.indexOf(e.c) === -1 && l.push(e.c))
+    return l
   },
 
   /**
@@ -366,11 +339,11 @@ Log.data = {
 
   /**
    * Get peak hour
-   * @param {Object[]=} pk - Peak hours
+   * @param {Object[]=} h - Peak hours
    * @returns {string} Peak hour
    */
-  peakHour(pk = Log.cache.peakHours) {
-    return !isNumArray(pk) || isEmpty(pk) ? '-' : `${pk.indexOf(Math.max(...pk))}:00`
+  peakHour(h = Log.cache.peakHours) {
+    return !isNumArray(h) || isEmpty(h) ? '-' : `${h.indexOf(Math.max(...h))}:00`
   },
 
   /**
@@ -380,13 +353,8 @@ Log.data = {
    */
   listDurations(ent = Log.log) {
     if (!isValidArray(ent)) return
-
     let list = []
-
-    ent.map(e => {
-      if (e.e !== 'undefined') list.push(e.dur)
-    })
-
+    ent.map(e => e.e !== 'undefined' && list.push(e.dur))
     return list
   },
 
@@ -416,23 +384,21 @@ Log.data = {
    * @returns {number} Average
    */
   avg(v) {
-    if (!isNumArray(v) || v === undefined) return '-'
-    return isEmpty(v) ? 0 : v.reduce((sum, num) => sum + num, 0) / v.length
+    if (!isNumArray(v) || isUndefined(v)) return '-'
+    return isEmpty(v) ? 0 : Log.data.total(v) / v.length
   },
 
   total(v) {
-    return isEmpty(v) || v === undefined ? 0 : v.reduce((total, num) => total + num, 0)
+    return isEmpty(v) || isUndefined(v) ? 0 : v.reduce((t, n) => t + n, 0)
   },
 
   /**
    * Calculate the total number of logged hours
-   * @param {Object[]=} ent - Entries
+   * @param {Object[]=} e - Entries
    * @returns {number} Total logged hours
    */
-  lh(ent = Log.log) {
-    return isEmpty(ent) ? 0 : Log.data.listDurations(ent).reduce(
-      (total, num) => total + num, 0
-    )
+  lh(e = Log.log) {
+    return isEmpty(e) ? 0 : Log.data.total(Log.data.listDurations(e))
   },
 
   /**
@@ -521,13 +487,8 @@ Log.data = {
    */
   streak(ent = Log.cache.sortEntries) {
     if (isEmpty(ent)) return 0
-
     let streak = 0
-
-    ent.map(e => {
-      streak = e.length === 0 ? 0 : streak + 1
-    })
-
+    ent.map(e => {streak = e.length === 0 ? 0 : streak + 1})
     return streak
   },
 
@@ -545,12 +506,12 @@ Log.data = {
     if (mode === 'sector') {
       ent.map(e => {
         let f = Log.data.sectorFocus(Log.data.listSectors(e))
-        if (f !== 0) list.push(f)
+        f !== 0 && list.push(f)
       })
     } else if (mode === 'project') {
       ent.map(e => {
         let f = Log.data.projectFocus(Log.data.listProjects(e))
-        if (f !== 0) list.push(f)
+        f !== 0 && list.push(f)
       })
     }
 
@@ -704,19 +665,17 @@ Log.data = {
       lw += wh
     }
 
-    const sort = Log.data.sortEntries(ent)
-
-    for (let i = 0, l = sort.length; i < l; i++) {
-      if (isEmpty(sort[i])) data.push([])
-      else {
-        data.push([])
-        for (let o = 0, l = sort[i].length; o < l; o++) {
-          if (sort[i][o].e === 'undefined') continue
-          o === 0 && (lw = 0)
-          addEntry(sort[i][o], i)
-        }
+    Log.data.sortEntries(ent).map((e, i) => {
+      data.push([])
+      if (!isEmpty(e)) {
+        e.map((o, m) => {
+          if (o.e !== 'undefined') {
+            m === 0 && (lw = 0)
+            addEntry(e[m], i)
+          }
+        })
       }
-    }
+    })
 
     return data
   },
@@ -737,50 +696,28 @@ Log.data = {
       const es = Log.time.parse(s)
       const wd = (Log.time.parse(e) - es) / 86400 * 100
       const dp = Log.utils.calcDP(es)
-
       const col = mode === 'sector' ? sCol :
-      mode === 'project' ? pCol :
-      mode === 'none' && Log.config.ui.colour
+                  mode === 'project' ? pCol :
+                  mode === 'none' && Log.config.ui.colour
 
-      data[i].push({
-        wd,
-        mg: dp - lp,
-        col,
-      })
+      data[i].push({wd, mg: dp - lp, col})
 
       lp = wd + dp
     }
 
     const sort = Log.data.sortEntries(ent)
 
-    for (let i = 0, l = sort.length; i < l; i++) {
+    Log.data.sortEntries(ent).map((e, i) => {
       data.push([])
-      if (!isEmpty(sort[i])) {
-        for (let o = 0, l = sort[i].length; o < l; o++) {
-          if (sort[i][o].e === 'undefined') continue
-          o === 0 && (lp = 0)
-          addEntry(sort[i][o], i)
-        }
+      if (!isEmpty(e)) {
+        e.map((o, m) => {
+          if (o.e !== 'undefined') {
+            m === 0 && (lp = 0)
+            addEntry(e[m], i)
+          }
+        })
       }
-    }
-
-    return data
-  },
-
-  pie(ent = Log.log, mode = Log.config.ui.colourMode) {
-    if (!isValidArray(ent) || isEmpty(ent)) return
-
-    const sort = Log.data.sortValues(ent, mode)
-    let data = []
-
-    const addEntry = (arr) => {
-
-    }
-
-    for (let i = 0, l = sort.length; i < l; i++) {
-      addEntry(sort[i])
-
-    }
+    })
 
     return data
   }

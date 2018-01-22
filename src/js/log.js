@@ -8,6 +8,9 @@
 
 'use strict';
 
+const cmd = document.getElementById('cmd')
+const con = document.getElementById('console')
+
 var Log = {
 
   path: '',
@@ -66,16 +69,16 @@ var Log = {
       ).getTime()
 
       Log.clock = setInterval(() => {
-        let s = Math.floor((new Date().getTime() - l) / 1E3)
-        let m = Math.floor(s / 60)
-        let h = Math.floor(m / 60)
+        let s = ~~((new Date().getTime() - l) / 1E3)
+        let m = ~~(s / 60)
+        let h = ~~(m / 60)
 
         h %= 24
         m %= 60
         s %= 60
 
         if (Log.config.system.timeFormat === 'decimal') {
-          write('timer', Log.time.toDecimal(Math.floor((new Date().getTime() - l) / 1E3)))
+          write('timer', Log.time.toDecimal(~~((new Date().getTime() - l) / 1E3)))
         } else {
           write('timer', `${`0${h}`.substr(-2)}:${`0${m}`.substr(-2)}:${`0${s}`.substr(-2)}`)
         }
@@ -94,19 +97,20 @@ var Log = {
 
   /**
    * Display a log table
-   * @param {Object[]} [ent=user.log] - Entries
-   * @param {number} [num=50] - Number of entries to show
-   * @param {string} [con='logbook'] - Container
+   * @param {Object[]=} ent - Entries
+   * @param {number=} num - Number of entries to show
+   * @param {string=} con - Container
    */
   display(ent = user.log, num = 50, con = 'logbook') {
-    if (!isValidArray(ent) || isEmpty(ent) || !isNumber(num) || !isString(con) || !exists(con)) return
+    if (!isValidArray(ent) || isEmpty(ent) || !isNumber(num) ||
+    !isString(con) || !exists(con)) return
 
     takeRight(ent, num).reverse().map((e, i) => {
       const rw = document.getElementById(con).insertRow(i)
       const date = Log.time.convert(Log.time.parse(e.s))
       const ic = rw.insertCell(0)
       const dc = rw.insertCell(1)
-      const start = Log.time.stamp(date)
+      const st = Log.time.stamp(date)
 
       ic.className = 'pl0'
       ic.innerHTML = e.id
@@ -116,18 +120,16 @@ var Log = {
       dc.setAttribute('onclick', `Log.nav.toJournal('${e.s}')`)
 
       if (e.e === 'undefined') {
-        rw.insertCell(2).innerHTML = `${start}`
+        rw.insertCell(2).innerHTML = `${st}`
         rw.insertCell(3).innerHTML = '&ndash;'
       } else {
-        rw.insertCell(2).innerHTML = `${start}&ndash;${Log.time.stamp(Log.time.convert(Log.time.parse(e.e)))}`
-
+        rw.insertCell(2).innerHTML = `${st}&ndash;${Log.time.stamp(Log.time.convert(Log.time.parse(e.e)))}`
 
         if (Log.config.system.timeFormat === 'decimal') {
           rw.insertCell(3).innerHTML = Log.time.toDecimal(Log.time.durationSeconds(e.s, e.e))
         } else {
           rw.insertCell(3).innerHTML = Log.time.duration(e.s, e.e).toFixed(2)
         }
-
       }
 
       const sc = rw.insertCell(4)
@@ -200,8 +202,7 @@ var Log = {
       takeRight(Log.data.getEntriesBySector(sec), 100).reverse().map((e, i) => {
         const rw = document.getElementById(con).insertRow(i)
         const date = Log.time.convert(Log.time.parse(e.s))
-        const startTime = Log.time.stamp(date)
-        const endTime = Log.time.stamp(Log.time.convert(Log.time.parse(e.e)))
+        const start = Log.time.stamp(date)
 
         const idCell = rw.insertCell(0)
         idCell.className = 'pl0'
@@ -209,10 +210,10 @@ var Log = {
         rw.insertCell(1).innerHTML = Log.time.displayDate(date)
 
         if (e.e === 'undefined') {
-          rw.insertCell(2).innerHTML = startTime
+          rw.insertCell(2).innerHTML = start
           rw.insertCell(3).innerHTML = '&ndash;'
         } else {
-          rw.insertCell(2).innerHTML = `${startTime}&ndash;${endTime}`
+          rw.insertCell(2).innerHTML = `${start}&ndash;${Log.time.stamp(Log.time.convert(Log.time.parse(e.e)))}`
           rw.insertCell(3).innerHTML = Log.time.duration(e.s, e.e).toFixed(2)
         }
 
@@ -275,9 +276,7 @@ var Log = {
       takeRight(Log.data.getEntriesByProject(pro), 100).reverse().map((e, i) => {
         const rw = document.getElementById(con).insertRow(i)
         const date = Log.time.convert(Log.time.parse(e.s))
-
-        const startTime = Log.time.stamp(date)
-        const endTime = Log.time.stamp(Log.time.convert(Log.time.parse(e.e)))
+        const start = Log.time.stamp(date)
 
         const idCell = rw.insertCell(0)
         idCell.className = 'pl0'
@@ -285,15 +284,14 @@ var Log = {
         rw.insertCell(1).innerHTML = Log.time.displayDate(date)
 
         if (e.e === 'undefined') {
-          rw.insertCell(2).innerHTML = `${startTime}`
+          rw.insertCell(2).innerHTML = `${start}`
           rw.insertCell(3).innerHTML = '&ndash;'
         } else {
-          rw.insertCell(2).innerHTML = `${startTime}&ndash;${endTime}`
+          rw.insertCell(2).innerHTML = `${start}&ndash;${Log.time.stamp(Log.time.convert(Log.time.parse(e.e)))}`
           rw.insertCell(3).innerHTML = Log.time.duration(e.s, e.e).toFixed(2)
         }
 
         const secCell = rw.insertCell(4)
-
         secCell.className = 'c-pt'
         secCell.setAttribute('onclick', `Log.nav.toSectorDetail('${e.c}')`)
         secCell.innerHTML = e.c
@@ -324,55 +322,41 @@ var Log = {
 
     /**
      * Display entries from a date
-     * @param {Object} [hex=new Date()] - Hex code
+     * @param {Object=} hex - Hex code
      */
     display(date = new Date()) {
       if (!isObject(date)) return
 
       Log.journal.clear()
 
-      const entries = Log.data.getEntriesByDate(date)
+      const ent = Log.data.getEntriesByDate(date)
 
-      if (isEmpty(entries)) return
+      if (isEmpty(ent)) return
 
       document.getElementById('journalDate').innerHTML = Log.time.displayDate(date)
 
       Log.vis.day(date, 'journalDay')
 
-      const durations = Log.data.listDurations(entries)
+      const dur = Log.data.listDurations(ent)
 
-      write('jLHT', `${Log.data.total(durations).toFixed(2)} h`)
-      write('jLSN', `${Log.data.min(durations).toFixed(2)} h`)
-      write('jLSX', `${Log.data.max(durations).toFixed(2)} h`)
-      write('jASDT', `${Log.data.avg(durations).toFixed(2)} h`)
-      write('jLPT', `${Log.data.lp(entries).toFixed(2)}%`)
-      write('jfocusToday', Log.data.projectFocus(Log.data.listProjects(entries)).toFixed(2))
+      write('jLHT', `${Log.data.total(dur).toFixed(2)} h`)
+      write('jLSN', `${Log.data.min(dur).toFixed(2)} h`)
+      write('jLSX', `${Log.data.max(dur).toFixed(2)} h`)
+      write('jASDT', `${Log.data.avg(dur).toFixed(2)} h`)
+      write('jLPT', `${Log.data.lp(ent).toFixed(2)}%`)
+      write('jfocusToday', Log.data.projectFocus(Log.data.listProjects(ent)).toFixed(2))
 
-      const l = entries.length
+      const l = ent.length
 
-      entries.map((e, i) => {
-        const li = create('li')
-        const id = create('span')
-        const tim = create('span')
-        const sec = create('span')
-        const pro = create('span')
-        const dur = create('span')
-        const ent = create('p')
-
-        li.className = i !== l - 1 ? 'f6 lhc bb pb3 mb3' : 'f6 lhc'
-        id.className = 'mr3 o7'
-        tim.className = 'mr3 o7'
-        sec.className = 'mr3 o7'
-        pro.className = 'o7'
-        dur.className = 'rf o7'
-        ent.className = 'f4 lhc'
-
-        id.innerHTML = `#${e.id}`
-        tim.innerHTML = `${Log.time.stamp(Log.time.convert(Log.time.parse(e.s)))} &ndash; ${Log.time.stamp(Log.time.convert(Log.time.parse(e.e)))}`
-        sec.innerHTML = e.c
-        pro.innerHTML = e.t
-        dur.innerHTML = `${e.dur.toFixed(2)} h`
-        ent.innerHTML = e.d
+      ent.map((e, i) => {
+        const liClass = i !== l - 1 ? 'f6 lhc bb pb3 mb3' : 'f6 lhc'
+        const li = create('li', liClass)
+        const id = create('span', 'mr3 o7', `#${e.id}`)
+        const tim = create('span', 'mr3 o7', `${Log.time.stamp(Log.time.convert(Log.time.parse(e.s)))} &ndash; ${Log.time.stamp(Log.time.convert(Log.time.parse(e.e)))}`)
+        const sec = create('span', 'mr3 o7', e.c)
+        const pro = create('span', 'o7', e.t)
+        const dur = create('span', 'rf o7', `${e.dur.toFixed(2)} h`)
+        const ent = create('p', 'f4 lhc', e.d)
 
         li.appendChild(id)
         li.appendChild(tim)
@@ -381,7 +365,7 @@ var Log = {
         li.appendChild(dur)
         li.appendChild(ent)
 
-        document.getElementById('journalEntries').appendChild(li)
+        append('journalEntries', li)
       })
     },
 
@@ -397,24 +381,28 @@ var Log = {
      * Journal navigation
      */
     nav() {
-      const entries = Log.cache.sortEntries.reverse()
+      const ent = Log.cache.sortEntries.reverse()
 
-      if (isEmpty(entries)) return
+      if (isEmpty(ent)) return
 
-      entries.map((e, i) => {
+      ent.map((e, i) => {
         if (!isEmpty(e)) {
-          const li = create('li')
           const s = e[0].s
-
-          li.className = 'lhd c-pt'
-          li.innerHTML = Log.time.displayDate(Log.time.convert(Log.time.parse(s)))
-
+          const li = create(
+            'li',
+            'lhd c-pt',
+            Log.time.displayDate(Log.time.convert(Log.time.parse(s)))
+          )
           li.setAttribute('onclick', `Log.journal.translate('${s}')`)
           document.getElementById('journalNav').appendChild(li)
         }
       })
     },
 
+    /**
+     * Convert hex into Date and display in Journal
+     * @param {string} hex - Hexadecimal time
+     */
     translate(hex) {
       Log.journal.display(Log.time.convert(Log.time.parse(hex)))
     }
@@ -449,7 +437,9 @@ var Log = {
     }
 
     for (let i = 0, l = b.length; i < l; i++) {
-      b[i].className = v ? `db mb3 ${t} on bg-cl o5 mr3` : `pv1 ${t} on bg-cl o5 mr3`
+      b[i].className = v ?
+      `db mb3 ${t} on bg-cl o5 mr3` :
+      `pv1 ${t} on bg-cl o5 mr3`
     }
 
     document.getElementById(s).style.display = 'block'
@@ -506,19 +496,14 @@ var Log = {
       localStorage.setItem('logHistory', JSON.stringify(Log.console.history))
     }
 
-    const cmd = document.getElementById('cmd')
-    const con = document.getElementById('console')
     let cmdIndex = 0
 
     cmd.addEventListener('submit', function() {
 	  cmdIndex = 0
       if (con.value !== '') {
         if (con.value != Log.console.history[Log.console.history.length - 1]) Log.console.history.push(con.value)
-
         if (Log.console.history.length >= 100) Log.console.history.shift()
-
         localStorage.setItem('logHistory', JSON.stringify(Log.console.history))
-
         Log.console.parse(con.value)
       }
 

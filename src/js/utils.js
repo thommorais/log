@@ -5,7 +5,7 @@ const isEmpty = a => a.length === 0
 const isUndefined = a => a === undefined
 const write = (e, c) => document.getElementById(e).innerHTML = c
 const clear = e => document.getElementById(e).innerHTML = ''
-const create = e => document.createElement(e)
+// const create = e => document.createElement(e)
 const isValidArray = a => isObject(a) && !isEmpty(a)
 const isNumArray = a => isObject(a) && a.every(isNumber)
 const hasEntries = a => isValidArray(a) && isObject(a[0])
@@ -18,6 +18,13 @@ const isNull = e => e === null
 
 const notify = m => {
   new window.Notification(m)
+}
+
+const create = (element, className = undefined, content = undefined) => {
+  const el = document.createElement(element)
+  !isUndefined(className) && (el.className = className)
+  !isUndefined(content) && (el.innerHTML = content)
+  return el
 }
 
 /**

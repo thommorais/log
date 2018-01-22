@@ -61,7 +61,7 @@ Log.time = {
     } else if (Log.config.system.timeFormat === '12') {
       return Log.time.twelveHours(d)
     } else {
-      let t = `${Log.time.decimal(d)}`
+      let t = Log.time.decimal(d).toString()
       return `${t.substr(0,(t.length-3))}:${t.substr(-3)}`
     }
   },
@@ -124,16 +124,16 @@ Log.time = {
    * @returns {string} Elapsed time
    */
   timeago(t) {
-    const min = Math.abs(Math.floor(((new Date()) - t) / 1E3 / 60))
+    const min = Math.abs(~~(((new Date()) - t) / 1E3 / 60))
     if (min === 0) return 'less than a minute ago'
     if (min === 1) return 'a minute ago'
     if (min < 59) return `${min} minutes ago`
     if (min === 60) return 'an hour ago'
-    if (min < 1440) return `${Math.floor(min / 60)} hours ago`
+    if (min < 1440) return `${~~(min / 60)} hours ago`
     if (min < 2880) return 'yesterday'
-    if (min < 86400) return `${Math.floor(min / 1440)} days ago`
-    if (min < 1051199) return `${Math.floor(min / 43200)} months ago`
-    return `over ${Math.floor(min / 525960)} years ago`
+    if (min < 86400) return `${~~(min / 1440)} days ago`
+    if (min < 1051199) return `${~~(min / 43200)} months ago`
+    return `over ${~~(min / 525960)} years ago`
   },
 
   /**

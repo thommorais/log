@@ -8,7 +8,7 @@ Log.console = {
    */
   parse(i) {
     const command = i.split(' ')[0].toLowerCase()
-    let params = []
+    const params = Log.console.getParams(i)
 
     switch (command) {
       case 'start':
@@ -29,9 +29,7 @@ Log.console = {
       case 'continue':
         Log.console.resume();
         break;
-
       case 'edit':
-        params = Log.console.getParams(i)
         Log.console.edit(params[1], params[2], params[3]);
         break;
       case 'delete':
@@ -47,15 +45,14 @@ Log.console = {
         Log.console.exportUser();
         break;
       case 'rename':
-        params = Log.console.getParams(i)
         Log.console.rename(params[1], params[2], params[3]);
         break;
       case 'invert':
         Log.console.invert();
         break;
-  	  case 'quit':
+      case 'quit':
       case 'exit':
-  	  	app.quit();
+        app.quit();
         break;
       default:
         return
@@ -71,9 +68,9 @@ Log.console = {
     if (!isString(s)) return
     if (!s.includes('"')) return
 
-    const quote = s.indexOf('"') - 1
-    const part = s.slice(0, quote).split(' ')
+    const part = s.slice(0, s.indexOf('"') - 1).split(' ')
     const p = s.split('')
+
     let params = []
     let ind = []
     let param = ''
@@ -82,12 +79,10 @@ Log.console = {
     p.map((e, i) => e === '"' && ind.push(i))
 
     for (let i = 0, l = ind.length; i < l; i++) {
-      param = ''
-      for (let o = ind[i] + 1; o < ind[i + 1]; o++) {
-        param += p[o]
-      }
+      for (let o = ind[i] + 1; o < ind[i + 1]; o++) param += p[o]
       params.push(param)
       i++
+      param = ''
     }
 
     return params
@@ -97,17 +92,12 @@ Log.console = {
    * Import user data
    */
   importUser() {
-    const path = dialog.showOpenDialog({
-      properties: ['openFile']
-    })
-
+    const path = dialog.showOpenDialog({properties: ['openFile']})
     if (!path) return
-
-    let string = ''
-    let notif
+    let s = ''
 
     try {
-      string = fs.readFileSync(path[0], 'utf-8')
+      s = fs.readFileSync(path[0], 'utf-8')
     } catch (e) {
       notify('An error occured while trying to load this file.')
       return
@@ -116,12 +106,9 @@ Log.console = {
     Log.path = path[0]
     localStorage.setItem('logDataPath', path[0])
     dataStore.path = Log.path
-
-    localStorage.setItem('user', string)
+    localStorage.setItem('user', s)
     user = JSON.parse(localStorage.getItem('user'))
-
     notify('Your log data was successfully imported.')
-
     Log.options.update.all()
   },
 
@@ -130,12 +117,9 @@ Log.console = {
    */
   exportUser() {
     const data = JSON.stringify(JSON.parse(localStorage.getItem('user')))
-
-    dialog.showSaveDialog((fileName) => {
-      if (fileName === undefined) return
-
-      fs.writeFile(fileName, data, (err) => {
-        let notif
+    dialog.showSaveDialog((file) => {
+      if (isUndefined(file)) return
+      fs.writeFile(file, data, (err) => {
         if (err) {
           notify(`An error occured creating the file ${err.message}`)
           return
@@ -158,7 +142,7 @@ Log.console = {
         notify(`Started ${state.phase}`)
       }
     })
-    Log.stopTimer = () => currentTimer.stop()
+    Log.stopTimer = _ => currentTimer.stop()
     Log.console.startLog(s)
   },
 
@@ -226,7 +210,6 @@ Log.console = {
     clearInterval(timer)
 
     notify(`Ended log: ${last.c} - ${last.t} - ${last.d}`)
-
     Log.options.update.log()
   },
 
@@ -298,21 +281,22 @@ Log.console = {
     if (isEmpty(Log.log)) return
 
     // all except first word are entry indices
-  	const words = i.split(' ').slice(1)
+    const words = i.split(' ').slice(1)
 
     if (words[0] === 'project') {
-  		user.log.forEach((entry, id) => {
-  			if (entry.t === words[1]) user.log.splice(id, 1)
-  		})
-  	} else if (words[0] === 'sector') {
-  		user.log.forEach((entry, id) => {
-  			if (entry.c === words[1]) user.log.splice(id, 1)
-  		})
-  	} else {
-  		const ascendingUniqueIndices = words.filter( /* uniq */ (v, i, self) => self.indexOf(v) === i).sort()
-  		// remove all indices. We start from the highest to avoid the shifting of indices after removal.
-  		ascendingUniqueIndices.reverse().forEach(index => user.log.splice(Number(index) - 1, 1))
-  	}
+      user.log.forEach((entry, id) => {
+        if (entry.t === words[1]) user.log.splice(id, 1)
+      })
+    } else if (words[0] === 'sector') {
+      user.log.forEach((entry, id) => {
+        if (entry.c === words[1]) user.log.splice(id, 1)
+      })
+    } else {
+      // aui = ascending unique indices
+      const aui = words.filter((v, i, self) => self.indexOf(v) === i).sort()
+      // remove all indices. We start from the highest to avoid the shifting of indices after removal.
+      aui.reverse().forEach(i => user.log.splice(Number(i) - 1, 1))
+    }
 
       Log.options.update.all()
   },
@@ -321,25 +305,25 @@ Log.console = {
    * Edit a log
    * @param {string} id - Entry ID
    * @param {string} attr - Entry attribute
-   * @param {string} value - Value
+   * @param {string} val - Value
    */
-  edit(id, attr, value) {
+  edit(id, attr, val) {
     if (isEmpty(user.log)) return
 
     id = Number(id) - 1
 
     if (contains(attr, 'sec sector'))
-      user.log[id].c = value
+      user.log[id].c = val
     else if (contains(attr, 'title pro project'))
-      user.log[id].t = value
+      user.log[id].t = val
     else if (contains(attr, 'desc dsc description'))
-      user.log[id].d = value
+      user.log[id].d = val
     else if (contains(attr, 'start'))
       user.log[id].s = Log.time.convertDateTime(value)
     else if (contains(attr, 'end'))
       user.log[id].e = Log.time.convertDateTime(value)
     else if (contains(attr, 'duration dur')) {
-      const duration = parseInt(value, 10) * 60 || 0
+      const duration = parseInt(val, 10) * 60 || 0
       user.log[id].e = Log.time.offset(user.log[id].s, duration)
     } else return
 
@@ -348,26 +332,26 @@ Log.console = {
 
   /**
    * Rename a sector or project
-   * @param {string} mode - Sector or project
+   * @param {string} mod - Sector or project
    * @param {string} old - Old name
    * @param {string} val - New name
    */
-  rename(mode, old, val) {
-    if (!contains(mode, 'sec sector pro project')) return
+  rename(mod, old, val) {
+    if (!contains(mod, 'sec sector pro project')) return
 
-    const notFound = mode => {
-      const message = mode === 'sector' ? `The sector "${old}" does not exist in your logs.` : `The project "${old}" does not exist in your logs.`
+    const notFound = mod => {
+      const message = mod === 'sector' ? `The sector "${old}" does not exist in your logs.` : `The project "${old}" does not exist in your logs.`
       notify(message)
     }
 
-    if (contains(mode, 'sector sec')) {
+    if (contains(mod, 'sector sec')) {
       if (isEmpty(Log.data.getEntriesBySector(old))) {
         notFound('sector')
         return
       }
 
       user.log.map(e => {if (e.c === old) e.c = val})
-    } else if (contains(mode, 'project pro')) {
+    } else if (contains(mod, 'project pro')) {
       if (isEmpty(Log.data.getEntriesByProject(old))) {
         notFound('project')
         return

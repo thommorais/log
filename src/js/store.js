@@ -13,6 +13,11 @@ class Store {
     return this.data[key]
   }
 
+  /**
+   * Set data object property
+   * @param {string} key - Key
+   * @param {string} val - Value
+   */
   set(key, val) {
     this.data[key] = val
     fs.writeFileSync(this.path, JSON.stringify(this.data))

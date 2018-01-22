@@ -11,8 +11,7 @@ Log.vis = {
     if (isEmpty(data) || !isString(con) || !exists(con)) return
 
     const addEntry = ({col, mg, wd}, row) => {
-      const div = create('div')
-      div.className = 'psr t0 sh1 mb2 lf br3'
+      const div = create('div', 'psr t0 sh1 mb2 lf br3')
       div.style.width = `${wd}%`
       div.style.marginLeft = `${mg}%`
       div.style.backgroundColor = col
@@ -20,8 +19,7 @@ Log.vis = {
     }
 
     const addRow = id => {
-      const row = create('div')
-      row.className = 'db wf sh1 mt2 mb3'
+      const row = create('div', 'db wf sh1 mt2 mb3')
       row.id = id
       append(con, row)
     }
@@ -45,8 +43,7 @@ Log.vis = {
     if (isEmpty(data) || !isString(con) || !exists(con)) return
 
     const addEntry = ({col, pos, wh}, row) => {
-      const div = create('div')
-      div.className = 'psa sw1'
+      const div = create('div', 'psa sw1')
       div.style.height = `${wh}%`
       div.style.bottom = `${pos}%`
       div.style.backgroundColor = col
@@ -54,11 +51,9 @@ Log.vis = {
     }
 
     const addCol = id => {
-      const col = create('div')
-      const inn = create('div')
-      col.className = 'dib hf psr'
+      const col = create('div', 'dib hf psr')
+      const inn = create('div', 'sw1 hf cn bb')
       col.style.width = `${100 / Log.config.ui.view}%`
-      inn.className = 'sw1 hf cn bb'
       inn.id = id
       col.appendChild(inn)
       append(con, col)
@@ -91,7 +86,7 @@ Log.vis = {
 
     ent.map(e => {
       if (e.e !== 'undefined') {
-        const div = create('div')
+        const div = create('div', 'nodrag psr t0 hf mb2 lf br3')
         const es = Log.time.parse(e.s)
         const dp = Log.utils.calcDP(es)
         const wd = (Log.time.parse(e.e) - es) / 86400 * 100
@@ -100,7 +95,6 @@ Log.vis = {
         mode === 'project' ? e.pCol :
         mode === 'none' && Log.config.ui.colour
 
-        div.className = 'nodrag psr t0 hf mb2 lf br3'
         div.style.width = `${wd}%`
         div.style.marginLeft = `${mg}%`
         div.style.backgroundColor = col || Log.config.ui.colour
@@ -126,16 +120,13 @@ Log.vis = {
     const peak = Log.data.max(peaks)
 
     peaks.map((e, i) => {
-      const col = create('div')
-      const out = create('div')
-      const inn = create('div')
+      const col = create('div', 'dib hf psr')
+      const out = create('div', 'sw1 hf cn bb')
+      const inn = create('div', 'psa b0 sw1 br3')
       const id = `${con}-${i}`
 
-      col.className = 'dib hf psr'
       col.style.width = `${100 / peaks.length}%`
       col.id = id
-      out.className = 'sw1 hf cn bb'
-      inn.className = 'psa b0 sw1 br3'
       inn.style.height = `${e / peak * 100}%`
 
       if (mode === 'hours') {
@@ -169,18 +160,6 @@ Log.vis = {
     let wd = 0
 
     list.map(e => {
-      const li = create('li')
-      const tl = create('span')
-      const st = create('span')
-      const br = create('div')
-      const dt = create('div')
-
-      li.className = 'mb4 c-pt'
-      tl.className = 'dib xw6 elip'
-      st.className = 'rf'
-      br.className = 'wf sh1'
-      dt.className = 'psr t0 hf lf br3'
-
       if (mode === 'sec') {
         col = Log.palette[e[0]]
         sh = Log.data.sh(e[0], ent)
@@ -195,11 +174,15 @@ Log.vis = {
         col = Log.config.ui.colour
       }
 
+      const li = create('li', 'mb4 c-pt')
+      const tl = create('span', 'dib xw6 elip', e[0])
+      const st = create('span', 'rf', `${e[1].toFixed(2)} h`)
+      const br = create('div', 'wf sh1')
+      const dt = create('div', 'psr t0 hf lf br3')
+
       dt.style.backgroundColor = col || Log.config.ui.colour
       dt.style.width = `${wd}%`
-      st.innerHTML = `${e[1].toFixed(2)} h`
       li.setAttribute('onclick', `Log.detail.${mode}('${e[0]}')`)
-      tl.innerHTML = e[0]
 
       li.appendChild(tl)
       li.appendChild(st)
@@ -219,10 +202,9 @@ Log.vis = {
     if (!isValidArray(ent) || isEmpty(ent) || !isString(con) || !exists(con)) return
 
     Log.data.sortValues(ent, mode).map(e => {
-      const itm = create('div')
+      const itm = create('div', 'psr t0 hf lf')
       const col = mode === 'sec' ? Log.palette[e[0]] : Log.projectPalette[e[0]]
 
-      itm.className = 'psr t0 hf lf'
       itm.style.backgroundColor = col || Log.config.ui.colour
       itm.style.width = `${e[1]}%`
 
@@ -240,18 +222,13 @@ Log.vis = {
     if (!isValidArray(ent) || isEmpty(ent) || !isString(con) || !exists(con) || ['sec', 'pro'].indexOf(mode) < 0) return
 
     Log.data.sortValues(ent, mode).map(e => {
-      const item = create('li')
-      const code = create('div')
-      const name = create('div')
       const col = mode === 'sec' ? Log.palette[e[0]] : Log.projectPalette[e[0]]
       const perc = e[1]
-
-      item.className = 'c3 mb3 f6 lhc'
-      code.className = 'dib sh3 sw3 brf mr2 lhs'
-      name.className = 'dib'
+      const item = create('li', 'c3 mb3 f6 lhc')
+      const code = create('div', 'dib sh3 sw3 brf mr2 lhs')
+      const name = create('div', 'dib', `${e[0]} (${perc.toFixed(2)}%)`)
 
       code.style.backgroundColor = col || Log.config.ui.colour
-      name.innerHTML = `${e[0]} (${perc.toFixed(2)}%)`
 
       item.appendChild(code)
       item.appendChild(name)
@@ -274,14 +251,11 @@ Log.vis = {
     set.map(e => {
       const list = mode === 'sec' ? Log.data.listSectors(e) : Log.data.listProjects(e)
       const height = list === undefined ? 0 : 1 / list.length * 100
-      const col = create('div')
-      const inn = create('div')
-      const cor = create('div')
+      const col = create('div', 'dib hf psr')
+      const inn = create('div', 'sw1 hf cn bb')
+      const cor = create('div', 'psa sw1 b0 bg-noir br3')
 
-      col.className = 'dib hf psr'
       col.style.width = `${100 / setLength}%`
-      inn.className = 'sw1 hf cn bb'
-      cor.className = 'psa sw1 b0 bg-noir br3'
       cor.style.backgroundColor = Log.config.ui.colour
       cor.style.height = `${height}%`
 
@@ -296,21 +270,16 @@ Log.vis = {
    * @param {string} con - Container
    */
   gridLines(con) {
-    const div100 = create('div')
-    const div75 = create('div')
-    const div50 = create('div')
-    const div25 = create ('div')
-    const div0 = create('div')
+    const div100 = create('div', 'psa wf bt o1')
+    const div75 = create('div', 'psa wf bt o1')
+    const div50 = create('div', 'psa wf bt o1')
+    const div25 = create ('div', 'psa wf bt o1')
+    const div0 = create('div', 'psa wf bt o1 b0')
 
-    div100.className = 'psa wf bt o1'
     div100.style.top = '0'
-    div75.className = 'psa wf bt o1'
     div75.style.top = '25%'
-    div50.className = 'psa wf bt o1'
     div50.style.bottom = '50%'
-    div25.className = 'psa wf bt o1'
     div25.style.bottom = '25%'
-    div0.className = 'psa wf bt o1 b0'
 
     append(con, div100)
     append(con, div75)
