@@ -12,8 +12,7 @@
     "build_win": "electron-packager . Log --platform=win32  --arch=x64 --out ./build --overwrite; echo 'Built for Windows'"
   },
   "devDependencies": {
-    "electron": "^1.8.1",
-    "electron-prebuilt": "^1.4.13",
+    "electron": "^1.8.2-beta.4",
     "electron-reload": "^1.2.2",
     "electron-packager": "^8.4.0"
   },
