@@ -1,6 +1,5 @@
 const {app, BrowserWindow, webFrame} = require('electron')
 const path = require('path')
-const url = require('url')
 
 if (process.argv[2] && process.argv[2] === 'dev') require('electron-reload')(__dirname)
 
@@ -25,9 +24,9 @@ app.on('ready', function() {
 })
 
 app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') app.quit()
+  process.platform !== 'darwin' && app.quit()
 })
 
 app.on('activate', () => {
-  if (win === null) createWindow()
+  win === null && createWindow()
 })

@@ -10,6 +10,7 @@
 
 const cmd = document.getElementById('cmd')
 const con = document.getElementById('console')
+const body = document.getElementById('app')
 
 var Log = {
 
@@ -55,7 +56,7 @@ var Log = {
    */
   status() {
     if (isEmpty(Log.log)) return
-    return Log.log.slice(-1)[0].e === 'undefined' ? true : false
+    return isUndefined(Log.log.slice(-1)[0].e) ? true : false
   },
 
   /**
@@ -65,7 +66,7 @@ var Log = {
   timer(status) {
     if (status) {
       const l = Log.time.convert(
-        Log.time.parse(Log.log.slice(-1)[0].s)
+        Log.log.slice(-1)[0].s
       ).getTime()
 
       Log.clock = setInterval(() => {
@@ -107,7 +108,7 @@ var Log = {
 
     takeRight(ent, num).reverse().map((e, i) => {
       const rw = document.getElementById(con).insertRow(i)
-      const date = Log.time.convert(Log.time.parse(e.s))
+      const date = Log.time.convert(e.s)
       const ic = rw.insertCell(0)
       const dc = rw.insertCell(1)
       const st = Log.time.stamp(date)
@@ -119,11 +120,11 @@ var Log = {
       dc.innerHTML = Log.time.displayDate(date)
       dc.setAttribute('onclick', `Log.nav.toJournal('${e.s}')`)
 
-      if (e.e === 'undefined') {
+      if (isUndefined(e.e)) {
         rw.insertCell(2).innerHTML = `${st}`
-        rw.insertCell(3).innerHTML = '&ndash;'
+        rw.insertCell(3).innerHTML = '&mdash;'
       } else {
-        rw.insertCell(2).innerHTML = `${st}&ndash;${Log.time.stamp(Log.time.convert(Log.time.parse(e.e)))}`
+        rw.insertCell(2).innerHTML = `${st}&ndash;${Log.time.stamp(Log.time.convert(e.e))}`
 
         if (Log.config.system.timeFormat === 'decimal') {
           rw.insertCell(3).innerHTML = Log.time.toDecimal(Log.time.durationSeconds(e.s, e.e))
@@ -201,7 +202,7 @@ var Log = {
 
       takeRight(Log.data.getEntriesBySector(sec), 100).reverse().map((e, i) => {
         const rw = document.getElementById(con).insertRow(i)
-        const date = Log.time.convert(Log.time.parse(e.s))
+        const date = Log.time.convert(e.s)
         const start = Log.time.stamp(date)
 
         const idCell = rw.insertCell(0)
@@ -209,11 +210,11 @@ var Log = {
         idCell.innerHTML = e.id
         rw.insertCell(1).innerHTML = Log.time.displayDate(date)
 
-        if (e.e === 'undefined') {
+        if (isUndefined(e.e)) {
           rw.insertCell(2).innerHTML = start
           rw.insertCell(3).innerHTML = '&ndash;'
         } else {
-          rw.insertCell(2).innerHTML = `${start}&ndash;${Log.time.stamp(Log.time.convert(Log.time.parse(e.e)))}`
+          rw.insertCell(2).innerHTML = `${start}&ndash;${Log.time.stamp(Log.time.convert(e.e))}`
           rw.insertCell(3).innerHTML = Log.time.duration(e.s, e.e).toFixed(2)
         }
 
@@ -275,7 +276,7 @@ var Log = {
 
       takeRight(Log.data.getEntriesByProject(pro), 100).reverse().map((e, i) => {
         const rw = document.getElementById(con).insertRow(i)
-        const date = Log.time.convert(Log.time.parse(e.s))
+        const date = Log.time.convert(e.s)
         const start = Log.time.stamp(date)
 
         const idCell = rw.insertCell(0)
@@ -283,11 +284,11 @@ var Log = {
         idCell.innerHTML = e.id
         rw.insertCell(1).innerHTML = Log.time.displayDate(date)
 
-        if (e.e === 'undefined') {
+        if (isUndefined(e.e)) {
           rw.insertCell(2).innerHTML = `${start}`
           rw.insertCell(3).innerHTML = '&ndash;'
         } else {
-          rw.insertCell(2).innerHTML = `${start}&ndash;${Log.time.stamp(Log.time.convert(Log.time.parse(e.e)))}`
+          rw.insertCell(2).innerHTML = `${start}&ndash;${Log.time.stamp(Log.time.convert(e.e))}`
           rw.insertCell(3).innerHTML = Log.time.duration(e.s, e.e).toFixed(2)
         }
 
@@ -352,7 +353,7 @@ var Log = {
         const liClass = i !== l - 1 ? 'f6 lhc bb pb3 mb3' : 'f6 lhc'
         const li = create('li', liClass)
         const id = create('span', 'mr3 o7', `#${e.id}`)
-        const tim = create('span', 'mr3 o7', `${Log.time.stamp(Log.time.convert(Log.time.parse(e.s)))} &ndash; ${Log.time.stamp(Log.time.convert(Log.time.parse(e.e)))}`)
+        const tim = create('span', 'mr3 o7', `${Log.time.stamp(Log.time.convert(e.s))} &ndash; ${Log.time.stamp(Log.time.convert(e.e))}`)
         const sec = create('span', 'mr3 o7', e.c)
         const pro = create('span', 'o7', e.t)
         const dur = create('span', 'rf o7', `${e.dur.toFixed(2)} h`)
@@ -391,7 +392,7 @@ var Log = {
           const li = create(
             'li',
             'lhd c-pt',
-            Log.time.displayDate(Log.time.convert(Log.time.parse(s)))
+            Log.time.displayDate(Log.time.convert(s))
           )
           li.setAttribute('onclick', `Log.journal.translate('${s}')`)
           document.getElementById('journalNav').appendChild(li)
@@ -404,7 +405,7 @@ var Log = {
      * @param {string} hex - Hexadecimal time
      */
     translate(hex) {
-      Log.journal.display(Log.time.convert(Log.time.parse(hex)))
+      Log.journal.display(Log.time.convert(hex))
     }
   },
 
@@ -414,6 +415,7 @@ var Log = {
      * Calculate DP
      */
     calcDP(a) {
+      if (isUndefined(a)) return
       const s = Log.time.convert(a)
       const y = s.getFullYear()
       const m = s.getMonth()
@@ -488,6 +490,20 @@ var Log = {
     }
   },
 
+  cmd: {
+    index: 0,
+
+    show() {
+      cmd.style.display = 'block'
+      con.focus()
+    },
+
+    hide() {
+      con.value = ''
+      cmd.style.display = 'none'
+    }
+  },
+
   init() {
     if (localStorage.hasOwnProperty('logHistory')) {
       Log.console.history = JSON.parse(localStorage.getItem('logHistory')) || []
@@ -496,10 +512,8 @@ var Log = {
       localStorage.setItem('logHistory', JSON.stringify(Log.console.history))
     }
 
-    let cmdIndex = 0
-
     cmd.addEventListener('submit', function() {
-	  cmdIndex = 0
+    Log.cmd.index = 0
       if (con.value !== '') {
         if (con.value != Log.console.history[Log.console.history.length - 1]) Log.console.history.push(con.value)
         if (Log.console.history.length >= 100) Log.console.history.shift()
@@ -507,48 +521,48 @@ var Log = {
         Log.console.parse(con.value)
       }
 
-      con.value = ''
-      cmd.style.display = 'none'
+      Log.cmd.hide()
     })
 
     if (!Log.keyEventInitialized) {
-      Log.keyEventInitialized = true;
+      Log.keyEventInitialized = true
+
       document.addEventListener('keydown', function(e) {
         if (e.which >= 65 && e.which <= 90) {
-          cmd.style.display = 'block'
-          con.focus()
+          Log.cmd.show()
         } else if (e.which >= 48 && e.which <= 54 && (e.ctrlKey || e.metaKey)) {
           Log.nav.index = e.which - 49
           Log.tab(Log.nav.menu[Log.nav.index], 'sect', 'tab')
         } else if (e.key === 'Escape') {
-          con.value = ''
-          cmd.style.display = 'none'
-          cmdIndex = 0
+          Log.cmd.hide()
+          Log.cmd.index = 0
         } else if (e.which === 38) {
-          cmd.style.display = 'block'
-          con.focus()
-          cmdIndex++
+          Log.cmd.show()
+          Log.cmd.index++
 
-          if (cmdIndex > Log.console.history.length) {
-            cmdIndex = Log.console.history.length
+          const history = Log.console.history.length
+
+          if (Log.cmd.index > history) {
+            Log.cmd.index = history
           }
 
-          con.value = Log.console.history[Log.console.history.length - cmdIndex]
+          con.value = Log.console.history[history - Log.cmd.index]
         } else if (e.which === 40) {
           cmd.style.display = 'block'
           con.focus()
-          cmdIndex--
+          Log.cmd.index--
 
-        if (cmdIndex < 1) cmdIndex = 1
-	      con.value = Log.console.history[Log.console.history.length - cmdIndex]
+        if (Log.cmd.index < 1) Log.cmd.index = 1
+        con.value = Log.console.history[Log.console.history.length - Log.cmd.index]
         } else if (e.key === 'Tab') {
           e.preventDefault()
           Log.nav.horizontal()
         }
+
         if (e.key === 'o' && (e.ctrlKey || e.metaKey)) {
           e.preventDefault()
           Log.console.importUser()
-	      return
+          return
         }
 
         if (e.key === 'e' && (e.ctrlKey || e.metaKey)) {
@@ -556,7 +570,7 @@ var Log = {
           Log.console.exportUser()
           return
         }
-	  })
+      })
     }
 
     let user = {
@@ -571,8 +585,8 @@ var Log = {
     Log.projectPalette = user.projectPalette
     Log.log = Log.data.parse(user.log)
 
-    document.getElementById('app').style.backgroundColor = Log.config.ui.bg
-    document.getElementById('app').style.color = Log.config.ui.colour
+    body.style.backgroundColor = Log.config.ui.bg
+    body.style.color = Log.config.ui.colour
 
     if (isEmpty(user.log)) {
       Log.nav.index = 5
@@ -612,11 +626,11 @@ var Log = {
       write('STK', Log.data.streak())
 
       const now = Log.log.slice(-1)[0]
-      const date = Log.time.convert(Log.time.parse(now.s))
+      const date = Log.time.convert(now.s)
       const startTime = Log.time.stamp(date)
-      const endTime = Log.time.stamp(Log.time.convert(Log.time.parse(now.e)))
+      const endTime = Log.time.stamp(Log.time.convert(now.e))
 
-      now.e === 'undefined' ?
+      isUndefined(now.e) ?
       write('lastTime', `${startTime}&ndash;`) :
       write('lastTime', `${startTime}&ndash;${endTime}`)
 

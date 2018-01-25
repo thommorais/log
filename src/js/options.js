@@ -98,35 +98,21 @@ Log.options = {
 
   /**
    * Set sector colour code
-   * @param {string} s - Input
+   * @param {string} sec - Sector
+   * @param {string} col - Colour
    */
-  setColourCode(s) {
-    const ch = s.split('')
-    let ind = []
-    let sec = ''
-
-    ch.map((e, i) => e === '"' && ind.push(i))
-
-    for (let i = ind[0] + 1; i < ind[1]; i++) sec += ch[i]
-
-    user.palette[sec] = s.substring(ind[1] + 1, s.length).trim()
+  setColourCode(sec, col) {
+    user.palette[sec] = col
     Log.options.update.palette()
   },
 
   /**
    * Set project colour code
-   * @param {string} s - Input
+   * @param {string} pro - Project
+   * @param {string} col - Colour
    */
   setProjectColourCode(s) {
-    const ch = s.split('')
-    let ind = []
-    let pro = ''
-
-    ch.map((e, i) => e === '"' && ind.push(i))
-
-    for (let i = ind[0] + 1; i < ind[1]; i++) pro += ch[i]
-
-    user.projectPalette[pro] = s.substring(ind[1] + 1, s.length).trim()
+    user.projectPalette[pro] = col
     Log.options.update.projectPalette()
   },
 

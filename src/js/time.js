@@ -1,3 +1,5 @@
+const months = 'Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec'.split(' ')
+
 Log = window.Log || {}
 Log.time = {
 
@@ -23,11 +25,11 @@ Log.time = {
 
   /**
    * Convert Unix time
-   * @param {number} t - Unix time
+   * @param {number} h - Hexadecimal time
    * @returns {Object} Date
    */
-  convert(t) {
-    return new Date(t * 1E3)
+  convert(h) {
+    return new Date(Log.time.parse(h) * 1E3)
   },
 
   /**
@@ -75,7 +77,7 @@ Log.time = {
     let h = d.getHours()
     let m = d.getMinutes()
     let s = d.getSeconds()
-    let x = h >= 12 ? 'PM' : 'AM'
+    const x = h >= 12 ? 'PM' : 'AM'
 
     h = h % 12
     h = h ? h : 12
@@ -88,11 +90,11 @@ Log.time = {
 
   /**
    * Convert hexadecimal timestamp into date
-   * @param {string} hex - Hexadecimal timestamp
+   * @param {string} h - Hexadecimal time
    * @returns {string} Date
    */
-  date(hex) {
-    const a = Log.time.convert(Log.time.parse(hex))
+  date(h) {
+    const a = Log.time.convert(h)
     return `${a.getFullYear()}${a.getMonth()}${a.getDate()}`
   },
 
@@ -105,10 +107,7 @@ Log.time = {
     const f = Log.config.system.calendar
 
     if (f === 'gregorian') {
-      let months = 'Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec'.split(' ')
-      let date = (`0${d.getDate()}`).slice(-2)
-
-      return `${date} ${months[d.getMonth()]} ${d.getFullYear().toString().substr(-2)}`
+      return `${`0${d.getDate()}`.slice(-2)} ${months[d.getMonth()]} ${d.getFullYear().toString().substr(-2)}`
     } else if (f === 'monocal') {
       return Monocal.short(Monocal.convert(d))
     } else if (f === 'aequirys') {
@@ -138,43 +137,49 @@ Log.time = {
 
   /**
    * List dates
-   * @param {Object} start - Start date
-   * @param {Object} end - End date
+   * @param {Object} s - Start date
+   * @param {Object} e - End date
    * @returns {Object[]} List of dates
    */
-  listDates(start, end) {
-    let list = []
-    let current = new Date(start.getFullYear(), start.getMonth(), start.getDate(), 0, 0, 0)
+  listDates(s, e) {
+    let l = []
+    let c = new Date(s.getFullYear(), s.getMonth(), s.getDate(), 0, 0, 0)
 
-    while (current <= end) {
-      list.push(new Date(current))
-      current = Date.prototype.addDays.call(current, 1)
+    while (c <= e) {
+      l.push(new Date(c))
+      c = Date.prototype.addDays.call(c, 1)
     }
 
-    return list
+    return l
   },
 
   /**
    * Calculate duration
-   * @param {number} a - Start (Unix time)
-   * @param {number} b - End (Unix time)
+   * @param {number} a - Start (Hex time)
+   * @param {number} b - End (Hex time)
    * @returns {number} Duration
    */
   duration(a, b) {
-    return (Log.time.parse(b) - Log.time.parse(a)) / 3600
+    return Log.time.durationSeconds(a, b) / 3600
   },
 
+  /**
+   * Calculate duration in seconds
+   * @param {number} a - Start (Hex time)
+   * @param {number} b - End (Hex time)
+   * @returns {number} Duration
+   */
   durationSeconds(a, b) {
     return Log.time.parse(b) - Log.time.parse(a)
   },
 
   /**
    * Returns a timestamp `duration` seconds after `start`
-   * @param {string} start - hexadecimal timestamp
-   * @param {number} duration - length to offset by (seconds)
+   * @param {string} s - hexadecimal timestamp
+   * @param {number} d - duration to offset by (seconds)
    * @returns {string} end - hexadecimal timestamp
    */
-  offset(start, duration) {
-    return (Log.time.parse(start) + duration).toString(16)
+  offset(s, d) {
+    return (Log.time.parse(s) + d).toString(16)
   }
 }

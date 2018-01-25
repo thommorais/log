@@ -5,7 +5,6 @@ const isEmpty = a => a.length === 0
 const isUndefined = a => a === undefined
 const write = (e, c) => document.getElementById(e).innerHTML = c
 const clear = e => document.getElementById(e).innerHTML = ''
-// const create = e => document.createElement(e)
 const isValidArray = a => isObject(a) && !isEmpty(a)
 const isNumArray = a => isObject(a) && a.every(isNumber)
 const hasEntries = a => isValidArray(a) && isObject(a[0])

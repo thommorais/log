@@ -17,7 +17,7 @@ Log.console = {
         break;
       case 'pomodoro':
       case 'tomato':
-        Log.console.startTomatoLog(i);
+        Log.console.startPomodoro(i);
         break;
       case 'stop':
       case 'end':
@@ -134,15 +134,15 @@ Log.console = {
    * Start a log entry with pomodoro timing
    * @param {Object[]} s - Input array
    */
-  startTomatoLog(s) {
-    const currentTimer = timer()()((state, phaseChanged) => {
+  startPomodoro(s) {
+    const clock = timer()()((state, phaseChanged) => {
       if (phaseChanged) {
         state.phase === 'break' || state.phase === 'longBreak' ? Log.console.endLog() : Log.console.startLog(s)
         state.phase === 'break' || state.phase === 'longBreak' ? Log.playSoundEffect('timerEnd') : Log.playSoundEffect('timerStart')
         notify(`Started ${state.phase}`)
       }
     })
-    Log.stopTimer = _ => currentTimer.stop()
+    Log.stopTimer = _ => clock.stop()
     Log.console.startLog(s)
   },
 
@@ -151,7 +151,7 @@ Log.console = {
    * @param {Object[]} s - Input array
    */
   startLog(s) {
-    if (!isEmpty(user.log) && user.log.slice(-1)[0].e === 'undefined') Log.console.endLog()
+    if (!isEmpty(user.log) && isUndefined(user.log.slice(-1)[0].e)) Log.console.endLog()
 
     let p = []
     let indices = []
@@ -186,7 +186,7 @@ Log.console = {
 
     user.log.push({
       s: Log.time.toHex(new Date()),
-      e: 'undefined',
+      e: undefined,
       c: sect,
       t: proj,
       d: desc
@@ -205,7 +205,7 @@ Log.console = {
     if (isEmpty(Log.log)) return
 
     const last = user.log.slice(-1)[0]
-    if (last.e !== 'undefined') return
+    // if (!isUndefined(last.e)) return
     last.e = Log.time.toHex(new Date())
     clearInterval(timer)
 
@@ -222,11 +222,11 @@ Log.console = {
 
     const last = user.log.slice(-1)[0]
 
-    if (last.e === 'undefined') return
+    if (isUndefined(last.e)) return
 
     user.log.push({
       s: Log.time.toHex(new Date()),
-      e: 'undefined',
+      e: undefined,
       c: last.c,
       t: last.t,
       d: last.d
@@ -251,23 +251,19 @@ Log.console = {
       Log.options.setColour(c[2])
     else if (contains(a, 'highlight accent'))
       Log.options.setAccent(c[2])
-    else if (contains(a, 'font typeface type'))
-      Log.options.setFont(c[2])
     else if (contains(a, 'view'))
       Log.options.setView(c[2])
     else if (contains(a, 'cal calendar'))
       Log.options.setCalendar(c[2])
     else if (contains(a, 'timeformat time'))
       Log.options.setTimeFormat(c[2])
-    else if (contains(a, 'dateformat date'))
-      Log.options.setDateFormat(c[2])
-    else if (contains(a, 'weekstart'))
-      Log.options.setWeekStart(c[2])
-    else if (contains(a, 'category sector cat sec'))
-      Log.options.setColourCode(i)
-    else if (contains(a, 'project pro'))
-      Log.options.setProjectColourCode(i)
-    else if (contains(a, 'colourmode colormode'))
+    else if (contains(a, 'category sector cat sec')) {
+      const param = Log.console.getParams(i)
+      console.log(param)
+      // Log.options.setColourCode(i)
+    } else if (contains(a, 'project pro')) {
+      // Log.options.setProjectColourCode(i)
+    } else if (contains(a, 'colourmode colormode'))
       Log.options.setColourMode(c[2])
     else return
   },
@@ -284,12 +280,12 @@ Log.console = {
     const words = i.split(' ').slice(1)
 
     if (words[0] === 'project') {
-      user.log.forEach((entry, id) => {
-        if (entry.t === words[1]) user.log.splice(id, 1)
+      user.log.forEach((e, id) => {
+        if (e.t === words[1]) user.log.splice(id, 1)
       })
     } else if (words[0] === 'sector') {
-      user.log.forEach((entry, id) => {
-        if (entry.c === words[1]) user.log.splice(id, 1)
+      user.log.forEach((e, id) => {
+        if (e.c === words[1]) user.log.splice(id, 1)
       })
     } else {
       // aui = ascending unique indices
@@ -312,17 +308,17 @@ Log.console = {
 
     id = Number(id) - 1
 
-    if (contains(attr, 'sec sector'))
+    if (contains(attr, 'sec sector')) {
       user.log[id].c = val
-    else if (contains(attr, 'title pro project'))
+    } else if (contains(attr, 'title pro project')) {
       user.log[id].t = val
-    else if (contains(attr, 'desc dsc description'))
+    } else if (contains(attr, 'desc dsc description')) {
       user.log[id].d = val
-    else if (contains(attr, 'start'))
+    } else if (contains(attr, 'start')) {
       user.log[id].s = Log.time.convertDateTime(value)
-    else if (contains(attr, 'end'))
+    } else if (contains(attr, 'end')) {
       user.log[id].e = Log.time.convertDateTime(value)
-    else if (contains(attr, 'duration dur')) {
+    } else if (contains(attr, 'duration dur')) {
       const duration = parseInt(val, 10) * 60 || 0
       user.log[id].e = Log.time.offset(user.log[id].s, duration)
     } else return
@@ -340,8 +336,8 @@ Log.console = {
     if (!contains(mod, 'sec sector pro project')) return
 
     const notFound = mod => {
-      const message = mod === 'sector' ? `The sector "${old}" does not exist in your logs.` : `The project "${old}" does not exist in your logs.`
-      notify(message)
+      const msg = mod === 'sector' ? `The sector "${old}" does not exist in your logs.` : `The project "${old}" does not exist in your logs.`
+      notify(msg)
     }
 
     if (contains(mod, 'sector sec')) {

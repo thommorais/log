@@ -35,9 +35,10 @@ Log.vis = {
    * Display a bar visualisation
    * @param {Object[]} data - Bar data
    * @param {string} con - Container
+   * @param {boolean=} lines - Lines
    */
-  bar(data, con) {
-    Log.vis.gridLines(con)
+  bar(data, con, lines = true) {
+    lines && Log.vis.gridLines(con)
 
     if (isUndefined(data)) return
     if (isEmpty(data) || !isString(con) || !exists(con)) return
@@ -82,21 +83,17 @@ Log.vis = {
     let lw = 0
     let lp = 0
 
-    const mode = Log.config.ui.colourMode
-
-    ent.map(e => {
-      if (e.e !== 'undefined') {
+    ent.map(({s, e, dur, sCol, pCol}) => {
+      if (!isUndefined(e)) {
         const div = create('div', 'nodrag psr t0 hf mb2 lf br3')
-        const es = Log.time.parse(e.s)
-        const dp = Log.utils.calcDP(es)
-        const wd = (Log.time.parse(e.e) - es) / 86400 * 100
-        const mg = dp - (lw + lp)
-        const col = mode === 'sector' ? e.sCol :
-        mode === 'project' ? e.pCol :
-        mode === 'none' && Log.config.ui.colour
+        const dp = Log.utils.calcDP(s)
+        const wd = dur * 3600 / 86400 * 100
+        const col = Log.config.ui.colourMode === 'sector' ? sCol :
+                    Log.config.ui.colourMode === 'project' ? pCol :
+                    Log.config.ui.colourMode === 'none' && Log.config.ui.colour
 
         div.style.width = `${wd}%`
-        div.style.marginLeft = `${mg}%`
+        div.style.marginLeft = `${dp - (lw + lp)}%`
         div.style.backgroundColor = col || Log.config.ui.colour
 
         append(con, div)
@@ -153,13 +150,11 @@ Log.vis = {
   list(mode, val, con, ent = Log.log) {
     if (!isValidArray(ent) || isEmpty(ent) || !isString(con) || !exists(con)) return
 
-    const list = Log.data.sortValues(ent, mode, val)
-
     let col = ''
     let sh = 0
     let wd = 0
 
-    list.map(e => {
+    Log.data.sortValues(ent, mode, val).map(e => {
       if (mode === 'sec') {
         col = Log.palette[e[0]]
         sh = Log.data.sh(e[0], ent)
@@ -175,8 +170,6 @@ Log.vis = {
       }
 
       const li = create('li', 'mb4 c-pt')
-      const tl = create('span', 'dib xw6 elip', e[0])
-      const st = create('span', 'rf', `${e[1].toFixed(2)} h`)
       const br = create('div', 'wf sh1')
       const dt = create('div', 'psr t0 hf lf br3')
 
@@ -184,8 +177,8 @@ Log.vis = {
       dt.style.width = `${wd}%`
       li.setAttribute('onclick', `Log.detail.${mode}('${e[0]}')`)
 
-      li.appendChild(tl)
-      li.appendChild(st)
+      li.appendChild(create('span', 'dib xw6 elip', e[0]))
+      li.appendChild(create('span', 'rf', `${e[1].toFixed(2)} h`))
       br.appendChild(dt)
       li.appendChild(br)
       append(con, li)
@@ -223,15 +216,13 @@ Log.vis = {
 
     Log.data.sortValues(ent, mode).map(e => {
       const col = mode === 'sec' ? Log.palette[e[0]] : Log.projectPalette[e[0]]
-      const perc = e[1]
       const item = create('li', 'c3 mb3 f6 lhc')
       const code = create('div', 'dib sh3 sw3 brf mr2 lhs')
-      const name = create('div', 'dib', `${e[0]} (${perc.toFixed(2)}%)`)
 
       code.style.backgroundColor = col || Log.config.ui.colour
 
       item.appendChild(code)
-      item.appendChild(name)
+      item.appendChild(create('div', 'dib', `${e[0]} (${e[1].toFixed(2)}%)`))
       append(con, item)
     })
   },
@@ -246,7 +237,7 @@ Log.vis = {
     if (!isValidArray(ent) || isEmpty(ent) || !isString(con) || !exists(con)) return
 
     const set = Log.data.sortEntries(ent)
-    const setLength = set.length
+    const length = set.length
 
     set.map(e => {
       const list = mode === 'sec' ? Log.data.listSectors(e) : Log.data.listProjects(e)
@@ -255,7 +246,7 @@ Log.vis = {
       const inn = create('div', 'sw1 hf cn bb')
       const cor = create('div', 'psa sw1 b0 bg-noir br3')
 
-      col.style.width = `${100 / setLength}%`
+      col.style.width = `${100 / length}%`
       cor.style.backgroundColor = Log.config.ui.colour
       cor.style.height = `${height}%`
 
@@ -270,21 +261,20 @@ Log.vis = {
    * @param {string} con - Container
    */
   gridLines(con) {
-    const div100 = create('div', 'psa wf bt o1')
-    const div75 = create('div', 'psa wf bt o1')
-    const div50 = create('div', 'psa wf bt o1')
-    const div25 = create ('div', 'psa wf bt o1')
-    const div0 = create('div', 'psa wf bt o1 b0')
+    const d100 = create('div', 'psa wf bt o1')
+    const d75 = create('div', 'psa wf bt o1')
+    const d50 = create('div', 'psa wf bt o1')
+    const d25 = create ('div', 'psa wf bt o1')
 
-    div100.style.top = '0'
-    div75.style.top = '25%'
-    div50.style.bottom = '50%'
-    div25.style.bottom = '25%'
+    d100.style.top = '0'
+    d75.style.top = '25%'
+    d50.style.bottom = '50%'
+    d25.style.bottom = '25%'
 
-    append(con, div100)
-    append(con, div75)
-    append(con, div50)
-    append(con, div25)
-    append(con, div0)
+    append(con, d100)
+    append(con, d75)
+    append(con, d50)
+    append(con, d25)
+    append(con, create('div', 'psa wf bt o1 b0'))
   }
 }

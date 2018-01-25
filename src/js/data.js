@@ -22,14 +22,13 @@ Log.data = {
 
     let p = []
 
-    ent.map((e, i) => {
-      const sCol = user.palette[e.c] || user.config.ui.colour
-      const pCol = user.projectPalette[e.t] || user.config.ui.colour
+    ent.map(({s, e, c, t, d}, i) => {
+      const sCol = user.palette[c] || user.config.ui.colour
+      const pCol = user.projectPalette[t] || user.config.ui.colour
 
-      if (Log.time.date(e.s) !== Log.time.date(e.e) && e.e !== 'undefined') {
-        const a = Log.time.convert(Log.time.parse(e.s))
-        const b = Log.time.convert(Log.time.parse(e.e))
-
+      if (Log.time.date(s) !== Log.time.date(e) && !isUndefined(e)) {
+        const a = Log.time.convert(s)
+        const b = Log.time.convert(e)
         const ne = Log.time.toHex(
           new Date(a.getFullYear(), a.getMonth(), a.getDate(), 23, 59, 59)
         )
@@ -38,18 +37,17 @@ Log.data = {
         )
 
         p.push({
-          id: i + 1, s: e.s, e: ne, c: e.c, t: e.t, d: e.d,
-          dur: Log.time.duration(e.s, ne), sCol, pCol
+          id: i + 1, s, e: ne, c, t, d,
+          dur: Log.time.duration(s, ne), sCol, pCol
         })
-
         p.push({
-          id: i + 1, s: ns, e: e.e, c: e.c, t: e.t, d: e.d,
-          dur: Log.time.duration(ns, e.e), sCol, pCol
+          id: i + 1, s: ns, e, c, t, d,
+          dur: Log.time.duration(ns, e), sCol, pCol
         })
       } else {
         p.push({
-          id: i + 1, s: e.s, e: e.e, c: e.c, t: e.t, d: e.d,
-          dur: Log.time.duration(e.s, e.e), sCol, pCol
+          id: i + 1, s, e, c, t, d,
+          dur: Log.time.duration(s, e), sCol, pCol
         })
       }
     })
@@ -68,8 +66,8 @@ Log.data = {
     let ent = []
 
     Log.log.map(e => {
-      if (e.e !== 'undefined') {
-        const a = Log.time.convert(Log.time.parse(e.s))
+      if (!isUndefined(e.e)) {
+        const a = Log.time.convert(e.s)
 
         a.getFullYear() === d.getFullYear()
         && a.getMonth() === d.getMonth()
@@ -92,11 +90,11 @@ Log.data = {
 
     let ent = []
 
-    const span = ((start, stop) => {
+    const span = ((start, end) => {
       let dates = []
       let current = start
 
-      while (current <= stop) {
+      while (current <= end) {
         dates.push(new Date(current))
         current = current.addDays(1)
       }
@@ -127,16 +125,9 @@ Log.data = {
   getEntriesByDay(d, ent = Log.log) {
     if (!isNumber(d) || d < 0 || d > 6 || !isValidArray(ent)) return
     if (!isObject(ent[0])) return
-
-    let entries = []
-
-    ent.map(e => {
-      if (e.e !== 'undefined' && Log.time.convert(Log.time.parse(e.s)).getDay() === d) {
-        entries.push(e)
-      }
-    })
-
-    return entries
+    return ent.filter(({s, e}) =>
+      !isUndefined(e) && Log.time.convert(s).getDay() === d
+    )
   },
 
   /**
@@ -148,10 +139,7 @@ Log.data = {
   getEntriesByProject(pro, ent = Log.log) {
     if (!isString(pro) || isEmpty(pro) ||
     !isValidArray(ent) || !hasEntries(ent)) return
-
-    let entries = []
-    ent.map(e => e.e !== 'undefined' && e.t === pro && entries.push(e))
-    return entries
+    return ent.filter(e => !isUndefined(e.e) && e.t === pro)
   },
 
   /**
@@ -163,10 +151,7 @@ Log.data = {
   getEntriesBySector(sec, ent = Log.log) {
     if (!isString(sec) || isEmpty(sec) ||
     !isValidArray(ent) || !hasEntries(ent)) return
-
-    let entries = []
-    ent.map(e => e.e !== 'undefined' && e.c === sec && entries.push(e))
-    return entries
+    return ent.filter(e => !isUndefined(e.e) && e.c === sec)
   },
 
   /**
@@ -177,9 +162,7 @@ Log.data = {
   sortEntries(ent = Log.log, end = new Date()) {
     if (!isValidArray(ent) || !isObject(end) || !hasEntries(ent)) return
 
-    const days = Log.time.listDates(
-      Log.time.convert(Log.time.parse(ent[0].s)), end
-    )
+    const days = Log.time.listDates(Log.time.convert(ent[0].s), end)
 
     let list = []
     let slots = []
@@ -231,8 +214,7 @@ Log.data = {
       (mode === 'sec' ? Log.data.sp(e, ent) : Log.data.pp(e, ent))
     })
 
-    let sorted = Object.keys(temp).sort((a, b) => temp[a] - temp[b])
-    sorted = sorted.reverse()
+    const sorted = Object.keys(temp).sort((a, b) => temp[a] - temp[b]).reverse()
 
     let sor = []
 
@@ -256,9 +238,8 @@ Log.data = {
    */
   listProjects(ent = Log.log) {
     if (!isValidArray(ent)) return
-
     let l = []
-    ent.map(e => e.e !== 'undefined' && l.indexOf(e.t) === -1 && l.push(e.t))
+    ent.map(({e, t}) => !isUndefined(e) && l.indexOf(t) === -1 && l.push(t))
     return l
   },
 
@@ -269,9 +250,8 @@ Log.data = {
    */
   listSectors(ent = Log.log) {
     if (!isValidArray(ent)) return
-
     let l = []
-    ent.map(e => e.e !== 'undefined' && l.indexOf(e.c) === -1 && l.push(e.c))
+    ent.map(({e, c}) => !isUndefined(e) && l.indexOf(c) === -1 && l.push(c))
     return l
   },
 
@@ -285,11 +265,9 @@ Log.data = {
 
     let days = Array(7).fill(0)
 
-    ent.map(e => {
-      if (e.e !== 'undefined') {
-        days[Log.time.convert(Log.time.parse(e.s)).getDay()] += e.dur
-      }
-    })
+    ent.map(({s, e, dur}) =>
+      !isUndefined(e) && (days[Log.time.convert(s).getDay()] += dur)
+    )
 
     return days
   },
@@ -313,12 +291,11 @@ Log.data = {
 
     let hours = Array(25).fill(0)
 
-    ent.map(e => {
-      if (e.e !== 'undefined') {
-        const es = Log.time.parse(e.s)
-        let index = Log.time.convert(es).getHours()
-        let time = Number(e.dur.toFixed(2))
-        let remainder = Number((time % 1).toFixed(2))
+    ent.map(({s, e, dur}) => {
+      if (!isUndefined(e)) {
+        let index = Log.time.convert(s).getHours()
+        const time = Number(dur.toFixed(2))
+        const remainder = Number((time % 1).toFixed(2))
         let block = time - remainder
 
         hours[index] += block - (block - 1)
@@ -354,7 +331,7 @@ Log.data = {
   listDurations(ent = Log.log) {
     if (!isValidArray(ent)) return
     let list = []
-    ent.map(e => e.e !== 'undefined' && list.push(e.dur))
+    ent.map(({e, dur}) => !isUndefined(e) && list.push(dur))
     return list
   },
 
@@ -420,8 +397,8 @@ Log.data = {
   lp(ent = Log.log) {
     if (isEmpty(ent)) return 0
 
-    const e = Log.time.convert(Log.time.parse(ent[0].s))
-    const d = Log.time.convert(Log.time.parse(ent.slice(-1)[0].s))
+    const e = Log.time.convert(ent[0].s)
+    const d = Log.time.convert(ent.slice(-1)[0].s)
     const n = Math.ceil((
               new Date(d.getFullYear(), d.getMonth(), d.getDate()) -
               new Date(e.getFullYear(), e.getMonth(), e.getDate())
@@ -501,21 +478,15 @@ Log.data = {
   listFocus(mode, ent = Log.cache.sortEntries) {
     if (!isValidArray(ent)) return
 
-    let list = []
-
     if (mode === 'sector') {
-      ent.map(e => {
-        let f = Log.data.sectorFocus(Log.data.listSectors(e))
-        f !== 0 && list.push(f)
+      return ent.filter(e => {
+        Log.data.sectorFocus(Log.data.listSectors(e)) !== 0
       })
     } else if (mode === 'project') {
-      ent.map(e => {
-        let f = Log.data.projectFocus(Log.data.listProjects(e))
-        f !== 0 && list.push(f)
+      return ent.filter(e => {
+        Log.data.projectFocus(Log.data.listProjects(e)) !== 0
       })
-    }
-
-    return list
+    } else return
   },
 
   /**
@@ -559,10 +530,9 @@ Log.data = {
   focusAvg(ent = Log.log) {
     if (!isValidArray(ent)) return
 
-    let avg = Log.data.listSectors(ent).reduce(
-      (total, num) => {
-        return total + Log.data.sh(num, ent) * (Log.data.sp(num, ent) / 100)
-      }, 0)
+    const avg = Log.data.listSectors(ent).reduce((total, num) => {
+      return total + Log.data.sh(num, ent) * (Log.data.sp(num, ent) / 100)
+    }, 0)
 
     return avg / Log.data.lh(ent)
   },
@@ -656,11 +626,7 @@ Log.data = {
       mode === 'project' ? pCol :
       mode === 'none' && Log.config.ui.colour
 
-      data[i].push({
-        wh,
-        col,
-        pos: lw
-      })
+      data[i].push({wh, col, pos: lw})
 
       lw += wh
     }
@@ -669,7 +635,7 @@ Log.data = {
       data.push([])
       if (!isEmpty(e)) {
         e.map((o, m) => {
-          if (o.e !== 'undefined') {
+          if (!isUndefined(o.e)) {
             m === 0 && (lw = 0)
             addEntry(e[m], i)
           }
@@ -692,10 +658,9 @@ Log.data = {
     let data = []
     let lp = 0
 
-    const addEntry = ({s, e, c, t, sCol, pCol}, i) => {
-      const es = Log.time.parse(s)
-      const wd = (Log.time.parse(e) - es) / 86400 * 100
-      const dp = Log.utils.calcDP(es)
+    const addEntry = ({s, e, c, t, dur, sCol, pCol}, i) => {
+      const wd = dur * 3600 / 86400 * 100
+      const dp = Log.utils.calcDP(s)
       const col = mode === 'sector' ? sCol :
                   mode === 'project' ? pCol :
                   mode === 'none' && Log.config.ui.colour
@@ -711,7 +676,7 @@ Log.data = {
       data.push([])
       if (!isEmpty(e)) {
         e.map((o, m) => {
-          if (o.e !== 'undefined') {
+          if (!isUndefined(o.e)) {
             m === 0 && (lp = 0)
             addEntry(e[m], i)
           }
