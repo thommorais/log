@@ -19,11 +19,19 @@ const notify = m => {
   new window.Notification(m)
 }
 
-const create = (element, className = undefined, content = undefined) => {
-  const el = document.createElement(element)
-  !isUndefined(className) && (el.className = className)
-  !isUndefined(content) && (el.innerHTML = content)
-  return el
+const create = (el) => {
+  const e = document.createElement(el.type)
+  !isUndefined(el.id) && (e.id = el.id)
+  !isUndefined(el.className) && (e.className = el.className)
+  !isUndefined(el.innerHTML) && (e.innerHTML = el.innerHTML)
+  !isUndefined(el.width) && (e.style.width = el.width)
+  !isUndefined(el.height) && (e.style.height = el.height)
+  !isUndefined(el.backgroundColor) && (e.style.backgroundColor = el.backgroundColor)
+  !isUndefined(el.onclick) && (e.setAttribute('onclick', el.onclick))
+  !isUndefined(el.top) && (e.style.top = el.top)
+  !isUndefined(el.bottom) && (e.style.bottom = el.bottom)
+  !isUndefined(el.marginLeft) && (e.style.marginLeft = el.marginLeft)
+  return e
 }
 
 /**

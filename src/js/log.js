@@ -350,21 +350,46 @@ var Log = {
       const l = ent.length
 
       ent.map((e, i) => {
-        const liClass = i !== l - 1 ? 'f6 lhc bb pb3 mb3' : 'f6 lhc'
-        const li = create('li', liClass)
-        const id = create('span', 'mr3 o7', `#${e.id}`)
-        const tim = create('span', 'mr3 o7', `${Log.time.stamp(Log.time.convert(e.s))} &ndash; ${Log.time.stamp(Log.time.convert(e.e))}`)
-        const sec = create('span', 'mr3 o7', e.c)
-        const pro = create('span', 'o7', e.t)
-        const dur = create('span', 'rf o7', `${e.dur.toFixed(2)} h`)
-        const ent = create('p', 'f4 lhc', e.d)
+        const li = create({
+          type: 'li',
+          className: i !== l - 1 ? 'f6 lhc bb pb3 mb3' : 'f6 lhc'
+        })
 
-        li.appendChild(id)
-        li.appendChild(tim)
-        li.appendChild(sec)
-        li.appendChild(pro)
-        li.appendChild(dur)
-        li.appendChild(ent)
+        li.appendChild(create({
+          type: 'span',
+          className: 'mr3 o7',
+          innerHTML: `#${e.id}`
+        }))
+
+        li.appendChild(create({
+          type: 'span',
+          className: 'mr3 o7',
+          innerHTML: `${Log.time.stamp(Log.time.convert(e.s))} &ndash; ${Log.time.stamp(Log.time.convert(e.e))}`
+        }))
+
+        li.appendChild(create({
+          type: 'span',
+          className: 'mr3 o7',
+          innerHTML: e.c
+        }))
+
+        li.appendChild(create({
+          type: 'span',
+          className: 'o7',
+          innerHTML: e.t
+        }))
+
+        li.appendChild(create({
+          type: 'span',
+          className: 'rf o7',
+          innerHTML: `${e.dur.toFixed(2)} h`
+        }))
+
+        li.appendChild(create({
+          type: 'p',
+          className: 'f4 lhc',
+          innerHTML: e.d
+        }))
 
         append('journalEntries', li)
       })
@@ -389,13 +414,12 @@ var Log = {
       ent.map((e, i) => {
         if (!isEmpty(e)) {
           const s = e[0].s
-          const li = create(
-            'li',
-            'lhd c-pt',
-            Log.time.displayDate(Log.time.convert(s))
-          )
-          li.setAttribute('onclick', `Log.journal.translate('${s}')`)
-          document.getElementById('journalNav').appendChild(li)
+          document.getElementById('journalNav').appendChild(create({
+            type: 'li',
+            className: 'lhd c-pt',
+            innerHTML: Log.time.displayDate(Log.time.convert(s)),
+            onclick: `Log.journal.translate('${s}')`
+          }))
         }
       })
     },
