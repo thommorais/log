@@ -5,7 +5,6 @@ t = (n, t, e) => {
 
 console.log('CONSOLE.JS')
 
-
 console.log('DATA.JS')
 
 t('data.parse (empty [])', Log.data.parse([]), undefined)
@@ -14,40 +13,40 @@ t('data.parse (non-array)', Log.data.parse(1), undefined)
 
 console.log('')
 
-t('getEntriesByDate !Date', Log.data.getEntriesByDate(0), undefined)
-t('getEntriesByDate past', Log.data.getEntriesByDate(new Date(1997, 2, 2)), undefined)
-t('getEntriesByDate future', Log.data.getEntriesByDate(new Date(2019, 2, 2)), undefined)
+t('entriesByDate !Date', Log.data.entriesByDate(0), undefined)
+t('entriesByDate past', Log.data.entriesByDate(new Date(1997, 2, 2)), undefined)
+t('entriesByDate future', Log.data.entriesByDate(new Date(2019, 2, 2)), undefined)
 
 console.log('')
 
-t('getEntriesByPeriod !Date', Log.data.getEntriesByPeriod(1), undefined)
-t('getEntriesByPeriod !Date', Log.data.getEntriesByPeriod(new Date(), 1), undefined)
-t('getEntriesByPeriod impossible range', Log.data.getEntriesByPeriod(new Date(2018, 0, 2), new Date(2018, 0, 1)), undefined)
+t('entriesByPeriod !Date', Log.data.entriesByPeriod(1), undefined)
+t('entriesByPeriod !Date', Log.data.entriesByPeriod(new Date(), 1), undefined)
+t('entriesByPeriod impossible range', Log.data.entriesByPeriod(new Date(2018, 0, 2), new Date(2018, 0, 1)), undefined)
 
 console.log('')
 
-t('getRecentEntries string', Log.data.getRecentEntries('1'), undefined)
-t('getRecentEntries 0', Log.data.getRecentEntries(0), undefined)
+t('recentEntries string', Log.data.recentEntries('1'), undefined)
+t('recentEntries 0', Log.data.recentEntries(0), undefined)
 
 console.log('')
 
-t('getEntriesByDay string', Log.data.getEntriesByDay('Sunday'), undefined)
-t('getEntriesByDay invalid number', Log.data.getEntriesByDay(-1), undefined)
-t('getEntriesByDay invalid number', Log.data.getEntriesByDay(8), undefined)
-t('getEntriesByDay empty []', Log.data.getEntriesByDay(0, []), undefined)
-t('getEntriesByDay invalid array', Log.data.getEntriesByDay(0, [1]), undefined)
+t('entriesByDay string', Log.data.entriesByDay('Sunday'), undefined)
+t('entriesByDay invalid number', Log.data.entriesByDay(-1), undefined)
+t('entriesByDay invalid number', Log.data.entriesByDay(8), undefined)
+t('entriesByDay empty []', Log.data.entriesByDay(0, []), undefined)
+t('entriesByDay invalid array', Log.data.entriesByDay(0, [1]), undefined)
 
 console.log('')
 
-t('getEntriesByProject nonexistent', Log.data.getEntriesByProject('Egg'), undefined)
-t('getEntriesByProject [!{}]', Log.data.getEntriesByProject('Log', [1]), undefined)
-t('getEntriesByProject non-string', Log.data.getEntriesByProject(1), undefined)
+t('entriesByProject nonexistent', Log.data.entriesByProject('Egg'), undefined)
+t('entriesByProject [!{}]', Log.data.entriesByProject('Log', [1]), undefined)
+t('entriesByProject non-string', Log.data.entriesByProject(1), undefined)
 
 console.log('')
 
-t('getEntriesBySector nonexistent', Log.data.getEntriesBySector('Egg'), undefined)
-t('getEntriesBySector [!{}]', Log.data.getEntriesBySector('Code', [1]), undefined)
-t('getEntriesBySector non-string', Log.data.getEntriesBySector(1), undefined)
+t('entriesBySector nonexistent', Log.data.entriesBySector('Egg'), undefined)
+t('entriesBySector [!{}]', Log.data.entriesBySector('Code', [1]), undefined)
+t('entriesBySector non-string', Log.data.entriesBySector(1), undefined)
 
 console.log('')
 

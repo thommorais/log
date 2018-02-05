@@ -75,14 +75,14 @@ Log.console = {
     let ind = []
     let param = ''
 
-    part.map(e => !e.includes('"') && params.push(e))
-    p.map((e, i) => e === '"' && ind.push(i))
+    part.map(e => !e.includes('"') && (params[params.length] = e))
+    p.map((e, i) => e === '"' && (ind[ind.length] = i))
 
     for (let i = 0, l = ind.length; i < l; i++) {
       for (let o = ind[i] + 1; o < ind[i + 1]; o++) param += p[o]
-      params.push(param)
-      i++
+      params[params.length] = param
       param = ''
+      i++
     }
 
     return params
@@ -154,7 +154,7 @@ Log.console = {
     if (!isEmpty(user.log) && isUndefined(user.log.slice(-1)[0].e)) Log.console.endLog()
 
     let p = []
-    let indices = []
+    let ind = []
     let sect = ''
     let proj = ''
     let desc = ''
@@ -162,35 +162,29 @@ Log.console = {
     if (s.includes('"')) {
       p = s.split('')
 
-      p.map((e, i) => e === '"' && indices.push(i))
+      p.map((e, i) => e === '"' && (ind[ind.length] = i))
 
-      for (let i = indices[0] + 1; i < indices[1]; i++) sect += p[i]
-      for (let i = indices[2] + 1; i < indices[3]; i++) proj += p[i]
-      for (let i = indices[4] + 1; i < indices[5]; i++) desc += p[i]
-    } else if (s.includes(';')) {
-      p = s.split(';')
-      sect = p[0].substring(6, p[0].length).trim()
-      proj = p[1].trim()
-      desc = p[2].trim()
-    } else if (s.includes('|')) {
-      p = s.split('|')
-      sect = p[0].substring(6, p[0].length).trim()
-      proj = p[1].trim()
-      desc = p[2].trim()
-    } else if (s.includes(',')) {
-      p = s.split(',')
-      sect = p[0].substring(6, p[0].length).trim()
-      proj = p[1].trim()
-      desc = p[2].trim()
-    } else return
+      for (let i = ind[0] + 1; i < ind[1]; i++) sect += p[i]
+      for (let i = ind[2] + 1; i < ind[3]; i++) proj += p[i]
+      for (let i = ind[4] + 1; i < ind[5]; i++) desc += p[i]
+    } else {
+      if (s.includes(';')) p = s.split(';')
+      else if (s.includes('|')) p = s.split('|')
+      else if (s.includes(',')) p = s.split(',')
+      else return
 
-    user.log.push({
+     sect = p[0].substring(6, p[0].length).trim()
+     proj = p[1].trim()
+     desc = p[2].trim()
+    }
+
+    user.log[user.log.length] = {
       s: Log.time.toHex(new Date()),
       e: undefined,
       c: sect,
       t: proj,
       d: desc
-    })
+    }
 
     notify(`Started log: ${sect} - ${proj} - ${desc}`)
 
@@ -205,7 +199,7 @@ Log.console = {
     if (isEmpty(Log.log)) return
 
     const last = user.log.slice(-1)[0]
-    // if (!isUndefined(last.e)) return
+    if (!isUndefined(last.e)) return
     last.e = Log.time.toHex(new Date())
     clearInterval(timer)
 
@@ -224,13 +218,13 @@ Log.console = {
 
     if (isUndefined(last.e)) return
 
-    user.log.push({
+    user.log[user.log.length] = {
       s: Log.time.toHex(new Date()),
       e: undefined,
       c: last.c,
       t: last.t,
       d: last.d
-    })
+    }
 
     notify(`Log resumed: ${last.c} - ${last.t} - ${last.d}`)
 
@@ -315,9 +309,9 @@ Log.console = {
     } else if (contains(attr, 'desc dsc description')) {
       user.log[id].d = val
     } else if (contains(attr, 'start')) {
-      user.log[id].s = Log.time.convertDateTime(value)
+      user.log[id].s = Log.time.convertDateTime(val)
     } else if (contains(attr, 'end')) {
-      user.log[id].e = Log.time.convertDateTime(value)
+      user.log[id].e = Log.time.convertDateTime(val)
     } else if (contains(attr, 'duration dur')) {
       const duration = parseInt(val, 10) * 60 || 0
       user.log[id].e = Log.time.offset(user.log[id].s, duration)
@@ -341,23 +335,20 @@ Log.console = {
     }
 
     if (contains(mod, 'sector sec')) {
-      if (isEmpty(Log.data.getEntriesBySector(old))) {
+      if (isEmpty(Log.data.entriesBySector(old))) {
         notFound('sector')
         return
       }
-
       user.log.map(e => {if (e.c === old) e.c = val})
     } else if (contains(mod, 'project pro')) {
-      if (isEmpty(Log.data.getEntriesByProject(old))) {
+      if (isEmpty(Log.data.entriesByProject(old))) {
         notFound('project')
         return
       }
-
       user.log.map(e => {if (e.t === old) e.t = val})
     } else return
 
     notify(`The sector "${old}" has been renamed to "${val}."`)
-
     Log.options.update.all()
   },
 

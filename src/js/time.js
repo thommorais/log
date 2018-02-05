@@ -146,7 +146,7 @@ Log.time = {
     let c = new Date(s.getFullYear(), s.getMonth(), s.getDate(), 0, 0, 0)
 
     while (c <= e) {
-      l.push(new Date(c))
+      l[l.length] = new Date(c)
       c = Date.prototype.addDays.call(c, 1)
     }
 

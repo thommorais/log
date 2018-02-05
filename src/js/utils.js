@@ -19,45 +19,8 @@ const notify = m => {
   new window.Notification(m)
 }
 
-const create = (el) => {
-  const e = document.createElement(el.type)
-  !isUndefined(el.id) && (e.id = el.id)
-  !isUndefined(el.className) && (e.className = el.className)
-  !isUndefined(el.innerHTML) && (e.innerHTML = el.innerHTML)
-  !isUndefined(el.width) && (e.style.width = el.width)
-  !isUndefined(el.height) && (e.style.height = el.height)
-  !isUndefined(el.backgroundColor) && (e.style.backgroundColor = el.backgroundColor)
-  !isUndefined(el.onclick) && (e.setAttribute('onclick', el.onclick))
-  !isUndefined(el.top) && (e.style.top = el.top)
-  !isUndefined(el.bottom) && (e.style.bottom = el.bottom)
-  !isUndefined(el.marginLeft) && (e.style.marginLeft = el.marginLeft)
-  return e
-}
-
-/**
- * Take the last n items of an array (from lodash)
- * @param {Object[]} a - Array
- * @param {number} [n=1] - Number of items
- * @returns {Object[]} An array with the last n items
- */
-const takeRight = (a, n = 1) => {
-  const l = a == null ? 0 : a.length
-  let slice = (a, s, e) => {
-    let l = a == null ? 0 : a.length
-    if (!l) return []
-    s = s == null ? 0 : s
-    e = e === undefined ? l : e
-    if (s < 0) s = -s > l ? 0 : (l + s)
-    e = e > l ? l : e
-    if (e < 0) e += l
-    l = s > e ? 0 : ((e - s) >>> 0)
-    s >>>= 0
-    let i = -1
-    const r = new Array(l)
-    while (++i < l) r[i] = a[i + s]
-    return r
-  }
-  if (!l) return []
-  n = l - n
-  return slice(a, n < 0 ? 0 : n, l)
+const createEl = c => {
+  const e = document.createElement('div')
+  e.innerHTML = c
+  return e.firstElementChild
 }

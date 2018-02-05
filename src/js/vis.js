@@ -10,28 +10,20 @@ Log.vis = {
     if (isUndefined(data)) return
     if (isEmpty(data) || !isString(con) || !exists(con)) return
 
-    const addEntry = ({col, mg, wd}, row) => {
-      append(row, create({
-        type: 'div',
-        className: 'psr t0 sh1 mb2 lf br3',
-        backgroundColor: col,
-        width: `${wd}%`,
-        marginLeft: `${mg}%`
-      }))
-    }
-
-    const addRow = id => {
-      append(con, create({
-        type: 'div',
-        id: id,
-        className: 'db wf sh1 mt2 mb3'
-      }))
+    const add = ({col, mg, wd}, row) => {
+      append(row, createEl(
+        `<div class="psr t0 sh1 mb2 lf br3" style="background-color:${col};width:${wd}%;margin-left:${mg}%"></div>`
+      ))
     }
 
     data.map((e, i) => {
       const id = `${con}${i}`
-      isNull(document.getElementById(id)) && addRow(id)
-      !isEmpty(e) && e.map(o => addEntry(o, id))
+      if (isNull(document.getElementById(id))) {
+        append(con, createEl(
+          `<div id="${id}" class="db wf sh1 mt2 mb3"></div>`
+        ))
+      }
+      !isEmpty(e) && e.map(o => add(o, id))
     })
   },
 
@@ -48,29 +40,15 @@ Log.vis = {
     if (isEmpty(data) || !isString(con) || !exists(con)) return
 
     const addEntry = ({col, pos, wh}, row) => {
-      append(row, create({
-        type: 'div',
-        className: 'psa sw1',
-        backgroundColor: col,
-        height: `${wh}%`,
-        bottom: `${pos}%`
-      }))
+      append(row, createEl(
+        `<div class="psa sw1" style="background-color:${col};height:${wh}%;bottom:${pos}%"></div>`
+      ))
     }
 
     const addCol = id => {
-      const col = create({
-        type: 'div',
-        className: 'dib hf psr',
-        width: `${100 / Log.config.ui.view}%`
-      })
-
-      col.appendChild(create({
-        type: 'div',
-        id: id,
-        className: 'sw1 hf cn bb'
-      }))
-
-      append(con, col)
+      append(con, createEl(
+        `<div class="dib hf psr" style="width:${100 / Log.config.ui.view}%"><div id="${id}" class="sw1 hf cn bb"></div></div>`
+      ))
     }
 
     data.map((e, i) => {
@@ -89,7 +67,7 @@ Log.vis = {
   day(d = new Date(), con = 'dayChart') {
     if (!isObject(d) || !isString(con) || !exists(con)) return
 
-    const ent = Log.data.getEntriesByDate(d)
+    const ent = Log.data.entriesByDate(d)
 
     if (isEmpty(ent)) return
 
@@ -100,17 +78,13 @@ Log.vis = {
       if (!isUndefined(e)) {
         const dp = Log.utils.calcDP(s)
         const wd = dur * 3600 / 86400 * 100
-        const col = Log.config.ui.colourMode === 'sector' ? sCol :
-                    Log.config.ui.colourMode === 'project' ? pCol :
-                    Log.config.ui.colourMode === 'none' && Log.config.ui.colour
+        const cl = (Log.config.ui.colourMode === 'sector' ? sCol :
+          Log.config.ui.colourMode === 'project' ? pCol :
+          Log.config.ui.colourMode === 'none' && Log.config.ui.colour) || Log.config.ui.colour
 
-        append(con, create({
-          type: 'div',
-          className: 'nodrag psr t0 hf mb2 lf br3',
-          backgroundColor: col || Log.config.ui.colour,
-          width: `${wd}%`,
-          marginLeft: `${dp - (lw + lp)}%`
-        }))
+        append(con, createEl(
+          `<div class="nodrag psr t0 hf mb2 lf br3" style="background-color:${cl};width:${wd}%;margin-left:${dp - (lw + lp)}%"></div>`
+        ))
 
         lw = wd
         lp = dp
@@ -132,29 +106,13 @@ Log.vis = {
 
     peaks.map((e, i) => {
       const id = `${con}-${i}`
-      const col = create({
-        type: 'div',
-        id: id,
-        className: 'dib hf psr',
-        width: `${100 / peaks.length}%`
-      })
+      const col = mode === 'hours' ?
+        (i === (new Date).getHours() ? Log.config.ui.accent : Log.config.ui.colour) :
+        (i === (new Date).getDay() ? Log.config.ui.accent : Log.config.ui.colour)
 
-      const out = create({
-        type: 'div',
-        className: 'sw1 hf cn bb'
-      })
-
-      out.appendChild(create({
-        type: 'div',
-        className: 'psa b0 sw1 br3',
-        backgroundColor: mode === 'hours' ?
-          (i === (new Date).getHours() ? Log.config.ui.accent : Log.config.ui.colour) :
-          (i === (new Date).getDay() ? Log.config.ui.accent : Log.config.ui.colour),
-        height: `${e / peak * 100}%`
-      }))
-
-      append(con, col)
-      append(id, out)
+      append(con, createEl(
+        `<div id="${id}" class="dib hf psr" style="width:${100 / peaks.length}%"><div class="sw1 hf cn bb"><div class="psa b0 sw1 br3" style="background-color:${col};height:${e / peak * 100}%"></div></div></div>`
+      ))
     })
   },
 
@@ -185,38 +143,15 @@ Log.vis = {
 
       if (Log.config.ui.colourMode === 'none') col = Log.config.ui.colour
 
-      const li = create({
-        type: 'li',
-        className: 'mb4 c-pt',
-        onclick: `Log.detail.${mode}('${e[0]}')`
-      })
-
-      const br = create({
-        type: 'div',
-        className: 'wf sh1'
-      })
-
-      li.appendChild(create({
-        type: 'span',
-        className: 'dib xw6 elip',
-        innerHTML: e[0]
-      }))
-
-      li.appendChild(create({
-        type: 'span',
-        className: 'rf',
-        innerHTML: `${e[1].toFixed(2)} h`
-      }))
-
-      br.appendChild(create({
-        type: 'div',
-        className: 'psr t0 hf lf br3',
-        backgroundColor: col || Log.config.ui.colour,
-        width: `${wd}%`
-      }))
-
-      li.appendChild(br)
-      append(con, li)
+      append(con, createEl(
+        `<li class="mb4 c-pt" onclick="Log.detail.${mode}('${e[0]}')">
+          <span class="dib xw6 elip">${e[0]}</span>
+          <span class="rf">${e[1].toFixed(2)} h</span>
+          <div class="wf sh1">
+            <div class="psr t0 hf lf br3" style="background-color:${col || Log.config.ui.colour};width:${wd}%"></div>
+          </div>
+        </li>`
+      ))
     })
   },
 
@@ -230,13 +165,9 @@ Log.vis = {
     if (!isValidArray(ent) || isEmpty(ent) || !isString(con) || !exists(con)) return
 
     Log.data.sortValues(ent, mode).map(e => {
-      const col = mode === 'sec' ? Log.palette[e[0]] : Log.projectPalette[e[0]]
-      append(con, create({
-        type: 'div',
-        className: 'psr t0 hf lf',
-        backgroundColor: col || Log.config.ui.colour,
-        width: `${e[1]}%`
-      }))
+      append(con, createEl(
+        `<div class="psr t0 hf lf" style="background-color:${(mode === 'sec' ? Log.palette[e[0]] : Log.projectPalette[e[0]]) || Log.config.ui.colour};width:${e[1]}%"></div>`
+      ))
     })
   },
 
@@ -250,25 +181,10 @@ Log.vis = {
     if (!isValidArray(ent) || isEmpty(ent) || !isString(con) || !exists(con) || ['sec', 'pro'].indexOf(mode) < 0) return
 
     Log.data.sortValues(ent, mode).map(e => {
-      const col = mode === 'sec' ? Log.palette[e[0]] : Log.projectPalette[e[0]]
-      const item = create({
-        type: 'li',
-        className: 'c3 mb3 f6 lhc'
-      })
-
-      item.appendChild(create({
-        type: 'div',
-        className: 'dib sh3 sw3 brf mr2 lhs',
-        backgroundColor: col || Log.config.ui.colour
-      }))
-
-      item.appendChild(create({
-        type: 'div',
-        className: 'dib',
-        innerHTML: `${e[0]} (${e[1].toFixed(2)}%)`
-      }))
-
-      append(con, item)
+      const col = (mode === 'sec' ? Log.palette[e[0]] : Log.projectPalette[e[0]]) || Log.config.ui.colour
+      append(con, createEl(
+        `<li class="c3 mb3 f6 lhc"><div class="dib sh3 sw3 brf mr2 lhs" style="background-color:${col}"></div><div class="dib">${e[0]} (${e[1].toFixed(2)}%)</div></li>`
+      ))
     })
   },
 
@@ -285,29 +201,14 @@ Log.vis = {
     const length = set.length
 
     set.map(e => {
-      const list = mode === 'sec' ? Log.data.listSectors(e) : Log.data.listProjects(e)
-      const height = list === undefined ? 0 : 1 / list.length * 100
-
-      const col = create({
-        type: 'div',
-        className: 'dib hf psr',
-        width: `${100 / length}%`
-      })
-
-      const inn = create({
-        type: 'div',
-        className: 'sw1 hf cn bb'
-      })
-
-      inn.appendChild(create({
-        type: 'div',
-        className: 'psa sw1 b0 bg-noir br3',
-        backgroundColor: Log.config.ui.colour,
-        height: `${height}%`
-      }))
-
-      col.appendChild(inn)
-      append(con, col)
+      const list = mode === 'sec' ? Log.data.listSec(e) : Log.data.listPro(e)
+      append(con, createEl(
+        `<div class="dib hf psr" style="width:${100 / length}%">
+          <div class="sw1 hf cn bb">
+            <div class="psa sw1 b0 br3" style="background-color:${Log.config.ui.colour};height:${list === undefined ? 0 : 1 / list.length * 100}%"></div>
+          </div>
+        </div>`
+      ))
     })
   },
 
@@ -316,33 +217,10 @@ Log.vis = {
    * @param {string} con - Container
    */
   gridLines(con) {
-    append(con, create({
-      type: 'div',
-      className: 'psa wf bt o1',
-      top: '0'
-    }))
-
-    append(con, create({
-      type: 'div',
-      className: 'psa wf bt o1',
-      top: '25%'
-    }))
-
-    append(con, create({
-      type: 'div',
-      className: 'psa wf bt o1',
-      bottom: '50%'
-    }))
-
-    append(con, create({
-      type: 'div',
-      className: 'psa wf bt o1',
-      bottom: '25%'
-    }))
-
-    append(con, create({
-      type: 'div',
-      className: 'psa wf bt o1 b0'
-    }))
+    append(con, createEl(`<div class="psa wf bt o1 t0"></div>`))
+    append(con, createEl(`<div class="psa wf bt o1" style="top:25%"></div>`))
+    append(con, createEl(`<div class="psa wf bt o1" style="top:50%"></div>`))
+    append(con, createEl(`<div class="psa wf bt o1" style="bottom:25%"></div>`))
+    append(con, createEl(`<div class="psa wf bt o1 b0"></div>`))
   }
 }
