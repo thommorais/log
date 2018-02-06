@@ -1,3 +1,5 @@
+const timer = require('headless-work-timer')
+
 Log = window.Log || {}
 Log.console = {
   history: [],

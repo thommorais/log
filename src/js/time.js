@@ -1,3 +1,7 @@
+const Aequirys = require('aequirys')
+const Monocal = require('./utils/monocal.min.js')
+const Desamber = require('./utils/desamber.js')
+
 const months = 'Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec'.split(' ')
 
 Log = window.Log || {}
