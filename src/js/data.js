@@ -1,7 +1,7 @@
-Date.prototype.addDays = function(days) {
-  const date = new Date(this.valueOf())
-  date.setDate(date.getDate() + days)
-  return date
+Date.prototype.addDays = function(n) {
+  const d = new Date(this.valueOf())
+  d.setDate(d.getDate() + n)
+  return d
 }
 
 const days = 'Sunday Monday Tuesday Wednesday Thursday Friday Saturday'.split(' ')
@@ -31,12 +31,11 @@ Log.data = {
         const ns = Log.time.toHex(
           new Date(b.getFullYear(), b.getMonth(), b.getDate(), 0, 0, 0)
         )
-
         p[p.length] = {
-          id: i++, s, e: ne, c, t, d, dur: Log.time.duration(s, ne), sCol, pCol
+          id: i, s, e: ne, c, t, d, dur: Log.time.duration(s, ne), sCol, pCol
         }
         p[p.length] = {
-          id: i++, s: ns, e, c, t, d, dur: Log.time.duration(ns, e), sCol, pCol
+          id: i, s: ns, e, c, t, d, dur: Log.time.duration(ns, e), sCol, pCol
         }
       } else {
         p[p.length] = {
@@ -58,16 +57,32 @@ Log.data = {
 
     let ent = []
 
-    const compare = (a, b) => {
-      return a.getFullYear() === b.getFullYear()
+    const com = (a, b) => (
+      a.getFullYear() === b.getFullYear()
       && a.getMonth() === b.getMonth()
       && a.getDate() === b.getDate()
-    }
+    )
 
     Log.log.map(e => {
-      if (!isUndefined(e.e)) {
-        compare(Log.time.convert(e.s), d) && (ent[ent.length] = e)
-      }
+      isUndefined(e.e) || com(Log.time.convert(e.s), d) && (ent[ent.length] = e)
+    })
+
+    return ent
+  },
+
+  entByDate(d = new Date()) {
+    if (!isObject(d) || d.getTime() > new Date().getTime()) return
+
+    let ent = []
+
+    const com = (a, b) => (
+      a.getFullYear() === b.getFullYear()
+      && a.getMonth() === b.getMonth()
+      && a.getDate() === b.getDate()
+    )
+
+    Log.log.map(({s, e, id}) => {
+      isUndefined(e) || com(Log.time.convert(s), d) && (ent[ent.length] = id)
     })
 
     return ent
@@ -85,14 +100,10 @@ Log.data = {
     let ent = []
 
     const span = ((start, end) => {
-      let dates = []
-      let current = start
-
-      while (current <= end) {
+      for (var dates = [], current = start; current <= end;) {
         dates[dates.length] = new Date(current)
         current = current.addDays(1)
       }
-
       return dates
     })(ps, pe)
 
@@ -154,11 +165,10 @@ Log.data = {
   sortEntries(ent = Log.log, end = new Date()) {
     if (!isValidArray(ent) || !isObject(end) || !hasEntries(ent)) return
 
-    const days = Log.time.listDates(Log.time.convert(ent[0].s), end)
     let list = []
     let sorted = []
 
-    days.map(e => {
+    Log.time.listDates(Log.time.convert(ent[0].s), end).map(e => {
       list[list.length] = Log.time.date(Log.time.toHex(
         new Date(e.getFullYear(), e.getMonth(), e.getDate(), 0, 0, 0)
       ))
@@ -166,7 +176,7 @@ Log.data = {
     })
 
     ent.map(e => {
-      let x = list.indexOf(Log.time.date(e.s))
+      const x = list.indexOf(Log.time.date(e.s))
       x > -1 && (sorted[x][sorted[x].length] = e)
     })
 
@@ -181,9 +191,16 @@ Log.data = {
   sortEntriesByDay(a = Log.log) {
     if (!isValidArray(a) || !hasEntries(a)) return
     let s = []
-    for (let i = 0; i < 7; i++) {
+    for (let i = 0; i < 7; i++)
       s[s.length] = Log.data.entriesByDay(i, a)
-    }
+    return s
+  },
+
+  sortEntByDay(a = Log.log) {
+    if (!isValidArray(a) || !hasEntries(a)) return
+    let s = []
+    for (let i = 0; i < 7; i++)
+      s[s.length] = Log.data.entByDay(i, a)
     return s
   },
 
@@ -200,11 +217,11 @@ Log.data = {
     const list = mod === 'sec' ? Log.data.listSec(ent) : Log.data.listPro(ent)
     let temp = []
 
-    list.map(e => {
+    list.map(e =>
       temp[e] = hp === 'hours' ?
-      (mod === 'sec' ? Log.data.sh(e, ent) : Log.data.ph(e, ent)) :
-      (mod === 'sec' ? Log.data.sp(e, ent) : Log.data.pp(e, ent))
-    })
+        (mod === 'sec' ? Log.data.sh(e, ent) : Log.data.ph(e, ent)) :
+        (mod === 'sec' ? Log.data.sp(e, ent) : Log.data.pp(e, ent))
+    )
 
     const sorted = Object.keys(temp).sort((a, b) => temp[a] - temp[b]).reverse()
 
@@ -330,8 +347,8 @@ Log.data = {
    * @returns {number} Minimum value
    */
   min(v) {
-    if (!isNumArray(v) || v === undefined) return '-'
-    return isEmpty(v) ? 0 : Math.min(...v)
+    return !isNumArray(v) || isUndefined(v) ?
+    '-' : isEmpty(v) ? 0 : Math.min(...v)
   },
 
   /**
@@ -340,8 +357,8 @@ Log.data = {
    * @returns {number} Maximum value
    */
   max(v) {
-    if (!isNumArray(v) || v === undefined) return '-'
-    return isEmpty(v) ? 0 : Math.max(...v)
+    return !isNumArray(v) || isUndefined(v) ?
+    '-' : isEmpty(v) ? 0 : Math.max(...v)
   },
 
   /**
@@ -350,8 +367,8 @@ Log.data = {
    * @returns {number} Average
    */
   avg(v) {
-    if (!isNumArray(v) || isUndefined(v)) return '-'
-    return isEmpty(v) ? 0 : Log.data.total(v) / v.length
+    return !isNumArray(v) || isUndefined(v) ? '-'
+    : isEmpty(v) ? 0 : Log.data.total(v) / v.length
   },
 
   total(v) {
@@ -373,9 +390,7 @@ Log.data = {
    * @returns {number} Average logged hours
    */
   avgLh(e = Log.cache.sortEntries) {
-    if (isEmpty(e)) return 0
-    let h = e.reduce((s, c) => s + Log.data.lh(c), 0)
-    return h / e.length
+    return isEmpty(e) ? 0 : e.reduce((s, c) => s + Log.data.lh(c),0) / e.length
   },
 
   /**
@@ -389,9 +404,9 @@ Log.data = {
     const e = Log.time.convert(a[0].s)
     const d = Log.time.convert(a.slice(-1)[0].s)
     const n = Math.ceil((
-              new Date(d.getFullYear(), d.getMonth(), d.getDate()) -
-              new Date(e.getFullYear(), e.getMonth(), e.getDate())
-            ) / 8.64e7)
+      new Date(d.getFullYear(), d.getMonth(), d.getDate()) -
+      new Date(e.getFullYear(), e.getMonth(), e.getDate())
+    ) / 864E5)
 
     return Log.data.lh(a) / (24 * (n + 1)) * 100
   },
@@ -454,27 +469,28 @@ Log.data = {
   streak(a = Log.cache.sortEntries) {
     let s = 0
     if (isEmpty(a)) return s
-    a.map(e => {s = e.length === 0 ? 0 : s + 1})
+    a.map(e => s = e.length === 0 ? 0 : s + 1)
     return s
   },
 
   /**
    * Get an array of focus stats
    * @param {string} m - Sector or project
-   * @param {Object[]=} a - Sorted entries
+   * @param {Object[]=} s - Sorted entries
    * @returns {Object[]} Array of focus stats
    */
-  listFocus(m, a = Log.cache.sortEntries) {
-    if (!isValidArray(a)) return
-    if (m === 'sector') {
-      return a.filter(e => {
-        Log.data.secFocus(Log.data.listSec(e)) !== 0
+  listFocus(m, s = Log.cache.sortEntries) {
+    if (!isValidArray(s)) return
+    let l = []
+    if (m === 'sector')
+      s.map(e => {
+        l[l.length] = Log.data.secFocus(Log.data.listSec(e))
       })
-    } else if (m === 'project') {
-      return a.filter(e => {
-        Log.data.proFocus(Log.data.listPro(e)) !== 0
+    if (m === 'project')
+      s.map(e => {
+        l[l.length] = Log.data.proFocus(Log.data.listPro(e))
       })
-    } else return
+    return l
   },
 
   /**
@@ -495,40 +511,6 @@ Log.data = {
     return l.length === 0 ? 0 : 1 / l.length
   },
 
-  /**
-   * Calculate minimum focus
-   * @param {string} m - Sector or project
-   * @param {Object[]=} e - Sorted entries
-   */
-  focMin(m, e = Log.cache.sortEntries) {
-    return isEmpty(e) ? 0 : Math.min(...Log.data.listFocus(m, e))
-  },
-
-  /**
-   * Calculate maximum focus
-   * @param {string} m - Sector or project
-   * @param {Object[]=} e - Sorted entries
-   * @returns {number} Maximum focus
-   */
-  focMax(m, e = Log.cache.sortEntries) {
-    return isEmpty(e) ? 0 : Math.max(...Log.data.listFocus(m, e))
-  },
-
-  /**
-   * Calculate average focus
-   * @param {Object[]=} e - Entries
-   * @returns {number} Average focus
-   */
-  focAvg(e = Log.log) {
-    if (!isValidArray(e)) return
-
-    const avg = Log.data.listSec(e).reduce((total, num) => {
-      return total + Log.data.sh(num, e) * (Log.data.sp(num, e) / 100)
-    }, 0)
-
-    return avg / Log.data.lh(e)
-  },
-
   forecast: {
 
     /**
@@ -536,7 +518,7 @@ Log.data = {
      * @returns {string} Sector focus
      */
     sf() {
-      const ent = Log.data.entriesByDay(new Date().getDay())
+      const ent = Log.cache.entriesByDay
 
       if (isEmpty(ent)) return '-'
 
@@ -557,7 +539,7 @@ Log.data = {
      */
     pt() {
       return Log.data.peakHour(
-        Log.data.peakHours(Log.data.entriesByDay(new Date().getDay()))
+        Log.data.peakHours(Log.cache.entriesByDay)
       )
     },
 
@@ -567,7 +549,7 @@ Log.data = {
      */
     lh() {
       return Log.data.avg(
-        Log.data.listDurations(Log.data.entriesByDay(new Date().getDay()))
+        Log.data.listDurations(Log.cache.entriesByDay)
       ) * 10
     },
 
@@ -576,9 +558,9 @@ Log.data = {
      * @returns {number} Session duration
      */
     sd() {
-      const ent = Log.data.entriesByDay(new Date().getDay())
-      if (isEmpty(ent)) return 0
-      return Log.data.avg(Log.data.listDurations(ent))
+      const e = Log.cache.entriesByDay
+      if (isEmpty(e)) return 0
+      return Log.data.avg(Log.data.listDurations(e))
     }
   },
 
@@ -596,24 +578,20 @@ Log.data = {
 
     const add = ({s, e, sCol, pCol, dur}, i) => {
       const wh = (Log.time.parse(e) - Log.time.parse(s)) / 86400 * 100
-      const col = mod === 'sector' ? sCol :
-                  mod === 'project' ? pCol :
-                  mod === 'none' && Log.config.ui.colour
-
-      data[i][data[i].length] = {wh, col, pos: lw}
+      data[i][data[i].length] = {
+        wh,
+        col: mod === 'sector' ? sCol :
+          mod === 'project' ? pCol :
+          mod === 'none' && Log.config.ui.colour,
+        pos: lw}
       lw += wh
     }
 
-    Log.data.sortEntries(ent).map((e, i) => {
-      data[i] = []
-      if (!isEmpty(e)) {
-        e.map((o, m) => {
-          if (!isUndefined(o.e)) {
-            m === 0 && (lw = 0)
-            add(e[m], i)
-          }
-        })
-      }
+    Log.data.sortEntries(ent).map((a, b) => {
+      data[b] = []
+      isEmpty(a) || a.map(({e}, c) =>
+        isUndefined(e) || (c === 0 && (lw = 0), add(a[c], b))
+      )
     })
 
     return data
@@ -631,29 +609,24 @@ Log.data = {
     let data = []
     let lp = 0
 
-    const add = ({s, e, c, t, dur, sCol, pCol}, i) => {
+    const add = ({s, dur, sCol, pCol}, i) => {
       const wd = dur * 3600 / 86400 * 100
       const dp = Log.utils.calcDP(s)
-      const col = mod === 'sector' ? sCol :
-                  mod === 'project' ? pCol :
-                  mod === 'none' && Log.config.ui.colour
-
-      data[i][data[i].length] = {wd, mg: dp - lp, col}
+      data[i][data[i].length] = {
+        wd,
+        mg: dp - lp,
+        col: mod === 'sector' ? sCol :
+          mod === 'project' ? pCol :
+          mod === 'none' && Log.config.ui.colour
+      }
       lp = wd + dp
     }
 
-    const sort = Log.data.sortEntries(ent)
-
-    Log.data.sortEntries(ent).map((e, i) => {
-      data[i] = []
-      if (!isEmpty(e)) {
-        e.map((o, m) => {
-          if (!isUndefined(o.e)) {
-            m === 0 && (lp = 0)
-            add(e[m], i)
-          }
-        })
-      }
+    Log.data.sortEntries(ent).map((a, b) => {
+      data[b] = []
+      isEmpty(a) || a.map(({e}, c) =>
+        isUndefined(e) || (c === 0 && (lp = 0), add(a[c], b))
+      )
     })
 
     return data

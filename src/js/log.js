@@ -30,7 +30,9 @@ var Log = {
     proFocus: [],
     peakHours: [],
     peakDays: [],
-    durations: []
+    durations: [],
+
+    entriesByDay: []
   },
 
   setCache() {
@@ -44,6 +46,7 @@ var Log = {
     Log.cache.peakHours = Log.data.peakHours()
     Log.cache.peakDays = Log.data.peakDays()
     Log.cache.durations = Log.data.listDurations()
+    Log.cache.entriesByDay = Log.data.entriesByDay(new Date().getDay())
   },
 
   /**
@@ -110,7 +113,7 @@ var Log = {
       const st = Log.time.stamp(date)
 
       ic.className = 'pl0'
-      ic.innerHTML = id
+      ic.innerHTML = ent.length - i
 
       dc.className = 'c-pt'
       dc.innerHTML = Log.time.displayDate(date)
@@ -161,17 +164,17 @@ var Log = {
       const ago = isEmpty(ent) ? `No activity in the past ${Log.config.ui.view} days` : `Updated ${Log.time.timeago(Log.time.parse(ent.slice(-1)[0].e) * 1E3)}`
       const dur = Log.data.listDurations(his)
 
-      write('sectorTitle', sec)
-      write('sectorLastUpdate', ago)
+      sectorTitle.innerHTML = sec
+      sectorLastUpdate.innerHTML = ago
 
-      write('sEnt', his.length)
-      write('sLHH', `${Log.data.total(dur).toFixed(2)} h`)
-      write('sLSNH', `${Log.data.min(dur).toFixed(2)} h`)
-      write('sLSXH', `${Log.data.max(dur).toFixed(2)} h`)
-      write('sASD', `${Log.data.avg(dur).toFixed(2)} h`)
-      write('sPHH', Log.data.peakHour(Log.data.peakHours(his)))
-      write('sPDH', Log.data.peakDay(Log.data.peakDays(his)))
-      write('sStreak', Log.data.streak(Log.data.sortEntries(his)))
+      sEnt.innerHTML = his.length
+      sLHH.innerHTML = `${Log.data.total(dur).toFixed(2)} h`
+      sLSNH.innerHTML = `${Log.data.min(dur).toFixed(2)} h`
+      sLSXH.innerHTML = `${Log.data.max(dur).toFixed(2)} h`
+      sASD.innerHTML = `${Log.data.avg(dur).toFixed(2)} h`
+      sPHH.innerHTML = Log.data.peakHour(Log.data.peakHours(his))
+      sPDH.innerHTML = Log.data.peakDay(Log.data.peakDays(his))
+      sStreak.innerHTML = Log.data.streak(Log.data.sortEntries(his))
 
       Log.vis.peakChart('hours', Log.data.peakHours(his), 'sPeakTimes')
       Log.vis.peakChart('days', Log.data.peakDays(his), 'sPeakDays')
@@ -182,9 +185,9 @@ var Log = {
         Log.vis.bar(Log.data.bar(ent, 'project'), 'sectorChart')
         Log.vis.focusChart('project', ent, 'sFocusChart')
 
-        write('sFavg', Log.data.avg(foc).toFixed(2))
-        write('sFmin', Log.data.min(foc).toFixed(2))
-        write('sFmax', Log.data.max(foc).toFixed(2))
+        sFavg.innerHTML = Log.data.avg(foc).toFixed(2)
+        sFmin.innerHTML = Log.data.min(foc).toFixed(2)
+        sFmax.innerHTML = Log.data.max(foc).toFixed(2)
 
         Log.vis.focusBar('pro', ent, 'projectDetailFocus')
         Log.vis.legend('pro', ent, 'projectLegend')
@@ -237,17 +240,17 @@ var Log = {
       const durations = Log.data.listDurations(his)
       const ago = isEmpty(ent) ? `No activity in the past ${Log.config.ui.view} days` : `Updated ${Log.time.timeago(Log.time.parse(ent.slice(-1)[0].e) * 1E3)}`
 
-      write('projectTitle', pro)
-      write('projectLastUpdate', ago)
+      projectTitle.innerHTML = pro
+      projectLastUpdate.innerHTML = ago
 
-      write('pEnt', his.length)
-      write('pLHH', `${Log.data.total(durations).toFixed(2)} h`)
-      write('pLSNH', `${Log.data.min(durations).toFixed(2)} h`)
-      write('pLSXH', `${Log.data.max(durations).toFixed(2)} h`)
-      write('pASD', `${Log.data.avg(durations).toFixed(2)} h`)
-      write('pPHH', Log.data.peakHour(Log.data.peakHours(his)))
-      write('pPDH', Log.data.peakDay(Log.data.peakDays(his)))
-      write('pStreak', Log.data.streak(Log.data.sortEntries(his)))
+      pEnt.innerHTML = his.length
+      pLHH.innerHTML = `${Log.data.total(durations).toFixed(2)} h`
+      pLSNH.innerHTML = `${Log.data.min(durations).toFixed(2)} h`
+      pLSXH.innerHTML = `${Log.data.max(durations).toFixed(2)} h`
+      pASD.innerHTML = `${Log.data.avg(durations).toFixed(2)} h`
+      pPHH.innerHTML = Log.data.peakHour(Log.data.peakHours(his))
+      pPDH.innerHTML = Log.data.peakDay(Log.data.peakDays(his))
+      pStreak.innerHTML = Log.data.streak(Log.data.sortEntries(his))
 
       Log.vis.peakChart('hours', Log.data.peakHours(his), 'pPeakTimes')
       Log.vis.peakChart('days', Log.data.peakDays(his), 'pPeakDays')
@@ -258,9 +261,9 @@ var Log = {
         Log.vis.bar(Log.data.bar(ent), 'projectChart')
         Log.vis.focusChart('sec', ent, 'pFocusChart')
 
-        write('pFavg', Log.data.avg(foc).toFixed(2))
-        write('pFmin', Log.data.min(foc).toFixed(2))
-        write('pFmax', Log.data.max(foc).toFixed(2))
+        pFavg.innerHTML = Log.data.avg(foc).toFixed(2)
+        pFmin.innerHTML = Log.data.min(foc).toFixed(2)
+        pFmax.innerHTML = Log.data.max(foc).toFixed(2)
 
         Log.vis.focusBar('sec', ent, 'sectorDetailFocus')
         Log.vis.legend('sec', ent, 'sectorLegend')
@@ -331,25 +334,23 @@ var Log = {
 
       journalDate.innerHTML = Log.time.displayDate(date)
 
-      Log.vis.day(date, 'journalDay')
+      Log.vis.day(date, 'jDyc')
 
       const dur = Log.data.listDurations(ent)
 
-      write('jLHT', `${Log.data.total(dur).toFixed(2)} h`)
-      write('jLSN', `${Log.data.min(dur).toFixed(2)} h`)
-      write('jLSX', `${Log.data.max(dur).toFixed(2)} h`)
-      write('jASDT', `${Log.data.avg(dur).toFixed(2)} h`)
-      write('jLPT', `${Log.data.lp(ent).toFixed(2)}%`)
-      write('jfocusToday', Log.data.proFocus(Log.data.listPro(ent)).toFixed(2))
+      jLHT.innerHTML = `${Log.data.total(dur).toFixed(2)} h`
+      jLSN.innerHTML = `${Log.data.min(dur).toFixed(2)} h`
+      jLSX.innerHTML = `${Log.data.max(dur).toFixed(2)} h`
+      jASDT.innerHTML = `${Log.data.avg(dur).toFixed(2)} h`
+      jLPT.innerHTML = `${Log.data.lp(ent).toFixed(2)}%`
+      jFT.innerHTML = Log.data.proFocus(Log.data.listPro(ent)).toFixed(2)
 
       const l = ent.length
 
       ent.map(({id, s, e, c, t, d, dur}, i) => {
-        const cl = i !== l - 1 ? 'f6 lhc bb pb3 mb3' : 'f6 lhc'
-
-        append('journalEntries', createEl(
-          `<li class="${cl}">
-            <span class="mr3 o7">#${id}</span>
+        append('jEnt', createEl(
+          `<li class="${i !== l - 1 ? 'f6 lhc bb pb3 mb3' : 'f6 lhc'}">
+            <span class="mr3 o7">ID ${id + 1}</span>
             <span class="mr3 o7">
               ${Log.time.stamp(Log.time.convert(s))} &ndash;
               ${Log.time.stamp(Log.time.convert(e))}
@@ -367,24 +368,21 @@ var Log = {
      * Clear journal
      */
     clear() {
-      clear('journalDay')
-      clear('journalEntries')
+      clear('jDyc')
+      clear('jEnt')
     },
 
     /**
      * Journal navigation
      */
     nav() {
-      const ent = Log.cache.sortEntries.reverse()
-      !isEmpty(ent) && ent.map((e, i) => {
-        if (!isEmpty(e)) {
-          const s = e[0].s
-          journalNav.appendChild(createEl(
-            `<li class="lhd c-pt" onclick="Log.journal.translate('${s}')">
-              ${Log.time.displayDate(Log.time.convert(s))}
-            </li>`
-          ))
-        }
+      const a = Log.cache.sortEntries.reverse()
+      !isEmpty(a) && a.map((e, i) => {
+        !isEmpty(e) && jNav.appendChild(createEl(
+          `<li class="lhd c-pt" onclick="Log.journal.translate('${e[0].s}')">
+            ${Log.time.displayDate(Log.time.convert(e[0].s))}
+          </li>`
+        ))
       })
     },
 
@@ -409,7 +407,7 @@ var Log = {
       const m = s.getMonth()
       const d = s.getDate()
 
-      return (new Date(y, m, d, s.getHours(), s.getMinutes(), s.getSeconds()).getTime() / 1E3 - (new Date(y, m, d).getTime() / 1E3)) / 86400 * 100
+      return ((new Date(y, m, d, s.getHours(), s.getMinutes(), s.getSeconds())).getTime() / 1E3 - (new Date(y, m, d)).getTime() / 1E3) / 86400 * 100
     }
   },
 
@@ -450,7 +448,7 @@ var Log = {
     clearInterval(Log.clock)
     write('timer', '00:00:00')
 
-    'phc pdc dayChart weekChart peakTimesHistory peakDaysHistory sectorBars projectBars sectorsList projectsList visual logbook focusChart sectorFocusBar sectorLegendSummary journalNav journalDay journalEntries'.split(' ').map(e => clear(e))
+    'phc pdc dyc ovc pth pdh sectorBars projectBars sectorsList projectsList visual logbook focusChart sectorFocusBar sectorLegendSummary jNav jDyc jEnt'.split(' ').map(e => clear(e))
   },
 
   nav: {
@@ -534,61 +532,60 @@ var Log = {
     Log.vis.peakChart('days', Log.cache.peakDays, 'pdc')
 
     if (Log.log.length !== 1) {
-      write('fsf', Log.data.forecast.sf())
-      write('flh', `${Log.data.forecast.lh().toFixed(2)} h`)
-      write('fsd', `${Log.data.forecast.sd().toFixed(2)} h`)
+      fsf.innerHTML = Log.data.forecast.sf()
+      flh.innerHTML = `${Log.data.forecast.lh().toFixed(2)} h`
+      fsd.innerHTML = `${Log.data.forecast.sd().toFixed(2)} h`
     }
 
+    Log.vis.meterLines('ovwMeter')
     Log.vis.day()
-    Log.vis.bar(Log.data.bar(mn), 'weekChart')
+    Log.vis.bar(Log.data.bar(mn), 'ovc')
 
     if (!isEmpty(en)) {
-      write('LHT', `${Log.data.lh(en).toFixed(2)} h`)
-      write('LSN', `${Log.data.min(dur).toFixed(2)} h`)
-      write('LSX', `${Log.data.max(dur).toFixed(2)} h`)
-      write('ASDT', `${Log.data.avg(dur).toFixed(2)} h`)
-      write('LPT', `${Log.data.lp(en).toFixed(2)}%`)
-      write('FOC', Log.data.proFocus(Log.data.listPro(en)).toFixed(2))
-      write('ENC', en.length)
-      write('STK', Log.data.streak())
+      LHT.innerHTML = `${Log.data.lh(en).toFixed(2)} h`
+      LSN.innerHTML = `${Log.data.min(dur).toFixed(2)} h`
+      LSX.innerHTML = `${Log.data.max(dur).toFixed(2)} h`
+      ASDT.innerHTML = `${Log.data.avg(dur).toFixed(2)} h`
+      LPT.innerHTML = `${Log.data.lp(en).toFixed(2)}%`
+      FOC.innerHTML = Log.data.proFocus(Log.data.listPro(en)).toFixed(2)
+      ENC.innerHTML = en.length
+      STK.innerHTML = Log.data.streak()
 
       const now = Log.log.slice(-1)[0]
       const date = Log.time.convert(now.s)
       const startTime = Log.time.stamp(date)
       const endTime = Log.time.stamp(Log.time.convert(now.e))
 
-      isUndefined(now.e) ?
-      write('lastTime', `${startTime}&ndash;`) :
-      write('lastTime', `${startTime}&ndash;${endTime}`)
+      lastTime.innerHTML = isUndefined(now.e) ? `${startTime}&ndash;` : `${startTime}&ndash;${endTime}`
 
-      write('lastID', user.log.length)
-      write('lastSector', now.c)
-      write('lastProject', now.t)
-      write('lastDescription', now.d)
+      lastID.innerHTML = user.log.length
+      lastSector.innerHTML = now.c
+      lastProject.innerHTML = now.t
+      lastDescription.innerHTML = now.d
     }
 
     Log.vis.list('sec', 'hours', 'sectorBars', en)
     Log.vis.list('pro', 'hours', 'projectBars', en)
 
-    write('LHH', `${hLh.toFixed(2)} h`)
-    write('LSNH', `${Log.data.min(Log.cache.durations).toFixed(2)} h`)
-    write('LSXH', `${Log.data.max(Log.cache.durations).toFixed(2)} h`)
-    write('ASD', `${Log.data.avg(Log.cache.durations).toFixed(2)} h`)
-    write('ALHH', `${Log.data.avgLh().toFixed(2)} h`)
-    write('LPH', `${Log.data.lp().toFixed(2)}%`)
-    write('entCount', user.log.length)
-    write('secCount', Log.cache.sectorCount)
-    write('proCount', Log.cache.projectCount)
-    write('PHH', Log.data.peakHour())
-    write('PDH', Log.data.peakDay())
+    LHH.innerHTML = `${hLh.toFixed(2)} h`
+    LSNH.innerHTML = `${Log.data.min(Log.cache.durations).toFixed(2)} h`
+    LSXH.innerHTML = `${Log.data.max(Log.cache.durations).toFixed(2)} h`
+    ASD.innerHTML = `${Log.data.avg(Log.cache.durations).toFixed(2)} h`
+    ALHH.innerHTML = `${Log.data.avgLh().toFixed(2)} h`
+    LPH.innerHTML = `${Log.data.lp().toFixed(2)}%`
+    entCount.innerHTML = user.log.length
+    secCount.innerHTML = Log.cache.sectorCount
+    proCount.innerHTML = Log.cache.projectCount
+    PHH.innerHTML = Log.data.peakHour()
+    PDH.innerHTML = Log.data.peakDay()
 
-    Log.vis.peakChart('hours', Log.cache.peakHours, 'peakTimesHistory')
-    Log.vis.peakChart('days', Log.cache.peakDays, 'peakDaysHistory')
+    Log.vis.peakChart('hours', Log.cache.peakHours, 'pth')
+    Log.vis.peakChart('days', Log.cache.peakDays, 'pdh')
     Log.vis.focusChart('pro', mn)
 
-    write('Favg', Log.data.avg(Log.cache.proFocus).toFixed(2))
-    write('Fmin', Log.data.min(Log.cache.proFocus).toFixed(2))
-    write('Fmax', Log.data.max(Log.cache.proFocus).toFixed(2))
+    Favg.innerHTML = Log.data.avg(Log.cache.proFocus).toFixed(2)
+    Fmin.innerHTML = Log.data.min(Log.cache.proFocus).toFixed(2)
+    Fmax.innerHTML = Log.data.max(Log.cache.proFocus).toFixed(2)
 
     Log.vis.focusBar('sec', Log.log, 'sectorFocusBar')
     Log.vis.legend('sec', Log.log, 'sectorLegendSummary')
@@ -600,8 +597,10 @@ var Log = {
       Log.vis.list('pro', 'hours', 'projectsList')
     }
 
+    Log.vis.meterLines('visMeter')
     Log.vis.line(Log.data.line(mn), 'visual')
-    Log.display(Log.log, 100)
+    Log.display(user.log, 100)
+    Log.vis.meterLines('jMeter')
     Log.journal.display()
     Log.journal.nav()
   },

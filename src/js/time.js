@@ -38,18 +38,16 @@ Log.time = {
 
   /**
    * Convert datetime into Log format (from Twig)
-   * @param {string} i - Datetime
+   * @param {string} d - Datetime
    * @returns {string} Datetime in Log format
    */
-  convertDateTime(i) {
-    const m = i.split(' ')
-    return (+new Date(m[0], Number(m[1] - 1), m[2], m[3], m[4], m[5]).getTime() / 1E3).toString(16)
+  convertDateTime(d) {
+    d = d.split(' ')
+    return (+new Date(d[0], Number(d[1] - 1), d[2], d[3], d[4], d[5]).getTime() / 1E3).toString(16)
   },
 
   decimal(time) {
-    const d = new Date(time)
-    const ms = time - d.setHours(0, 0, 0, 0)
-    return parseInt(ms / 864 * 10)
+    return parseInt((time - new Date(time).setHours(0, 0, 0, 0)) / 864 * 10)
   },
 
   toDecimal(sec) {
@@ -79,17 +77,9 @@ Log.time = {
    */
   twelveHours(d) {
     let h = d.getHours()
-    let m = d.getMinutes()
-    let s = d.getSeconds()
     const x = h >= 12 ? 'PM' : 'AM'
-
-    h = h % 12
-    h = h ? h : 12
-    h = (`0${h}`).slice(-2)
-    m = (`0${m}`).slice(-2)
-    s = (`0${s}`).slice(-2)
-
-    return `${h}:${m}:${s} ${x}`
+    h = (h %= 12) ? h : 12
+    return `${`0${h}`.slice(-2)}:${`0${d.getMinutes()}`.slice(-2)} ${x}`
   },
 
   /**
@@ -109,16 +99,10 @@ Log.time = {
    */
   displayDate(d) {
     const f = Log.config.system.calendar
-
-    if (f === 'gregorian') {
-      return `${`0${d.getDate()}`.slice(-2)} ${months[d.getMonth()]} ${d.getFullYear().toString().substr(-2)}`
-    } else if (f === 'monocal') {
-      return Monocal.short(Monocal.convert(d))
-    } else if (f === 'aequirys') {
-      return Aequirys.display(Aequirys.convert(d))
-    } else if (f === 'desamber') {
-      return Desamber.display(Desamber.convert(d))
-    }
+    if (f === 'aequirys') return Aequirys.display(Aequirys.convert(d))
+    if (f === 'desamber') return Desamber.display(Desamber.convert(d))
+    if (f === 'monocal') return Monocal.short(Monocal.convert(d))
+    if (f === 'gregorian') return `${`0${d.getDate()}`.slice(-2)} ${months[d.getMonth()]} ${d.getFullYear().toString().substr(-2)}`
   },
 
   /**
@@ -127,16 +111,16 @@ Log.time = {
    * @returns {string} Elapsed time
    */
   timeago(t) {
-    const min = Math.abs(~~(((new Date()) - t) / 1E3 / 60))
-    if (min === 0) return 'less than a minute ago'
-    if (min === 1) return 'a minute ago'
-    if (min < 59) return `${min} minutes ago`
-    if (min === 60) return 'an hour ago'
-    if (min < 1440) return `${~~(min / 60)} hours ago`
-    if (min < 2880) return 'yesterday'
-    if (min < 86400) return `${~~(min / 1440)} days ago`
-    if (min < 1051199) return `${~~(min / 43200)} months ago`
-    return `over ${~~(min / 525960)} years ago`
+    const m = Math.abs(~~((new Date - t) / 1E3 / 60))
+    return m === 0 ? 'less than a minute ago' :
+      m === 1 ? 'a minute ago' :
+      m < 59 ? `${m} minutes ago` :
+      m === 60 ? 'an hour ago' :
+      m < 1440 ? `${~~(m / 60)} hours ago` :
+      m < 2880 ? 'yesterday' :
+      m < 86400 ? `${~~(m / 1440)} days ago` :
+      m < 1051199 ? `${~~(m / 43200)} months ago` :
+      `over ${~~(m / 525960)} years ago`
   },
 
   /**

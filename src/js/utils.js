@@ -11,8 +11,6 @@ const hasEntries = a => isValidArray(a) && isObject(a[0])
 const append = (e, c) => document.getElementById(e).appendChild(c)
 const contains = (s, a) => a.indexOf(s.split(' ')) > -1 ? true : false
 const exists = e => document.getElementById(e) !== null
-const hide = e => document.getElementById(e).style.display = 'none'
-const show = e => document.getElementById(e).style.display = 'block'
 const isNull = e => e === null
 
 const notify = m => {

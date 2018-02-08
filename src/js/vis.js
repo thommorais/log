@@ -64,7 +64,7 @@ Log.vis = {
    * @param {string=} con - Container
    * @param {string=} mode - Colour mode
    */
-  day(d = new Date(), con = 'dayChart') {
+  day(d = new Date(), con = 'dyc') {
     if (!isObject(d) || !isString(con) || !exists(con)) return
 
     const ent = Log.data.entriesByDate(d)
@@ -214,13 +214,25 @@ Log.vis = {
 
   /**
    * Create chart lines
-   * @param {string} con - Container
+   * @param {string} c - Container
    */
-  gridLines(con) {
-    append(con, createEl(`<div class="psa wf bt o1 t0"></div>`))
-    append(con, createEl(`<div class="psa wf bt o1" style="top:25%"></div>`))
-    append(con, createEl(`<div class="psa wf bt o1" style="top:50%"></div>`))
-    append(con, createEl(`<div class="psa wf bt o1" style="bottom:25%"></div>`))
-    append(con, createEl(`<div class="psa wf bt o1 b0"></div>`))
+  gridLines(c) {
+    append(c, createEl(`<div class="psa wf bt o1 t0"></div>`))
+    append(c, createEl(`<div class="psa wf bt o1" style="top:25%"></div>`))
+    append(c, createEl(`<div class="psa wf bt o1" style="top:50%"></div>`))
+    append(c, createEl(`<div class="psa wf bt o1" style="bottom:25%"></div>`))
+    append(c, createEl(`<div class="psa wf bt o1 b0"></div>`))
+  },
+
+  meterLines(c) {
+    let l = 0
+    let e = ''
+
+    for (let i = 0; i < 24; i++) {
+      l += 4.166666666666667
+      e = i % 2 === 0 ? `<div class="psa h5 br o5" style="left:${l}%"></div>`
+      : `<div class="psa hf br o7" style="left:${l}%"></div>`
+      append(c, createEl(e))
+    }
   }
 }
