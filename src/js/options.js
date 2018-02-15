@@ -19,7 +19,7 @@ Log.options = {
      */
     config() {
       dataStore.set('config', user.config)
-      Log.refresh()
+      Log.options.update.localStorage()
     },
 
     /**
@@ -27,7 +27,7 @@ Log.options = {
      */
     palette() {
       dataStore.set('palette', user.palette)
-      Log.refresh()
+      Log.options.update.localStorage()
     },
 
     /**
@@ -35,7 +35,7 @@ Log.options = {
      */
     projectPalette() {
       dataStore.set('projectPalette', user.projectPalette)
-      Log.refresh()
+      Log.options.update.localStorage()
     },
 
     /**
@@ -43,19 +43,18 @@ Log.options = {
      */
     log() {
       dataStore.set('log', user.log)
-      Log.refresh()
+      Log.options.update.localStorage()
     },
 
     /**
      * Update all
      */
     all() {
-      localStorage.setItem('user', JSON.stringify(user))
-      dataStore.set('config', user.config)
-      dataStore.set('palette', user.palette)
-      dataStore.set('projectPalette', user.projectPalette)
-      dataStore.set('log', user.log)
-      Log.refresh()
+      Log.options.update.config()
+      Log.options.update.palette()
+      Log.options.update.projectPalette()
+      Log.options.update.log()
+      Log.options.update.localStorage()
     }
   },
 
