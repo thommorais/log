@@ -1,4 +1,6 @@
-Log = window.Log || {}
+'use strict';
+
+var Log = window.Log || {};
 Log.options = {
 
   /**
@@ -10,52 +12,53 @@ Log.options = {
      * Update localStorage
      */
     localStorage() {
-      localStorage.setItem('user', JSON.stringify(user))
-      Log.refresh()
+      localStorage.setItem('user', JSON.stringify(user));
+      Log.reset();
+      Log.load();
     },
 
     /**
      * Update config
      */
     config() {
-      dataStore.set('config', user.config)
-      Log.options.update.localStorage()
+      dataStore.set('config', user.config);
+      Log.options.update.localStorage();
     },
 
     /**
      * Update palette
      */
     palette() {
-      dataStore.set('palette', user.palette)
-      Log.options.update.localStorage()
+      dataStore.set('palette', user.palette);
+      Log.options.update.localStorage();
     },
 
     /**
      * Update project palette
      */
     projectPalette() {
-      dataStore.set('projectPalette', user.projectPalette)
-      Log.options.update.localStorage()
+      dataStore.set('projectPalette', user.projectPalette);
+      Log.options.update.localStorage();
     },
 
     /**
      * Update log
      */
     log() {
-      dataStore.set('log', user.log)
-      Log.options.update.localStorage()
+      dataStore.set('log', user.log);
+      Log.options.update.localStorage();
     },
 
     /**
      * Update all
      */
     all() {
-      Log.options.update.config()
-      Log.options.update.palette()
-      Log.options.update.projectPalette()
-      Log.options.update.log()
-      Log.options.update.localStorage()
-    }
+      Log.options.update.config();
+      Log.options.update.palette();
+      Log.options.update.projectPalette();
+      Log.options.update.log();
+      Log.options.update.localStorage();
+    },
   },
 
   /**
@@ -63,8 +66,10 @@ Log.options = {
    * @param {string} c - Colour
    */
   setBG(c) {
-    user.config.ui.bg = c
-    Log.options.update.config()
+    if (typeof c !== 'string' || c.length === 0) return;
+    user.config.ui.bg = c;
+    ui.style.backgroundColor = c;
+    Log.options.update.config();
   },
 
   /**
@@ -72,8 +77,10 @@ Log.options = {
    * @param {string} c - Colour
    */
   setColour(c) {
-    user.config.ui.colour = c
-    Log.options.update.config()
+    if (typeof c !== 'string' || c.length === 0) return;
+    user.config.ui.colour = c;
+    ui.style.color = c;
+    Log.options.update.config();
   },
 
   /**
@@ -81,8 +88,9 @@ Log.options = {
    * @param {string} c - Colour
    */
   setAccent(c) {
-    user.config.ui.accent = c
-    Log.options.update.config()
+    if (typeof c !== 'string' || c.length === 0) return;
+    user.config.ui.accent = c;
+    Log.options.update.config();
   },
 
   /**
@@ -90,29 +98,37 @@ Log.options = {
    * @param {string} m - Mode
    */
   setColourMode(m) {
-    if (!contains(m, 'sector project none')) return
-    user.config.ui.colourMode = m
-    Log.options.update.config()
+    if (m === undefined) return;
+    if (typeof m !== 'string' || m.length === 0) return;
+    if (['sector', 'project', 'none'].indexOf(m) === -1) return;
+    user.config.ui.colourMode = m;
+    Log.options.update.config();
   },
 
   /**
    * Set sector colour code
-   * @param {string} sec - Sector
-   * @param {string} col - Colour
+   * @param {string} s - Sector
+   * @param {string} c - Colour
    */
-  setColourCode(sec, col) {
-    user.palette[sec] = col
-    Log.options.update.palette()
+  setColourCode(s, c) {
+    if (s === undefined || c === undefined) return;
+    if (typeof s !== 'string' || s.length === 0) return;
+    if (typeof c !== 'string' || c.length === 0) return;
+    user.palette[s] = c;
+    Log.options.update.palette();
   },
 
   /**
    * Set project colour code
-   * @param {string} pro - Project
-   * @param {string} col - Colour
+   * @param {string} p - Project
+   * @param {string} c - Colour
    */
-  setProjectColourCode(s) {
-    user.projectPalette[pro] = col
-    Log.options.update.projectPalette()
+  setProjectColourCode(p, c) {
+    if (p === undefined || c === undefined) return;
+    if (typeof p !== 'string' || p.length === 0) return;
+    if (typeof c !== 'string' || c.length === 0) return;
+    user.projectPalette[p] = c;
+    Log.options.update.projectPalette();
   },
 
   /**
@@ -120,8 +136,10 @@ Log.options = {
    * @param {number} n - Number of days
    */
   setView(n) {
-    user.config.ui.view = n
-    Log.options.update.config()
+    if (n === undefined) return;
+    if (typeof n !== 'number' || n < 0) return;
+    user.config.ui.view = n;
+    Log.options.update.config();
   },
 
   /**
@@ -129,9 +147,11 @@ Log.options = {
    * @param {string} c - Calendrical system
    */
   setCalendar(c) {
-    if (!contains(c, 'aequirys monocal desamber gregorian')) return
-    user.config.system.calendar = c
-    Log.options.update.config()
+    if (c === undefined) return;
+    if (typeof c !== 'string' || c.length === 0) return;
+    if (['aequirys', 'monocal', 'gregorian'].indexOf(c) === -1) return;
+    user.config.system.calendar = c;
+    Log.options.update.config();
   },
 
   /**
@@ -139,8 +159,10 @@ Log.options = {
    * @param {string} f - Format
    */
   setTimeFormat(f) {
-    if (!contains(f, '24 12 decimal')) return
-    user.config.system.timeFormat = f
-    Log.options.update.config()
-  }
-}
+    if (f === undefined) return;
+    if (typeof f !== 'string' || f.length === 0) return;
+    if (['24', '12', 'decimal'].indexOf(f) === -1) return;
+    user.config.system.timeFormat = f;
+    Log.options.update.config();
+  },
+};

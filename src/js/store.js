@@ -1,7 +1,7 @@
 class Store {
   constructor(opts) {
-    this.path = opts.path
-    this.data = parseDataFile(this.path, opts.defaults)
+    this.path = opts.path;
+    this.data = parseDataFile(this.path, opts.defaults);
   }
 
   /**
@@ -10,7 +10,7 @@ class Store {
    * @returns Property
    */
   get(key) {
-    return this.data[key]
+    return this.data[key];
   }
 
   /**
@@ -19,17 +19,17 @@ class Store {
    * @param {string} val - Value
    */
   set(key, val) {
-    this.data[key] = val
-    fs.writeFileSync(this.path, JSON.stringify(this.data))
+    this.data[key] = val;
+    fs.writeFileSync(this.path, JSON.stringify(this.data));
   }
 }
 
 function parseDataFile(filePath, defaults) {
   try {
-    return JSON.parse(fs.readFileSync(filePath))
-  } catch(error) {
-    return defaults
+    return JSON.parse(fs.readFileSync(filePath));
+  } catch (error) {
+    return defaults;
   }
 }
 
-module.exports = Store
+module.exports = Store;

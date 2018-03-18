@@ -1,10 +1,15 @@
-const Aequirys = require('aequirys')
-const Monocal = require('./utils/monocal.min.js')
-const Desamber = require('./utils/desamber.js')
+'use strict';
 
-const months = 'Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec'.split(' ')
+const Aequirys = require('aequirys');
+const Monocal = require('./utils/monocal.min.js');
+const Desamber = require('./utils/desamber.js');
 
-Log = window.Log || {}
+const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+const toHexCache = {};
+const dateCache = {};
+
+var Log = window.Log || {};
 Log.time = {
 
   /**
@@ -13,18 +18,23 @@ Log.time = {
    * @returns {number} Decimal conversion
    */
   parse(s) {
-    return parseInt(s, 16)
+    return parseInt(s, 16);
   },
 
   /**
    * Convert to hexadecimal format
-   * @param {number} t - Unix time
+   * @param {Object} t - Unix time
    */
   toHex(t) {
-    return (new Date(
-      t.getFullYear(), t.getMonth(), t.getDate(),
-      t.getHours(), t.getMinutes(), t.getSeconds()
-    ).getTime() / 1E3).toString(16)
+    if (t === undefined) return;
+    if (typeof t !== 'object') return;
+
+    return t in toHexCache ?
+      toHexCache[t] :
+      toHexCache[t] = (new Date(
+        t.getFullYear(), t.getMonth(), t.getDate(),
+        t.getHours(), t.getMinutes(), t.getSeconds(),
+      ).getTime() / 1E3).toString(16)
   },
 
   /**
@@ -33,7 +43,7 @@ Log.time = {
    * @returns {Object} Date
    */
   convert(h) {
-    return new Date(Log.time.parse(h) * 1E3)
+    return new Date(Log.time.parse(h) * 1E3);
   },
 
   /**
@@ -42,16 +52,19 @@ Log.time = {
    * @returns {string} Datetime in Log format
    */
   convertDateTime(d) {
-    d = d.split(' ')
-    return (+new Date(d[0], Number(d[1] - 1), d[2], d[3], d[4], d[5]).getTime() / 1E3).toString(16)
+    d = d.split(' ');
+    return (+new Date(d[0], Number(d[1] - 1), d[2], d[3], d[4], d[5]).getTime() / 1E3).toString(16);
   },
 
+  /**
+   * Convert to decimal time
+   */
   decimal(time) {
-    return parseInt((time - new Date(time).setHours(0, 0, 0, 0)) / 864 * 10)
+    return parseInt((time - new Date(time).setHours(0, 0, 0, 0)) / 864 * 10);
   },
 
   toDecimal(sec) {
-    return parseInt((sec / 864) * 100)
+    return parseInt((sec / 864) * 100);
   },
 
   /**
@@ -60,13 +73,14 @@ Log.time = {
    * @returns {string} Timestamp
    */
   stamp(d) {
-    if (Log.config.system.timeFormat === '24') {
-      return `${`0${d.getHours()}`.substr(-2)}:${`0${d.getMinutes()}`.substr(-2)}`
-    } else if (Log.config.system.timeFormat === '12') {
-      return Log.time.twelveHours(d)
-    } else {
-      let t = Log.time.decimal(d).toString()
-      return `${t.substr(0,(t.length-3))}:${t.substr(-3)}`
+    switch (Log.config.system.timeFormat) {
+      case '24':
+        return `${`0${d.getHours()}`.substr(-2)}:${`0${d.getMinutes()}`.substr(-2)}`;
+      case '12':
+        return Log.time.twelveHours(d);
+      default:
+        const t = Log.time.decimal(d).toString();
+        return `${t.substr(0, (t.length - 3))}:${t.substr(-3)}`;
     }
   },
 
@@ -76,10 +90,10 @@ Log.time = {
    * @returns {string} 12-hour format
    */
   twelveHours(d) {
-    let h = d.getHours()
-    const x = h >= 12 ? 'PM' : 'AM'
-    h = (h %= 12) ? h : 12
-    return `${`0${h}`.slice(-2)}:${`0${d.getMinutes()}`.slice(-2)} ${x}`
+    let h = d.getHours();
+    const x = h >= 12 ? 'PM' : 'AM';
+    return `${`0${(h %= 12) ?
+      h : 12}`.slice(-2)}:${`0${d.getMinutes()}`.slice(-2)} ${x}`;
   },
 
   /**
@@ -88,8 +102,12 @@ Log.time = {
    * @returns {string} Date
    */
   date(h) {
-    const a = Log.time.convert(h)
-    return `${a.getFullYear()}${a.getMonth()}${a.getDate()}`
+    if (h in dateCache) {
+      return dateCache[h];
+    } else {
+      const d = Log.time.convert(h);
+      return dateCache[h] = `${d.getFullYear()}${d.getMonth()}${d.getDate()}`;
+    }
   },
 
   /**
@@ -98,11 +116,16 @@ Log.time = {
    * @returns {string} Formatted date
    */
   displayDate(d) {
-    const f = Log.config.system.calendar
-    if (f === 'aequirys') return Aequirys.display(Aequirys.convert(d))
-    if (f === 'desamber') return Desamber.display(Desamber.convert(d))
-    if (f === 'monocal') return Monocal.short(Monocal.convert(d))
-    if (f === 'gregorian') return `${`0${d.getDate()}`.slice(-2)} ${months[d.getMonth()]} ${d.getFullYear().toString().substr(-2)}`
+    switch (Log.config.system.calendar) {
+      case 'aequirys':
+        return Aequirys.display(Aequirys.convert(d));
+      case 'desamber':
+        return Desamber.display(Desamber.convert(d));
+      case 'monocal':
+        return Monocal.short(Monocal.convert(d));
+      default:
+        return `${`0${d.getDate()}`.slice(-2)} ${months[d.getMonth()]} ${d.getFullYear().toString().substr(-2)}`;
+    }
   },
 
   /**
@@ -111,7 +134,7 @@ Log.time = {
    * @returns {string} Elapsed time
    */
   timeago(t) {
-    const m = Math.abs(~~((new Date - t) / 1E3 / 60))
+    const m = Math.abs(~~((new Date() - t) / 1E3 / 60));
     return m === 0 ? 'less than a minute ago' :
       m === 1 ? 'a minute ago' :
       m < 59 ? `${m} minutes ago` :
@@ -120,7 +143,7 @@ Log.time = {
       m < 2880 ? 'yesterday' :
       m < 86400 ? `${~~(m / 1440)} days ago` :
       m < 1051199 ? `${~~(m / 43200)} months ago` :
-      `over ${~~(m / 525960)} years ago`
+      `over ${~~(m / 525960)} years ago`;
   },
 
   /**
@@ -130,15 +153,15 @@ Log.time = {
    * @returns {Object[]} List of dates
    */
   listDates(s, e) {
-    let l = []
-    let c = new Date(s.getFullYear(), s.getMonth(), s.getDate(), 0, 0, 0)
+    const l = [];
+    let c = new Date(s.getFullYear(), s.getMonth(), s.getDate(), 0, 0, 0);
 
-    while (c <= e) {
-      l[l.length] = new Date(c)
-      c = Date.prototype.addDays.call(c, 1)
+    for (; c <= e;) {
+      l[l.length] = new Date(c);
+      c = Date.prototype.addDays.call(c, 1);
     }
 
-    return l
+    return l;
   },
 
   /**
@@ -148,7 +171,7 @@ Log.time = {
    * @returns {number} Duration
    */
   duration(a, b) {
-    return Log.time.durationSeconds(a, b) / 3600
+    return Log.time.durationSeconds(a, b) / 3600;
   },
 
   /**
@@ -158,7 +181,7 @@ Log.time = {
    * @returns {number} Duration
    */
   durationSeconds(a, b) {
-    return Log.time.parse(b) - Log.time.parse(a)
+    return Log.time.parse(b) - Log.time.parse(a);
   },
 
   /**
@@ -168,6 +191,6 @@ Log.time = {
    * @returns {string} end - hexadecimal timestamp
    */
   offset(s, d) {
-    return (Log.time.parse(s) + d).toString(16)
+    return (Log.time.parse(s) + d).toString(16);
   }
-}
+};
