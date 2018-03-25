@@ -1,32 +1,37 @@
-const {app, BrowserWindow, webFrame} = require('electron')
-const path = require('path')
+const {
+  app,
+  BrowserWindow,
+  webFrame
+} = require('electron');
 
-if (process.argv[2] && process.argv[2] === 'dev') require('electron-reload')(__dirname)
+if (process.argv[2] && process.argv[2] === 'dev') {
+  require('electron-reload')(__dirname);
+}
 
-var win
+let win
 
-app.on('ready', function() {
+app.on('ready', _ => {
   win = new BrowserWindow({
-    width: 960,
-    height: 600,
+    icon: `${__dirname}/icon.ico`,
     backgroundColor: '#0c0c0c',
-    resizable: false,
     autoHideMenuBar: true,
+    resizable: false,
     frame: false,
-    icon: `${__dirname}/icon.ico`
+    height: 600,
+    width: 960
   })
 
-  win.loadURL(`file://${__dirname}/src/index.html`)
+  win.loadURL(`file://${__dirname}/src/index.html`);
 
-  win.on('closed', () => {
+  win.on('closed', _ => {
     win = null
   })
 })
 
-app.on('window-all-closed', () => {
-  process.platform !== 'darwin' && app.quit()
+app.on('window-all-closed', _ => {
+  process.platform !== 'darwin' && app.quit();
 })
 
-app.on('activate', () => {
-  win === null && createWindow()
+app.on('activate', _ => {
+  win === null && createWindow();
 })
