@@ -6,728 +6,900 @@
   <meta name="author" content="Josh Avanier">
   <meta name="description" content="A log and time-tracking system">
   <link rel="stylesheet" href="css/macian.min.css">
+  <style>
+    #topbar {
+      grid-column-start: 1;
+      grid-column-end: 4;
+    }
+
+    #main {
+      grid-row-start: 2;
+      grid-column-start: 1;
+      grid-column-end: 4;
+    }
+
+    #container {
+      display: grid;
+      grid-template-rows: 10% 90%;
+      grid-template-columns: auto;
+      grid-template-areas:
+        "topbar"
+        "main";
+    }
+
+    #ovwTop {
+      grid-column-start: 1;
+      grid-column-end: 4;
+    }
+
+    #ovwSideA {
+      display: grid;
+      grid-row-gap: 5%;
+      grid-template-rows: 25% 25% 40%;
+      grid-template-areas:
+        "peakHours"
+        "peakDays"
+        "forecast";
+    }
+
+    #ovwCenter {
+      display: grid;
+      grid-row-gap: 5%;
+      grid-template-rows: 15% 50% 30%;
+      grid-template-areas:
+        "lastEntry"
+        "ovc"
+        "todayStats";
+    }
+
+    #ovwSideB {
+      display: grid;
+      grid-row-gap: 5%;
+      grid-template-rows: 47.5% 47.5%;
+      grid-template-areas:
+        "ovwSideBA"
+        "ovwSideBB";
+    }
+
+    #ovw {
+      display: grid;
+      grid-column-gap: 2.5%;
+      grid-row-gap: 5%;
+      grid-template-rows: 10% 85%;
+      grid-template-columns: 15% 65% 15%;
+      grid-template-areas:
+        "ovwTop"
+        "ovwSideA ovwCenter ovwSideB";
+    }
+
+    #lis {
+      grid-column-gap: 5%;
+      grid-template-columns: 10% 85%;
+      grid-template-areas:
+        "lisSideA lisCenter";
+    }
+
+    #sec {
+      grid-column-gap: 5%;
+      grid-template-columns: 75% 20%;
+      grid-template-areas:
+        "secDetails secList";
+    }
+
+    #secStat {
+      display: grid;
+      grid-row-gap: 5%;
+      grid-template-rows: 45% auto auto auto;
+      grid-template-areas:
+        "secChart"
+        "secStats"
+        "secPeaks"
+        "secFocus";
+    }
+
+    #pro {
+      grid-column-gap: 5%;
+      grid-template-columns: 75% 20%;
+      grid-template-areas:
+        "proDetails proList";
+    }
+
+    #proStat {
+      display: grid;
+      grid-row-gap: 5%;
+      grid-template-rows: 45% auto auto auto;
+      grid-template-areas:
+        "proChart"
+        "proStats"
+        "proPeaks"
+        "proFocus";
+    }
+
+    #vis {
+      grid-row-gap: 2.5%;
+      grid-template-rows: 5% 90%;
+      grid-template-columns: auto;
+      grid-template-areas:
+        "visMeter"
+        "visual";
+    }
+
+    #jou {
+      grid-row-gap: 5%;
+      grid-template-rows: 25% 75%;
+      grid-template-areas:
+        "jCal"
+        "jEntry";
+    }
+
+    #gui {
+      grid-column-gap: 5%;
+      grid-template-columns: 15% 40% 40%;
+      grid-template-areas:
+        "toc guideContent credits";
+    }
+  </style>
 </head>
 <body id="ui" class="noselect r p4 p4-m p5-l hf cn c-d">
 
-  <header class="mb4 f6 lhc">
-    <h1 class="dib mr3 f5 upc tk">Log <span id="ver"></span></h1>
-    <button id="b-ovw" class="pv1 tab on bg-cl of mr3" onclick="Log.tab('ovw', 'sect', 'tab')">Overview</button>
-    <button id="b-lis" class="pv1 tab on bg-cl o5 mr3" onclick="Log.tab('lis', 'sect', 'tab')">Details</button>
-    <button id="b-vis" class="pv1 tab on bg-cl o5 mr3" onclick="Log.tab('vis', 'sect', 'tab')">Visualisation</button>
-    <button id="b-tab" class="pv1 tab on bg-cl o5 mr3" onclick="Log.tab('tab', 'sect', 'tab')">Entries</button>
-    <button id="b-jou" class="pv1 tab on bg-cl o5 mr3" onclick="Log.tab('jou', 'sect', 'tab')">Journal</button>
-    <button id="b-gui" class="pv1 tab on bg-cl o5 mr3" onclick="Log.tab('gui', 'sect', 'tab')">Guide</button>
-    <span id="timer" class="rf f5 dn di-m di-l">00:00:00</span>
-  </header>
+  <div id="container" class="hf">
+    <header id="topbar" class="mb2 f6 lhc">
+      <h1 class="dib mr3 f5 upc tk">Log <span id="ver"></span></h1>
+      <button id="b-ovw" class="pv1 tab on bg-cl of mr3" onclick="Log.tab('ovw', 'sect', 'tab')">Overview</button>
+      <button id="b-lis" class="pv1 tab on bg-cl o5 mr3" onclick="Log.tab('lis', 'sect', 'tab')">Details</button>
+      <button id="b-vis" class="pv1 tab on bg-cl o5 mr3" onclick="Log.tab('vis', 'sect', 'tab')">Visualisation</button>
+      <button id="b-tab" class="pv1 tab on bg-cl o5 mr3" onclick="Log.tab('tab', 'sect', 'tab')">Entries</button>
+      <button id="b-jou" class="pv1 tab on bg-cl o5 mr3" onclick="Log.tab('jou', 'sect', 'tab')">Journal</button>
+      <button id="b-gui" class="pv1 tab on bg-cl o5 mr3" onclick="Log.tab('gui', 'sect', 'tab')">Guide</button>
 
-  <div id="ovw" class="sect h9">
-    <div class="h1">
-      <div id="ovwMeter" class="mb3 psr wf sh2 bl br"></div>
-      <div id="dyc" class="psr wf sh2"></div>
-    </div>
+      <span id="timer" class="rf f5 dn di-m di-l">00:00:00</span>
+    </header>
 
-    <div class="h9 r oyh">
-      <div class="c2 hf-l">
-        <div id="phc" class="psr mb4 mt2 h2 wf"></div>
-        <div id="pdc" class="psr mb4 h2 wf"></div>
-
-        <ul class="lsn f6 lhc">
-          <li class="mb3">
-            <p id="fsf" class="f4 fwb">&ndash;</p>
-            <p class="o9">Sector Focus</p>
-          </li>
-          <li class="mb3">
-            <p id="flh" class="f4 fwb">&ndash;</p>
-            <p class="o9">Forecast LH</p>
-          </li>
-          <li class="mb3">
-            <p id="fsd" class="f4 fwb">&ndash;</p>
-            <p class="o9">Forecast ASD</p>
-          </li>
-        </ul>
-      </div>
-
-      <div class="c8 ph4-l hf-l oya-l">
-        <table class="mb4 wf bn f6 lhc">
-          <thead class="al">
-            <tr>
-              <th class="fwn pb1">ID</th>
-              <th class="fwn pb1">Time</th>
-              <th class="fwn pb1">Sector</th>
-              <th class="fwn pb1">Project</th>
-              <th class="fwn pb1">Description</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td id="leid"></td>
-              <td id="ltim"></td>
-              <td id="lsec"></td>
-              <td id="lpro"></td>
-              <td id="ldsc"></td>
-            </tr>
-          </tbody>
-        </table>
-
-        <div id="ovc" class="mb4 psr h4"></div>
-
-        <ul class="mb4 lsn f6 lhc r">
-          <li class="mb3 c6 c3-m c3-l">
-            <p id="tLHT" class="f4 fwb">&ndash;</p>
-            <p class="o9">Logged Hours</p>
-          </li>
-          <li class="mb3 c6 c3-m c3-l">
-            <p id="tLSN" class="f4 fwb">&ndash;</p>
-            <p class="o9">Min Session</p>
-          </li>
-          <li class="mb3 c6 c3-m c3-l">
-            <p id="tLSX" class="f4 fwb">&ndash;</p>
-            <p class="o9">Max Session</p>
-          </li>
-          <li class="mb3 c6 c3-m c3-l">
-            <p id="tASD" class="f4 fwb">&ndash;</p>
-            <p class="o9">Avg Session</p>
-          </li>
-          <li class="mb3 mb0-l c6 c3-m c3-l">
-            <p id="tLPT" class="f4 fwb">&ndash;</p>
-            <p class="o9">Log Percentage</p>
-          </li>
-          <li class="mb3 mb0-l c6 c3-m c3-l">
-            <p id="tFOC" class="f4 fwb">&ndash;</p>
-            <p class="o9">Focus</p>
-          </li>
-          <li class="mb3 mb0-l c6 c3-m c3-l">
-            <p id="tENC" class="f4 fwb">&ndash;</p>
-            <p class="o9">Entries</p>
-          </li>
-          <li class="mb3 mb0-l c6 c3-m c3-l">
-            <p id="tSTK" class="f4 fwb">&ndash;</p>
-            <p class="o9">Streak</p>
-          </li>
-        </ul>
-      </div>
-
-      <div class="c2 hf-l f6 lhc">
-        <h3 class="mb3 mt2 f5 fwn">Sectors</h3>
-        <ul id="secBars" class="nodrag lsn mb3 h4-l oya-l"></ul>
-        <h3 class="mb3 f5 fwn">Projects</h3>
-        <ul id="proBars" class="nodrag lsn h4-l oya-l"></ul>
-      </div>
-    </div>
-  </div>
-
-  <div id="lis" class="dn sect h9 r">
-    <div class="mb3 c1 lhc">
-      <button id="b-sum" class="db mb3 subtab on bg-cl of mr3" onclick="Log.tab('sum', 'subsect', 'subtab', true)">Summary</button>
-      <button id="b-sec" class="db mb3 subtab on bg-cl o5 mr3" onclick="Log.tab('sec', 'subsect', 'subtab', true)">Sectors</button>
-      <button id="b-pro" class="db mb3 subtab on bg-cl o5 mr3" onclick="Log.tab('pro', 'subsect', 'subtab', true)">Projects</button>
-    </div>
-
-    <div class="cb pl4-l hf-l">
-      <div id="sum" class="nodrag subsect hf oya">
-
-        <ul class="mb4 lsn f6 lhc r">
-          <li class="mb4 c6 c3-m c3-l">
-            <p id="LHH" class="f4 fwb">&ndash;</p>
-            <p class="o9">Logged Hours</p>
-          </li>
-          <li class="mb4 c6 c3-m c3-l">
-            <p id="LNH" class="f4 fwb">&ndash;</p>
-            <p class="o9">Min Session</p>
-          </li>
-          <li class="mb4 c6 c3-m c3-l">
-            <p id="LXH" class="f4 fwb">&ndash;</p>
-            <p class="o9">Max Session</p>
-          </li>
-          <li class="mb4 c6 c3-m c3-l">
-            <p id="ASD" class="f4 fwb">&ndash;</p>
-            <p class="o9">Avg Session</p>
-          </li>
-          <li class="mb4 c6 c3-m c3-l">
-            <p id="ALH" class="f4 fwb">&ndash;</p>
-            <p class="o9">Daily Average</p>
-          </li>
-          <li class="mb4 c6 c3-m c3-l">
-            <p id="LPH" class="f4 fwb">&ndash;</p>
-            <p class="o9">Log Percentage</p>
-          </li>
-          <li class="mb4 c6 c3-m c3-l">
-            <p id="EHC" class="f4 fwb">&ndash;</p>
-            <p class="o9">Entries</p>
-          </li>
-          <li class="mb4 c6 c3-m c3-l">
-            <p id="SCC" class="f4 fwb">&ndash;</p>
-            <p class="o9">Sectors</p>
-          </li>
-          <li class="mb4 mb0-l c6 c3-m c3-l">
-            <p id="PRC" class="f4 fwb">&ndash;</p>
-            <p class="o9">Projects</p>
-          </li>
-          <li class="mb4 mb0-l c6 c3-m c3-l">
-            <p id="PHH" class="f4 fwb">&ndash;</p>
-            <p class="o9">Peak Hour</p>
-          </li>
-          <li class="mb4 mb0-l c6 c3-m c3-l">
-            <p id="PDH" class="f4 fwb">&ndash;</p>
-            <p class="o9">Peak Day</p>
-          </li>
-        </ul>
-
-        <h3 class="mb3 f6 fwn">Peaks</h3>
-        <div class="dib mb4-l pr4-l lf h3 w5">
-          <div id="pth" class="psr hf wf"></div>
-        </div>
-        <div class="dib mb4-l pl4-l lf h3 w5">
-          <div id="pdh" class="psr hf wf"></div>
+    <div id="main">
+      <div id="ovw" class="sect hf wf">
+        <div id="ovwTop">
+          <div id="ovwMeter" class="mb3 psr wf sh2 bl br"></div>
+          <div id="dyc" class="psr wf sh2"></div>
         </div>
 
-        <h3 class="mb3 f6 fwn">Focus</h3>
-        <div id="focusChart" class="psr mb4 wf sh5"></div>
+        <div id="ovwSideA">
 
-        <ul class="mb4 lsn f6 lhc r">
-          <li class="c6 c3-m c3-l">
-            <p id="Favg" class="f4 fwb">&ndash;</p>
-            <p class="o9">Avg Focus</p>
-          </li>
-          <li class="c6 c3-m c3-l">
-            <p id="Fmin" class="f4 fwb">&ndash;</p>
-            <p class="o9">Min Focus</span>
-            </p>
-          </li>
-          <li class="c6 c3-m c3-l">
-            <p id="Fmax" class="f4 fwb">&ndash;</p>
-            <p class="o9">Max Focus</p>
-          </li>
-        </ul>
-
-        <h3 class="mb3 f6 fwn">Sector Focus</h3>
-        <div id="secFocBar" class="mb3 wf sh2"></div>
-        <ul id="secLegSum" class="lsn r"></ul>
-      </div>
-
-      <div id="sec" class="dn subsect hf r">
-        <div class="nodrag c9 hf-l oya-l">
-          <h2 id="secTtl" class="mb0 f4 lht">Sector</h2>
-          <p id="sectorLastUpdate" class="mb2 f6 o7"></p>
-
-          <div class="mb3 lhc">
-            <button id="b-secStat" class="pv1 sectab on bg-cl of mr3" onclick="Log.tab('secStat', 'secsect', 'sectab')">Statistics</button>
-            <button id="b-secEnt" class="pv1 sectab on bg-cl o5 mr3" onclick="Log.tab('secEnt', 'secsect', 'sectab')">Entries</button>
+          <div id="peakHours">
+            <h3 class="mb2 f6 lhc fwn">17:00</h3>
+            <div id="phc" class="psr h7 wf"></div>
           </div>
 
-          <div id="secStat" class="secsect hf">
-            <div id="secChart" class="psr h4 mb4"></div>
-
-            <ul class="mb5 lsn f6 lhc r">
-              <li class="mb4 c6 c3-m c3-l">
-                <p id="sLHH" class="f4 fwb">&ndash;</p>
-                <p class="o9">Logged Hours</p>
-              </li>
-              <li class="mb4 c6 c3-m c3-l">
-                <p id="sLNH" class="f4 fwb">&ndash;</p>
-                <p class="o9">Min Session</p>
-              </li>
-              <li class="mb4 c6 c3-m c3-l">
-                <p id="sLXH" class="f4 fwb">&ndash;</p>
-                <p class="o9">Max Session</p>
-              </li>
-              <li class="mb4 c6 c3-m c3-l">
-                <p id="sASD" class="f4 fwb">&ndash;</p>
-                <p class="o9">Avg Session</p>
-              </li>
-              <li class="mb4 mb0-l c6 c3-m c3-l">
-                <p id="sEnt" class="f4 fwb">&ndash;</p>
-                <p class="o9">Entries</p>
-              </li>
-              <li class="mb4 mb0-l c6 c3-m c3-l">
-                <p id="sSTK" class="f4 fwb">&ndash;</p>
-                <p class="o9">Streak</p>
-              </li>
-              <li class="mb4 mb0-l c6 c3-m c3-l">
-                <p id="sPHH" class="f4 fwb">&ndash;</p>
-                <p class="o9">Peak Hour</p>
-              </li>
-              <li class="mb4 mb0-l c6 c3-m c3-l">
-                <p id="sPDH" class="f4 fwb">&ndash;</p>
-                <p class="o9">Peak Day</p>
-              </li>
-            </ul>
-
-            <h3 class="mb3 f6 fwn">Peaks</h3>
-            <div class="dib mb4-l pr4-l lf h2 w5">
-              <div id="sPKH" class="psr hf wf"></div>
-            </div>
-            <div class="dib mb4-l pl4-l lf h2 w5">
-              <div id="sPKD" class="psr hf wf"></div>
-            </div>
-
-            <h3 class="mb3 f6 fwn">Focus</h3>
-            <div id="sFoc" class="psr mb4 wf h1"></div>
-
-            <ul class="mb4 lsn f6 lhc r">
-              <li class="c6 c3-m c3-l">
-                <p id="sFavg" class="f4 fwb">&ndash;</p>
-                <p class="o9">Avg Focus</p>
-              </li>
-              <li class="c6 c3-m c3-l">
-                <p id="sFmin" class="f4 fwb">&ndash;</p>
-                <p class="o9">Min Focus</p>
-              </li>
-              <li class="c6 c3-m c3-l">
-                <p id="sFmax" class="f4 fwb">&ndash;</p>
-                <p class="o9">Max Focus</p>
-              </li>
-            </ul>
-
-            <h3 class="mb3 f6 fwn">Sector Focus</h3>
-            <div id="proFocDetail" class="mb3 wf sh2"></div>
-            <ul id="proLeg" class="lsn r"></ul>
+          <div id="peakDays">
+            <h3 class="mb2 f6 lhc fwn">Tuesday</h3>
+            <div id="pdc" class="psr h7 wf"></div>
           </div>
 
-          <table id="secEnt" class="dn secsect wf bn">
-            <thead>
-              <tr class="f6 al">
-                <th class="fwn pl0">ID</th>
-                <th class="fwn">Date</th>
-                <th class="fwn">Time</th>
-                <th class="fwn">Duration</th>
-                <th class="fwn">Project</th>
-                <th class="fwn pr0">Description</th>
-              </tr>
-            </thead>
-            <tbody id="secLog" class="nodrag f6"></tbody>
-          </table>
-        </div>
-
-        <ul id="secList" class="nodrag c3 pl4-l hf-l oya-l lsn f6 lhc"></ul>
-      </div>
-
-      <div id="pro" class="dn subsect hf r">
-        <div class="nodrag c9 hf-l oya-l">
-          <h2 id="proTtl" class="mb0 f4 lht">Project</h2>
-          <p id="proLastUpdate" class="mb2 f6 o7"></p>
-
-          <div class="mb3 lhc">
-            <button id="b-proStat" class="pv1 protab on bg-cl of mr3" onclick="Log.tab('proStat', 'prosect', 'protab')">Statistics</button>
-            <button id="b-proEnt" class="pv1 protab on bg-cl o5 mr3" onclick="Log.tab('proEnt', 'prosect', 'protab')">Entries</button>
-          </div>
-
-          <div id="proStat" class="prosect hf">
-            <div id="proChart" class="psr h4 mb4"></div>
-
-            <ul class="mb5 lsn f6 lhc r">
-              <li class="mb4 c6 c3-m c3-l">
-                <p id="pLHH" class="f4 fwb">&ndash;</p>
-                <p class="o9">Logged Hours</p>
-              </li>
-              <li class="mb4 c6 c3-m c3-l">
-                <p id="pLNH" class="f4 fwb">&ndash;</p>
-                <p class="o9">Min Session</p>
-              </li>
-              <li class="mb4 c6 c3-m c3-l">
-                <p id="pLXH" class="f4 fwb">&ndash;</p>
-                <p class="o9">Max Session</p>
-              </li>
-              <li class="mb4 c6 c3-m c3-l">
-                <p id="pASD" class="f4 fwb">&ndash;</p>
-                <p class="o9">Avg Session</p>
-              </li>
-              <li class="mb4 mb0-l c6 c3-m c3-l">
-                <p id="pEnt" class="f4 fwb">&ndash;</p>
-                <p class="o9">Entries</p>
-              </li>
-              <li class="mb4 mb0-l c6 c3-m c3-l">
-                <p id="pSTK" class="f4 fwb">&ndash;</p>
-                <p class="o9">Streak</p>
-              </li>
-              <li class="mb4 mb0-l c6 c3-m c3-l">
-                <p id="pPHH" class="f4 fwb">&ndash;</p>
-                <p class="o9">Peak Hour</p>
-              </li>
-              <li class="mb4 mb0-l c6 c3-m c3-l">
-                <p id="pPDH" class="f4 fwb">&ndash;</p>
-                <p class="o9">Peak Day</p>
-              </li>
-            </ul>
-
-            <h3 class="mb4 f6 fwn">Peaks</h3>
-            <div class="dib mb4-l pr4-l lf h2 w5">
-              <div id="pPKH" class="psr hf wf"></div>
-            </div>
-            <div class="dib mb4-l pl4-l lf h2 w5">
-              <div id="pPKD" class="psr hf wf"></div>
-            </div>
-
-            <h3 class="mb4 f6 fwn">Focus</h3>
-            <div id="pFoc" class="psr mb4 wf h1"></div>
-
-            <ul class="mb5 lsn f6 lhc r">
-              <li class="c6 c3-m c3-l">
-                <p id="pFavg" class="f4 fwb">&ndash;</p>
-                <p class="o9">Avg Focus</p>
-              </li>
-              <li class="c6 c3-m c3-l">
-                <p id="pFmin" class="f4 fwb">&ndash;</p>
-                <p class="o9">Min Focus</p>
-              </li>
-              <li class="c6 c3-m c3-l">
-                <p id="pFmax" class="f4 fwb">&ndash;</p>
-                <p class="o9">Max Focus</p>
-              </li>
-            </ul>
-
-            <h3 class="mb4 f6 fwn">Sector Focus</h3>
-            <div id="secFocDetail" class="mb3 wf sh2"></div>
-            <ul id="secLeg" class="lsn r"></ul>
-          </div>
-
-          <table id="proEnt" class="dn prosect wf bn">
-            <thead>
-              <tr class="f6 al">
-                <th class="pl0 fwn">ID</th>
-                <th class="fwn">Date</th>
-                <th class="fwn">Time</th>
-                <th class="fwn">Duration</th>
-                <th class="fwn">Sector</th>
-                <th class="pr0 fwn">Description</th>
-              </tr>
-            </thead>
-            <tbody id="proLog" class="nodrag f6"></tbody>
-          </table>
-        </div>
-
-        <ul id="proList" class="nodrag c3 pl4-l hf-l oya-l lsn f6 lhc"></ul>
-      </div>
-    </div>
-  </div>
-
-  <div id="vis" class="nodrag dn sect h9 oya">
-    <div id="visMeter" class="psr wf sh2 bl br"></div>
-    <div id="visual" class="nodrag mt4 h9 oya"></div>
-  </div>
-
-  <div id="tab" class="dn sect wf h9 oya">
-    <table class="wf bn">
-      <thead class="f6 al">
-        <th class="pl0 fwn">ID</th>
-        <th class="fwn">Date</th>
-        <th class="fwn">Time</th>
-        <th class="fwn">Duration</th>
-        <th class="fwn">Sector</th>
-        <th class="fwn">Project</th>
-        <th class="pr0 fwn">Description</th>
-      </thead>
-      <tbody id="logbook" class="nodrag f6"></tbody>
-    </table>
-  </div>
-
-  <div id="jou" class="dn sect wf h9 oya">
-
-    <div class="pb4 h3 wf oya pr1">
-      <table id="cal" class="nodrag wf f6 lhc c-pt">
-        <tbody></tbody>
-      </table>
-    </div>
-
-    <div class="h7">
-      <ul id="jNav" class="dn nodrag c2 hf-l oya-l lsn f6 lhc"></ul>
-      <div class="nodrag hf-l oya-l">
-
-        <h2 id="journalDate" class="mb4 f5">Journal</h2>
-
-        <div class="mb4 ph1">
-          <div id="jMeter" class="mb3 psr wf sh2 bl br"></div>
-          <div id="jDyc" class="mb3 psr wf sh2"></div>
-        </div>
-
-        <div class="r h7">
-          <ul id="jEnt" class="c8 pr4-l hf oya lsn"></ul>
-
-          <ul class="c4 pl4-l lsn f6 lhc r">
-            <li class="mb4 c6">
-              <p id="jLHT" class="f4 fwb">&ndash;</p>
-              <p class="o9">Logged Hours</p>
+          <ul id="forecast" class="lsn f6 lhc">
+            <li class="mb3">
+              <p id="fsf" class="f4 fwb">&ndash;</p>
+              <p class="o9">Sector Focus</p>
             </li>
-            <li class="mb4 c6">
-              <p id="jLSN" class="f4 fwb">&ndash;</p>
-              <p class="o9">Min Session</p>
+            <li class="mb3">
+              <p id="flh" class="f4 fwb">&ndash;</p>
+              <p class="o9">Forecast LH</p>
             </li>
-            <li class="mb4 c6">
-              <p id="jLSX" class="f4 fwb">&ndash;</p>
-              <p class="o9">Max Session</p>
-            </li>
-            <li class="mb4 c6">
-              <p id="jASDT" class="f4 fwb">&ndash;</p>
-              <p class="o9">Avg Session</p>
-            </li>
-            <li class="mb4 mb0-l c6">
-              <p id="jLPT" class="f4 fwb">&ndash;</p>
-              <p class="o9">Log Percentage</p>
-            </li>
-            <li class="mb4 mb0-l c6">
-              <p id="jFT" class="f4 fwb">&ndash;</p>
-              <p class="o9">Focus</p>
+            <li class="mb3">
+              <p id="fsd" class="f4 fwb">&ndash;</p>
+              <p class="o9">Forecast ASD</p>
             </li>
           </ul>
         </div>
-      </div>
-    </div>
-  </div>
 
-  <div id="gui" class="dn sect wf r h9-l f6 lhc oya">
-    <div class="nodrag mb5 mb0-l c2 br pr4-l hf-l oya-l">
-      <h2 class="mb3 f5">Contents</h2>
+        <div id="ovwCenter" class="oya-l">
+          <div id="lastEntry">
+            <table class="wf bn f6 lhc">
+              <thead class="al">
+                <tr>
+                  <th class="fwn pb1 pt0">ID</th>
+                  <th class="fwn pb1 pt0">Time</th>
+                  <th class="fwn pb1 pt0">Sector</th>
+                  <th class="fwn pb1 pt0">Project</th>
+                  <th class="fwn pb1 pt0">Description</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td id="leid"></td>
+                  <td id="ltim"></td>
+                  <td id="lsec"></td>
+                  <td id="lpro"></td>
+                  <td id="ldsc"></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
 
-      <ul class="lsn">
-        <li class="fwb mb3">Console</li>
-        <li><a href="#starting">Starting</a></li>
-        <li><a href="#stopping">Stopping</a></li>
-        <li class="mb3"><a href="#pausing">Pausing</a></li>
-        <li><a href="#editing">Editing</a></li>
-        <li class="mb3"><a href="#deleting">Deleting</a></li>
-        <li class="mb3"><a href="#customising">Customising</a></li>
-        <li class="mb3"><a href="#import">Import/Export</a></li>
-        <li class="mb4"><a href="#shortcuts">Shortcuts</a></li>
+          <div id="ovc" class="psr"></div>
 
-        <li class="fwb mb3">Terminology</li>
-        <li><a href="#shortcuts">Sectors</a></li>
-        <li class="mb3"><a href="#shortcuts">Projects</a></li>
+          <ul id="todayStats" class="lsn f6 lhc r">
+            <li class="mb3 c6 c3-m c3-l">
+              <p id="tLHT" class="f4 fwb">&ndash;</p>
+              <p class="o9">Logged Hours</p>
+            </li>
+            <li class="mb3 c6 c3-m c3-l">
+              <p id="tLSN" class="f4 fwb">&ndash;</p>
+              <p class="o9">Min Session</p>
+            </li>
+            <li class="mb3 c6 c3-m c3-l">
+              <p id="tLSX" class="f4 fwb">&ndash;</p>
+              <p class="o9">Max Session</p>
+            </li>
+            <li class="mb3 c6 c3-m c3-l">
+              <p id="tASD" class="f4 fwb">&ndash;</p>
+              <p class="o9">Avg Session</p>
+            </li>
+            <li class="mb3 mb0-l c6 c3-m c3-l">
+              <p id="tLPT" class="f4 fwb">&ndash;</p>
+              <p class="o9">Log Percentage</p>
+            </li>
+            <li class="mb3 mb0-l c6 c3-m c3-l">
+              <p id="tFOC" class="f4 fwb">&ndash;</p>
+              <p class="o9">Focus</p>
+            </li>
+            <li class="mb3 mb0-l c6 c3-m c3-l">
+              <p id="tENC" class="f4 fwb">&ndash;</p>
+              <p class="o9">Entries</p>
+            </li>
+            <li class="mb3 mb0-l c6 c3-m c3-l">
+              <p id="tSTK" class="f4 fwb">&ndash;</p>
+              <p class="o9">Streak</p>
+            </li>
+          </ul>
+        </div>
 
-        <li class="mb3"><a href="#statistics">Statistics</a></li>
-
-        <li>Charts</li>
-        <li><a href="#shortcuts">Overview</a></li>
-        <li><a href="#shortcuts">Peak Times</a></li>
-        <li><a href="#shortcuts">Focus Chart</a></li>
-        <li class="mb4"><a href="#shortcuts">Visualisation</a></li>
-
-        <li class="mb4"><a href="#shortcuts">Journal</a></li>
-
-        <li class="fwb mb3">About</li>
-        <li><a href="#contributions">Contribution</a></li>
-        <li><a href="#credits">Credits</a></li>
-      </ul>
-    </div>
-
-    <div class="nodrag mb5 mb0-l ca pl4-l hf-l oya-l">
-      <h2 class="mb3 f5">Guide</h2>
-
-      <p class="mb4 m">The Log is designed for single-tasking. When you start a log, focus on your activity and stop at any time.</p>
-
-      <p class="mb4 m">Use the console to enter commands. The console is summoned when you start typing. Here are a list of available commands:</p>
-
-      <h3 id="starting" class="mb3 f5">Starting Log Entries</h3>
-
-      <p class="mb3 m">To start a log, you may do so in a few different ways. Choose the one you find convenient:</p>
-      <div class="mb4 bl pl3 m">
-        <p class="mb2">start "Sector" "Project" "A description"</p>
-        <p class="mb2">start Sector, Project, A description</p>
-        <p class="mb2">start Sector; Project; A description</p>
-        <p>start Sector | Title | Description</p>
-      </div>
-
-      <p class="mb4 m">If you start a log without ending an ongoing previous session, that session will be automatically stopped before opening a new session.
-
-      <h3 id="stopping" class="mb3 f5">Stopping Log Entries</h3>
-
-      <p class="mb3 m">To stop logging:</p>
-      <div class="mb4 bl pl3 m">
-        <p>stop</p>
-      </div>
-
-      <h3 id="pausing" class="mb3 f5">Pausing Log Entries</h3>
-
-      <p class="mb3 m">If you want pause logging temporarily, and resume logging from where you left off previously:</p>
-      <div class="mb4 bl pl3 m">
-        <p>pause <span class="o8">// stops your current log session</span></p>
-        <p>resume <span class="o8">// resumes the last log session</span></p>
-      </div>
-
-      <h3 id="editing" class="mb3 f5">Editing Log Entries</h3>
-
-      <p class="mb3 m">To edit a log entry, use its ID (shown in Entries):</p>
-      <div class="mb4 bl pl3 m">
-        <p class="mb2">edit 12 sector "Code" <span class="o8">// edits entry #12</span></p>
-        <p class="mb2">edit 25 project "Fishing"</p>
-        <p class="mb2">edit 3 description "Chasing dragon"</p>
-        <p class="mb2">edit 24 start "YYYY MM DD HH MM SS"</p>
-        <p class="mb2">edit 1 start "2017 12 15 13 30 14"</p>
-        <p class="mb2">edit 5 end "2018 10 9 12 15 0"</p>
-        <p>edit 4 duration "90" <span class="o8">// sets duration in minutes</span></p>
+        <div id="ovwSideB" class="f6 lhc">
+          <div id="ovwSideBA">
+            <h3 class="mb3 f5 fwn">Sectors</h3>
+            <ul id="secBars" class="nodrag lsn h8-l oya-l"></ul>
+          </div>
+          <div id="ovwSideBB">
+            <h3 class="mb3 f5 fwn">Projects</h3>
+            <ul id="proBars" class="nodrag lsn h8-l oya-l"></ul>
+          </div>
+        </div>
       </div>
 
-      <h3 id="deleting" class="mb3 f5">Deleting</h3>
+      <div id="lis" class="dn sect hf wf">
+        <div id="lisSideA" class="lhc">
+          <button id="b-sum" class="db mb3 subtab on bg-cl of mr3" onclick="Log.tab('sum', 'subsect', 'subtab', true)">Summary</button>
+          <button id="b-sec" class="db mb3 subtab on bg-cl o5 mr3" onclick="Log.tab('sec', 'subsect', 'subtab', true)">Sectors</button>
+          <button id="b-pro" class="db mb3 subtab on bg-cl o5 mr3" onclick="Log.tab('pro', 'subsect', 'subtab', true)">Projects</button>
+        </div>
 
-      <p class="mb3 m">To delete a log entry, use its ID:</p>
-      <div class="mb4 bl pl3 m">
-        <p>delete 15 <span class="o8">// deletes entry #15</span></p>
+        <div id="lisCenter" class="oya">
+          <div id="sum" class="nodrag subsect hf oya">
+
+            <div id="sumStats">
+              <ul class="mb4 lsn f6 lhc r">
+                <li class="mb4 c6 c3-m c3-l">
+                  <p id="LHH" class="f4 fwb">&ndash;</p>
+                  <p class="o9">Logged Hours</p>
+                </li>
+                <li class="mb4 c6 c3-m c3-l">
+                  <p id="LNH" class="f4 fwb">&ndash;</p>
+                  <p class="o9">Min Session</p>
+                </li>
+                <li class="mb4 c6 c3-m c3-l">
+                  <p id="LXH" class="f4 fwb">&ndash;</p>
+                  <p class="o9">Max Session</p>
+                </li>
+                <li class="mb4 c6 c3-m c3-l">
+                  <p id="ASD" class="f4 fwb">&ndash;</p>
+                  <p class="o9">Avg Session</p>
+                </li>
+                <li class="mb4 c6 c3-m c3-l">
+                  <p id="ALH" class="f4 fwb">&ndash;</p>
+                  <p class="o9">Daily Average</p>
+                </li>
+                <li class="mb4 c6 c3-m c3-l">
+                  <p id="LPH" class="f4 fwb">&ndash;</p>
+                  <p class="o9">Log Percentage</p>
+                </li>
+                <li class="mb4 c6 c3-m c3-l">
+                  <p id="EHC" class="f4 fwb">&ndash;</p>
+                  <p class="o9">Entries</p>
+                </li>
+                <li class="mb4 c6 c3-m c3-l">
+                  <p id="SCC" class="f4 fwb">&ndash;</p>
+                  <p class="o9">Sectors</p>
+                </li>
+                <li class="mb4 mb0-l c6 c3-m c3-l">
+                  <p id="PRC" class="f4 fwb">&ndash;</p>
+                  <p class="o9">Projects</p>
+                </li>
+                <li class="mb4 mb0-l c6 c3-m c3-l">
+                  <p id="PHH" class="f4 fwb">&ndash;</p>
+                  <p class="o9">Peak Hour</p>
+                </li>
+                <li class="mb4 mb0-l c6 c3-m c3-l">
+                  <p id="PDH" class="f4 fwb">&ndash;</p>
+                  <p class="o9">Peak Day</p>
+                </li>
+              </ul>
+            </div>
+
+            <div id="sumPeaks">
+              <h3 class="mb3 f6 fwn">Peaks</h3>
+              <div class="dib mb4-l pr4-l lf sh6 w5">
+                <div id="pth" class="psr hf wf"></div>
+              </div>
+              <div class="dib mb4-l pl4-l lf sh6 w5">
+                <div id="pdh" class="psr hf wf"></div>
+              </div>
+            </div>
+
+            <div id="sumFocus">
+              <h3 class="mb3 f6 fwn">Focus</h3>
+              <div id="focusChart" class="psr mb4 wf sh5"></div>
+
+              <ul class="mb4 lsn f6 lhc r">
+                <li class="c6 c3-m c3-l">
+                  <p id="Favg" class="f4 fwb">&ndash;</p>
+                  <p class="o9">Avg Focus</p>
+                </li>
+                <li class="c6 c3-m c3-l">
+                  <p id="Fmin" class="f4 fwb">&ndash;</p>
+                  <p class="o9">Min Focus</span>
+                  </p>
+                </li>
+                <li class="c6 c3-m c3-l">
+                  <p id="Fmax" class="f4 fwb">&ndash;</p>
+                  <p class="o9">Max Focus</p>
+                </li>
+              </ul>
+
+              <h3 class="mb3 f6 fwn">Sector Focus</h3>
+              <div id="secFocBar" class="mb3 wf sh2"></div>
+              <ul id="secLegSum" class="lsn r"></ul>
+            </div>
+          </div>
+
+          <div id="sec" class="dn subsect hf">
+            <div id="secDetails" class="nodrag oys">
+              <h2 id="secTtl" class="mb0 f4 lht">Sector</h2>
+              <p id="sectorLastUpdate" class="mb2 f6 o7"></p>
+
+              <div class="mb3 lhc">
+                <button id="b-secStat" class="pv1 sectab on bg-cl of mr3" onclick="Log.tab('secStat', 'secsect', 'sectab')">Statistics</button>
+                <button id="b-secEnt" class="pv1 sectab on bg-cl o5 mr3" onclick="Log.tab('secEnt', 'secsect', 'sectab')">Entries</button>
+              </div>
+
+              <div id="secStat" class="secsect hf">
+                <div id="secChart" class="psr"></div>
+
+                <div id="secStats">
+                  <ul class="lsn f6 lhc r">
+                    <li class="mb4 c6 c3-m c3-l">
+                      <p id="sLHH" class="f4 fwb">&ndash;</p>
+                      <p class="o9">Logged Hours</p>
+                    </li>
+                    <li class="mb4 c6 c3-m c3-l">
+                      <p id="sLNH" class="f4 fwb">&ndash;</p>
+                      <p class="o9">Min Session</p>
+                    </li>
+                    <li class="mb4 c6 c3-m c3-l">
+                      <p id="sLXH" class="f4 fwb">&ndash;</p>
+                      <p class="o9">Max Session</p>
+                    </li>
+                    <li class="mb4 c6 c3-m c3-l">
+                      <p id="sASD" class="f4 fwb">&ndash;</p>
+                      <p class="o9">Avg Session</p>
+                    </li>
+                    <li class="mb4 mb0-l c6 c3-m c3-l">
+                      <p id="sEnt" class="f4 fwb">&ndash;</p>
+                      <p class="o9">Entries</p>
+                    </li>
+                    <li class="mb4 mb0-l c6 c3-m c3-l">
+                      <p id="sSTK" class="f4 fwb">&ndash;</p>
+                      <p class="o9">Streak</p>
+                    </li>
+                    <li class="mb4 mb0-l c6 c3-m c3-l">
+                      <p id="sPHH" class="f4 fwb">&ndash;</p>
+                      <p class="o9">Peak Hour</p>
+                    </li>
+                    <li class="mb4 mb0-l c6 c3-m c3-l">
+                      <p id="sPDH" class="f4 fwb">&ndash;</p>
+                      <p class="o9">Peak Day</p>
+                    </li>
+                  </ul>
+                </div>
+
+                <div id="secPeaks">
+                  <h3 class="mb3 f6 fwn">Peaks</h3>
+                  <div class="dib mb4-l pr4-l lf sh6 w5">
+                    <div id="sPKH" class="psr hf wf"></div>
+                  </div>
+                  <div class="dib mb4-l pl4-l lf sh6 w5">
+                    <div id="sPKD" class="psr hf wf"></div>
+                  </div>
+                </div>
+
+                <div id="secFocus">
+                  <h3 class="mb3 f6 fwn">Focus</h3>
+                  <div id="sFoc" class="psr mb4 wf h1"></div>
+
+                  <ul class="mb4 lsn f6 lhc r">
+                    <li class="c6 c3-m c3-l">
+                      <p id="sFavg" class="f4 fwb">&ndash;</p>
+                      <p class="o9">Avg Focus</p>
+                    </li>
+                    <li class="c6 c3-m c3-l">
+                      <p id="sFmin" class="f4 fwb">&ndash;</p>
+                      <p class="o9">Min Focus</p>
+                    </li>
+                    <li class="c6 c3-m c3-l">
+                      <p id="sFmax" class="f4 fwb">&ndash;</p>
+                      <p class="o9">Max Focus</p>
+                    </li>
+                  </ul>
+
+                  <h3 class="mb3 f6 fwn">Sector Focus</h3>
+                  <div id="proFocDetail" class="mb3 wf sh2"></div>
+                  <ul id="proLeg" class="lsn r"></ul>
+                </div>
+
+
+              </div>
+
+              <div id="secEnt" class="dn secsect hf">
+                <table class="wf bn">
+                  <thead>
+                    <tr class="f6 al">
+                      <th class="fwn pl0">ID</th>
+                      <th class="fwn">Date</th>
+                      <th class="fwn">Time</th>
+                      <th class="fwn">Duration</th>
+                      <th class="fwn">Project</th>
+                      <th class="fwn pr0">Description</th>
+                    </tr>
+                  </thead>
+                  <tbody id="secLog" class="nodrag f6"></tbody>
+                </table>
+              </div>
+            </div>
+
+            <ul id="secList" class="nodrag oys lsn f6 lhc"></ul>
+          </div>
+
+          <div id="pro" class="dn subsect hf">
+            <div id="proDetails" class="nodrag oys">
+              <h2 id="proTtl" class="mb0 f4 lht">Project</h2>
+              <p id="proLastUpdate" class="mb2 f6 o7"></p>
+
+              <div class="mb3 lhc">
+                <button id="b-proStat" class="pv1 protab on bg-cl of mr3" onclick="Log.tab('proStat', 'prosect', 'protab')">Statistics</button>
+                <button id="b-proEnt" class="pv1 protab on bg-cl o5 mr3" onclick="Log.tab('proEnt', 'prosect', 'protab')">Entries</button>
+              </div>
+
+              <div id="proStat" class="prosect hf">
+                <div id="proChart" class="psr"></div>
+
+                <div id="proStats">
+                  <ul class="lsn f6 lhc r">
+                    <li class="mb4 c6 c3-m c3-l">
+                      <p id="pLHH" class="f4 fwb">&ndash;</p>
+                      <p class="o9">Logged Hours</p>
+                    </li>
+                    <li class="mb4 c6 c3-m c3-l">
+                      <p id="pLNH" class="f4 fwb">&ndash;</p>
+                      <p class="o9">Min Session</p>
+                    </li>
+                    <li class="mb4 c6 c3-m c3-l">
+                      <p id="pLXH" class="f4 fwb">&ndash;</p>
+                      <p class="o9">Max Session</p>
+                    </li>
+                    <li class="mb4 c6 c3-m c3-l">
+                      <p id="pASD" class="f4 fwb">&ndash;</p>
+                      <p class="o9">Avg Session</p>
+                    </li>
+                    <li class="mb4 mb0-l c6 c3-m c3-l">
+                      <p id="pEnt" class="f4 fwb">&ndash;</p>
+                      <p class="o9">Entries</p>
+                    </li>
+                    <li class="mb4 mb0-l c6 c3-m c3-l">
+                      <p id="pSTK" class="f4 fwb">&ndash;</p>
+                      <p class="o9">Streak</p>
+                    </li>
+                    <li class="mb4 mb0-l c6 c3-m c3-l">
+                      <p id="pPHH" class="f4 fwb">&ndash;</p>
+                      <p class="o9">Peak Hour</p>
+                    </li>
+                    <li class="mb4 mb0-l c6 c3-m c3-l">
+                      <p id="pPDH" class="f4 fwb">&ndash;</p>
+                      <p class="o9">Peak Day</p>
+                    </li>
+                  </ul>
+                </div>
+
+                <div id="proPeaks">
+                  <h3 class="mb4 f6 fwn">Peaks</h3>
+                  <div class="dib pr4-l lf sh6 w5">
+                    <div id="pPKH" class="psr hf wf"></div>
+                  </div>
+                  <div class="dib pl4-l lf sh6 w5">
+                    <div id="pPKD" class="psr hf wf"></div>
+                  </div>
+                </div>
+
+                <div id="proFocus">
+                  <h3 class="mb4 f6 fwn">Focus</h3>
+                  <div id="pFoc" class="psr mb4 wf h1"></div>
+
+                  <ul class="mb5 lsn f6 lhc r">
+                    <li class="c6 c3-m c3-l">
+                      <p id="pFavg" class="f4 fwb">&ndash;</p>
+                      <p class="o9">Avg Focus</p>
+                    </li>
+                    <li class="c6 c3-m c3-l">
+                      <p id="pFmin" class="f4 fwb">&ndash;</p>
+                      <p class="o9">Min Focus</p>
+                    </li>
+                    <li class="c6 c3-m c3-l">
+                      <p id="pFmax" class="f4 fwb">&ndash;</p>
+                      <p class="o9">Max Focus</p>
+                    </li>
+                  </ul>
+
+                  <h3 class="mb4 f6 fwn">Sector Focus</h3>
+                  <div id="secFocDetail" class="mb3 wf sh2"></div>
+                  <ul id="secLeg" class="lsn r"></ul>
+                </div>
+              </div>
+
+              <div id="proEnt" class="dn prosect hf">
+                <table class="wf bn">
+                  <thead>
+                    <tr class="f6 al">
+                      <th class="pl0 fwn">ID</th>
+                      <th class="fwn">Date</th>
+                      <th class="fwn">Time</th>
+                      <th class="fwn">Duration</th>
+                      <th class="fwn">Sector</th>
+                      <th class="pr0 fwn">Description</th>
+                    </tr>
+                  </thead>
+                  <tbody id="proLog" class="nodrag f6"></tbody>
+                </table>
+              </div>
+            </div>
+
+            <ul id="proList" class="nodrag oys lsn f6 lhc"></ul>
+          </div>
+        </div>
       </div>
 
-      <p class="mb3 m">To delete a sector or project, use its name:</p>
-      <div class="mb4 bl pl3 m">
-        <p class="mb2">delete sector Code <span class="o8">// deletes all Code entries</span></p>
-		<p>delete project Fishing <span class="o8">// deletes all Fishing entries</span></p>
+      <div id="vis" class="nodrag dn sect hf oya">
+        <div id="visMeter" class="psr wf sh2 bl br"></div>
+        <div id="visual" class="nodrag oya"></div>
       </div>
 
-      <h3 id="customising" class="mb3 f5">Customising</h3>
-
-      <p class="mb3 m">To change the interface's background colour, choose a hexadecimal colour or an HTML colour name:</p>
-      <div class="mb4 bl pl3 m">
-        <p class="mb2">set background #aabbcc</p>
-        <p>set background aquamarine</p>
+      <div id="tab" class="dn sect hf wf oya">
+        <table class="wf bn">
+          <thead class="f6 al">
+            <th class="pl0 fwn">ID</th>
+            <th class="fwn">Date</th>
+            <th class="fwn">Time</th>
+            <th class="fwn">Duration</th>
+            <th class="fwn">Sector</th>
+            <th class="fwn">Project</th>
+            <th class="pr0 fwn">Description</th>
+          </thead>
+          <tbody id="logbook" class="nodrag f6"></tbody>
+        </table>
       </div>
 
-      <p class="mb3 m">To change the interface's text colour, choose a hexadecimal colour or an HTML colour name:</p>
-      <div class="mb4 bl pl3 m">
-        <p class="mb2">set colour #112233</p>
-        <p>set colour black</p>
+      <div id="jou" class="dn sect hf wf">
+        <div id="jCal" class="wf oya">
+          <table id="cal" class="nodrag hf wf f6 lhc c-pt bn">
+            <tbody></tbody>
+          </table>
+        </div>
+
+        <div id="jEntry" class="nodrag oya-l">
+          <h2 id="journalDate" class="mb4 f5">Journal</h2>
+
+          <div class="mb4 ph1">
+            <div id="jMeter" class="mb3 psr wf sh2 bl br"></div>
+            <div id="jDyc" class="mb3 psr wf sh2"></div>
+          </div>
+
+          <div class="r h6">
+            <ul id="jEnt" class="c8 pr4-l hf oya lsn"></ul>
+
+            <ul class="c4 pl4-l lsn f6 lhc r">
+              <li class="mb4 c6">
+                <p id="jLHT" class="f4 fwb">&ndash;</p>
+                <p class="o9">Logged Hours</p>
+              </li>
+              <li class="mb4 c6">
+                <p id="jLSN" class="f4 fwb">&ndash;</p>
+                <p class="o9">Min Session</p>
+              </li>
+              <li class="mb4 c6">
+                <p id="jLSX" class="f4 fwb">&ndash;</p>
+                <p class="o9">Max Session</p>
+              </li>
+              <li class="mb4 c6">
+                <p id="jASD" class="f4 fwb">&ndash;</p>
+                <p class="o9">Avg Session</p>
+              </li>
+              <li class="mb4 mb0-l c6">
+                <p id="jLPT" class="f4 fwb">&ndash;</p>
+                <p class="o9">Log Percentage</p>
+              </li>
+              <li class="mb4 mb0-l c6">
+                <p id="jFT" class="f4 fwb">&ndash;</p>
+                <p class="o9">Focus</p>
+              </li>
+            </ul>
+          </div>
+        </div>
       </div>
 
-      <p class="mb3 m">The accent is what indicates the current hour and day
-      in the peak time charts. To change the it, choose a
-      hexadecimal colour or an HTML colour name:</p>
-      <div class="mb4 bl pl3 m">
-        <p class="mb2">set accent #ac1d1c</p>
-        <p>set accent red</p>
+      <div id="gui" class="dn sect hf wf oys">
+
+        <div id="toc" class="nodrag oys f6 lhc">
+          <h2 class="mb3 f5">Contents</h2>
+
+          <ul class="lsn">
+            <li class="fwb mb3">Console</li>
+            <li><a href="#starting">Starting</a></li>
+            <li><a href="#stopping">Stopping</a></li>
+            <li class="mb3"><a href="#pausing">Pausing</a></li>
+            <li><a href="#editing">Editing</a></li>
+            <li class="mb3"><a href="#deleting">Deleting</a></li>
+            <li class="mb3"><a href="#customising">Customising</a></li>
+            <li class="mb3"><a href="#import">Import/Export</a></li>
+            <li class="mb4"><a href="#shortcuts">Shortcuts</a></li>
+
+            <li class="fwb mb3">Terminology</li>
+            <li><a href="#shortcuts">Sectors</a></li>
+            <li class="mb3"><a href="#shortcuts">Projects</a></li>
+
+            <li class="mb3"><a href="#statistics">Statistics</a></li>
+
+            <li>Charts</li>
+            <li><a href="#shortcuts">Overview</a></li>
+            <li><a href="#shortcuts">Peak Times</a></li>
+            <li><a href="#shortcuts">Focus Chart</a></li>
+            <li class="mb4"><a href="#shortcuts">Visualisation</a></li>
+
+            <li class="mb4"><a href="#shortcuts">Journal</a></li>
+
+            <li class="fwb mb3">About</li>
+            <li><a href="#contributions">Contribution</a></li>
+            <li><a href="#credits">Credits</a></li>
+          </ul>
+        </div>
+
+        <div id="guideContent" class="nodrag oys f6 lhc">
+          <h2 class="mb3 f5">Guide</h2>
+
+          <p class="mb4 m">Log is designed for single-tasking. When you start a log, focus on your activity and stop at any time.</p>
+
+          <p class="mb4 m">Use the console to enter commands. The console is summoned when you start typing. Here are a list of available commands:</p>
+
+          <h3 id="starting" class="mb3 f5">Starting Log Entries</h3>
+
+          <p class="mb3 m">To start a log, you may do so in a few different ways. Choose the one you find convenient:</p>
+          <div class="mb4 bl pl3 m">
+            <p class="mb2">start "Sector" "Project" "A description"</p>
+            <p class="mb2">start Sector, Project, A description</p>
+            <p class="mb2">start Sector; Project; A description</p>
+            <p>start Sector | Title | Description</p>
+          </div>
+
+          <p class="mb4 m">If you start a log without ending an ongoing previous session, that session will be automatically stopped before opening a new session.
+
+          <h3 id="stopping" class="mb3 f5">Stopping Log Entries</h3>
+
+          <p class="mb3 m">To stop logging:</p>
+          <div class="mb4 bl pl3 m">
+            <p>stop</p>
+          </div>
+
+          <h3 id="pausing" class="mb3 f5">Pausing Log Entries</h3>
+
+          <p class="mb3 m">If you want pause logging temporarily, and resume logging from where you left off previously:</p>
+          <div class="mb4 bl pl3 m">
+            <p>pause <span class="o8">// stops your current log session</span></p>
+            <p>resume <span class="o8">// resumes the last log session</span></p>
+          </div>
+
+          <h3 id="editing" class="mb3 f5">Editing Log Entries</h3>
+
+          <p class="mb3 m">To edit a log entry, use its ID (shown in Entries):</p>
+          <div class="mb4 bl pl3 m">
+            <p class="mb2">edit 12 sector "Code" <span class="o8">// edits entry #12</span></p>
+            <p class="mb2">edit 25 project "Fishing"</p>
+            <p class="mb2">edit 3 description "Chasing dragon"</p>
+            <p class="mb2">edit 24 start "YYYY MM DD HH MM SS"</p>
+            <p class="mb2">edit 1 start "2017 12 15 13 30 14"</p>
+            <p class="mb2">edit 5 end "2018 10 9 12 15 0"</p>
+            <p>edit 4 duration "90" <span class="o8">// sets duration in minutes</span></p>
+          </div>
+
+          <h3 id="deleting" class="mb3 f5">Deleting</h3>
+
+          <p class="mb3 m">To delete a log entry, use its ID:</p>
+          <div class="mb4 bl pl3 m">
+            <p>delete 15 <span class="o8">// deletes entry #15</span></p>
+          </div>
+
+          <p class="mb3 m">To delete a sector or project, use its name:</p>
+          <div class="mb4 bl pl3 m">
+            <p class="mb2">delete sector Code <span class="o8">// deletes all Code entries</span></p>
+          </div>
+          <p>delete project Fishing <span class="o8">// deletes all Fishing entries</span></p>
+
+          <h3 id="customising" class="mb3 f5">Customising</h3>
+
+          <p class="mb3 m">To change the interface's background colour, choose a hexadecimal colour or an HTML colour name:</p>
+          <div class="mb4 bl pl3 m">
+            <p class="mb2">set background #aabbcc</p>
+            <p>set background aquamarine</p>
+          </div>
+
+          <p class="mb3 m">To change the interface's text colour, choose a hexadecimal colour or an HTML colour name:</p>
+          <div class="mb4 bl pl3 m">
+            <p class="mb2">set colour #112233</p>
+            <p>set colour black</p>
+          </div>
+
+          <p class="mb3 m">The accent is what indicates the current hour and day
+          in the peak time charts. To change the it, choose a
+          hexadecimal colour or an HTML colour name:</p>
+          <div class="mb4 bl pl3 m">
+            <p class="mb2">set accent #ac1d1c</p>
+            <p>set accent red</p>
+          </div>
+
+          <p class="mb3 m">To switch the interface's background and text colours:</p>
+          <div class="mb4 bl pl3 m">
+            <p>invert</p>
+          </div>
+
+          <p class="mb3 m">To set your sectors' and projects' colour codes (used in charts):</p>
+          <div class="mb4 bl pl3 m">
+            <p class="mb2">set sector "Fishing" green</p>
+            <p>set project "Top Secret Project" #c0ffee</p>
+          </div>
+
+          <p class="mb3 m">The colour mode defines how charts show colour &mdash; using sector or project colour codes:</p>
+          <div class="mb4 bl pl3 m">
+            <p class="mb2">set colourmode sector</p>
+            <p>set colourmode project</p>
+          </div>
+
+          <p class="mb3 m">To change the number of days displayed in the charts:</p>
+          <div class="mb4 bl pl3 m">
+            <p class="mb2">set view 30 <span class="o8">// shows only the last 30 days</span></p>
+            <p>set view 7 <span class="o8">// shows only the last 7 days</span></p>
+          </div>
+
+          <p class="mb3 m">To change the calendar system used, choose between the Gregorian, Desamber, MONOCAL, or Aequirys calendars. This does not affect your logs. It simply shows dates differently:</p>
+          <div class="mb4 bl pl3 m">
+            <p class="mb2">set calendar gregorian</p>
+            <p class="mb2">set calendar desamber</p>
+            <p class="mb2">set calendar monocal</p>
+            <p>set calendar aequirys</p>
+          </div>
+
+          <p class="mb3 m">To change the time format, choose between 12- or 24-hours:</p>
+          <div class="mb4 bl pl3 m">
+            <p class="mb2">set time 12</p>
+            <p>set time 24</p>
+          </div>
+
+          <h3 id="import" class="mb3 f5">Import/Export</h3>
+
+          <p class="mb3 m">If you have an existing data file (JSON), you can import it:</p>
+          <div class="mb4 bl pl3 m">
+            <p>import</p>
+          </div>
+
+          <p class="mb3 m">To export your data:</p>
+          <div class="mb4 bl pl3 m">
+            <p>export</p>
+          </div>
+
+          <p class="mb3 m">To quit:</p>
+          <div class="mb4 bl pl3 m">
+            <p>quit</p>
+          </div>
+
+          <h3 id="terminology" class="mb3 f5">Terminology</h3>
+
+          <p class="mb4 m">A <b>Sector</b> defines an activity type. A <b>Project</b> can involve one or more Sectors. For example, an app project may involve Design, Code, and Research sectors.</p>
+
+          <h3 id="statistics" class="mb3 f5">Statistics</h3>
+
+          <p class="mb4 m">The Stats provide information about your log activity.</p>
+
+          <dl class="mb4 m">
+            <dt class="fwb">Logged Hours (LH)</dt>
+            <dd class="mb3">The number of hours logged</dd>
+
+            <dt class="fwb">Min Session (LHn)</dt>
+            <dd class="mb3">The duration of the shortest log session</dd>
+
+            <dt class="fwb">Max Session (LHx)</dt>
+            <dd class="mb3">The duration of the longest log session</dd>
+
+            <dt class="fwb">Avg Session (Lha)</dt>
+            <dd class="mb3">The average duration of your log sessions. In the Overview, the Lha shown is for the day. Historical Lha is found in the Details</dd>
+
+            <dt class="fwb">Log Percentage</dt>
+            <dd class="mb3">How much of a time period has been logged. For example, a Log Percentage of 50% means half of your day was logged.</dd>
+
+            <dt class="fwb">Focus</dt>
+            <dd class="mb3">Focus shows how much of your time was spent on Sectors or Projects. For example, a 0.50 focus means your time was split between 2 projects. By default, Focus is calculated for projects but in the case of the Project view in the Details, Sector Focus is calculated.</dd>
+
+            <dt class="fwb">Entries</dt>
+            <dd class="mb3">The number of log entries</dd>
+
+            <dt class="fwb">Streak</dt>
+            <dd class="mb3">Desc</dd>
+
+            <dt class="fwb">Daily Average</dt>
+            <dd class="mb3">The average daily logged hours</dd>
+
+            <dt class="fwb">Sectors</dt>
+            <dd class="mb3">Number of sectors</dd>
+
+            <dt class="fwb">Projects</dt>
+            <dd class="mb3">Number of projects</dd>
+
+            <dt class="fwb">Peak Hour</dt>
+            <dd class="mb3">Most productive hour of the day</dd>
+
+            <dt class="fwb">Sectors</dt>
+            <dd>Most productive day of the week</dd>
+          </dl>
+
+          <h3 id="charts" class="mb3 f5">Charts</h3>
+
+          <p class="mb4 m">A <b>Sector</b> defines an activity type. A <b>Project</b> can involve one or more Sectors. For example, an app project may involve Design, Code, and Research sectors.</p>
+
+          <dl class="mb4 m">
+            <dt class="fwb">Peak Hour Chart</dt>
+            <dd class="mb3">Shows your peak times from 00:00 to 23:00. The current hour is highlighted</dd>
+
+            <dt class="fwb">Peak Day Chart</dt>
+            <dd class="mb3">Shows your peak times from Sunday to Saturday. The current day is highlighted</dd>
+
+            <dt class="fwb">Day Chart</dt>
+            <dd class="mb3">Shows a timeline of the current day and its activities</dd>
+
+            <dt class="fwb">Overview Chart</dt>
+            <dd class="mb3">Shows data from the past number of days. In the Details, these charts are filtered by Sector and Project</dd>
+
+            <dt class="fwb">Focus Chart</dt>
+            <dd class="mb3">Shows focus data from the past number of days</dd>
+
+            <dt class="fwb">Visualisation</dt>
+            <dd>An alternative view of the data from the past number of days. Each row is a day that spans from midnight to midnight.</dd>
+          </dl>
+        </div>
+
+        <div id="credits" class="nodrag oys f6 lhc">
+          <h2 class="mb3 f5">Log</h2>
+          <p class="mb4 m">Log is a log and time-tracking system. Its primary purpose is to provide insight to how one's time is spent to optimise personal productivity and better manage time.</p>
+
+          <h3 class="mb3 f5">Contribution</h3>
+          <p class="mb3 m">This project is open-source and its source code is available on GitHub under the MIT License:</p>
+          <p class="bl pl3 mb4 m">github.com/joshavanier/log</p>
+
+          <p class="mb3 m">If you have any thoughts, comments, suggestions, questions, or if you simply want to say hello:</p>
+          <p class="bl pl3 mb4 m">Twitter: @joshavanier</p>
+          <p>&mdash; Josh</p>
+        </div>
       </div>
-
-      <p class="mb3 m">To switch the interface's background and text colours:</p>
-      <div class="mb4 bl pl3 m">
-        <p>invert</p>
-      </div>
-
-      <p class="mb3 m">To set your sectors' and projects' colour codes (used in charts):</p>
-      <div class="mb4 bl pl3 m">
-        <p class="mb2">set sector "Fishing" green</p>
-        <p>set project "Top Secret Project" #c0ffee</p>
-      </div>
-
-      <p class="mb3 m">The colour mode defines how charts show colour &mdash; using sector or project colour codes:</p>
-      <div class="mb4 bl pl3 m">
-        <p class="mb2">set colourmode sector</p>
-        <p>set colourmode project</p>
-      </div>
-
-      <p class="mb3 m">To change the number of days displayed in the charts:</p>
-      <div class="mb4 bl pl3 m">
-        <p class="mb2">set view 30 <span class="o8">// shows only the last 30 days</span></p>
-        <p>set view 7 <span class="o8">// shows only the last 7 days</span></p>
-      </div>
-
-      <p class="mb3 m">To change the calendar system used, choose between the Gregorian, Desamber, MONOCAL, or Aequirys calendars. This does not affect your logs. It simply shows dates differently:</p>
-      <div class="mb4 bl pl3 m">
-        <p class="mb2">set calendar gregorian</p>
-        <p class="mb2">set calendar desamber</p>
-        <p class="mb2">set calendar monocal</p>
-        <p>set calendar aequirys</p>
-      </div>
-
-      <p class="mb3 m">To change the time format, choose between 12- or 24-hours:</p>
-      <div class="mb4 bl pl3 m">
-        <p class="mb2">set time 12</p>
-        <p>set time 24</p>
-      </div>
-
-      <h3 id="import" class="mb3 f5">Import/Export</h3>
-
-      <p class="mb3 m">If you have an existing data file (JSON), you can import it:</p>
-      <div class="mb4 bl pl3 m">
-        <p>import</p>
-      </div>
-
-      <p class="mb3 m">To export your data:</p>
-      <div class="mb4 bl pl3 m">
-        <p>export</p>
-      </div>
-
-      <p class="mb3 m">To quit:</p>
-      <div class="mb4 bl pl3 m">
-        <p>quit</p>
-      </div>
-
-      <h3 id="terminology" class="mb3 f5">Terminology</h3>
-
-      <p class="mb4 m">A <b>Sector</b> defines an activity type. A <b>Project</b> can involve one or more Sectors. For example, an app project may involve Design, Code, and Research sectors.</p>
-
-      <h3 id="statistics" class="mb3 f5">Statistics</h3>
-
-      <p class="mb4 m">The Stats provide information about your log activity.</p>
-
-      <dl class="mb4 m">
-        <dt class="fwb">Logged Hours (LH)</dt>
-        <dd class="mb3">The number of hours logged</dd>
-
-        <dt class="fwb">Min Session (LHn)</dt>
-        <dd class="mb3">The duration of the shortest log session</dd>
-
-        <dt class="fwb">Max Session (LHx)</dt>
-        <dd class="mb3">The duration of the longest log session</dd>
-
-        <dt class="fwb">Avg Session (Lha)</dt>
-        <dd class="mb3">The average duration of your log sessions. In the Overview, the Lha shown is for the day. Historical Lha is found in the Details</dd>
-
-        <dt class="fwb">Log Percentage</dt>
-        <dd class="mb3">How much of a time period has been logged. For example, a Log Percentage of 50% means half of your day was logged.</dd>
-
-        <dt class="fwb">Focus</dt>
-        <dd class="mb3">Focus shows how much of your time was spent on Sectors or Projects. For example, a 0.50 focus means your time was split between 2 projects. By default, Focus is calculated for projects but in the case of the Project view in the Details, Sector Focus is calculated.</dd>
-
-        <dt class="fwb">Entries</dt>
-        <dd class="mb3">The number of log entries</dd>
-
-        <dt class="fwb">Streak</dt>
-        <dd class="mb3">Desc</dd>
-
-        <dt class="fwb">Daily Average</dt>
-        <dd class="mb3">The average daily logged hours</dd>
-
-        <dt class="fwb">Sectors</dt>
-        <dd class="mb3">Number of sectors</dd>
-
-        <dt class="fwb">Projects</dt>
-        <dd class="mb3">Number of projects</dd>
-
-        <dt class="fwb">Peak Hour</dt>
-        <dd class="mb3">Most productive hour of the day</dd>
-
-        <dt class="fwb">Sectors</dt>
-        <dd>Most productive day of the week</dd>
-      </dl>
-
-      <h3 id="charts" class="mb3 f5">Charts</h3>
-
-      <p class="mb4 m">A <b>Sector</b> defines an activity type. A <b>Project</b> can involve one or more Sectors. For example, an app project may involve Design, Code, and Research sectors.</p>
-
-      <dl class="mb4 m">
-        <dt class="fwb">Peak Hour Chart</dt>
-        <dd class="mb3">Shows your peak times from 00:00 to 23:00. The current hour is highlighted</dd>
-
-        <dt class="fwb">Peak Day Chart</dt>
-        <dd class="mb3">Shows your peak times from Sunday to Saturday. The current day is highlighted</dd>
-
-        <dt class="fwb">Day Chart</dt>
-        <dd class="mb3">Shows a timeline of the current day and its activities</dd>
-
-        <dt class="fwb">Overview Chart</dt>
-        <dd class="mb3">Shows data from the past number of days. In the Details, these charts are filtered by Sector and Project</dd>
-
-        <dt class="fwb">Focus Chart</dt>
-        <dd class="mb3">Shows focus data from the past number of days</dd>
-
-        <dt class="fwb">Visualisation</dt>
-        <dd>An alternative view of the data from the past number of days. Each row is a day that spans from midnight to midnight.</dd>
-      </dl>
-
-      <h2 class="mb3 f5">Log</h2>
-      <p class="mb4 m">Log is a log and time-tracking system. Its primary purpose is to provide insight to how one's time is spent to optimise personal productivity and better manage time.</p>
-
-      <h3 class="mb3 f5">Contribution</h3>
-      <p class="mb3 m">This project is open-source and its source code is available on GitHub under the MIT License:</p>
-      <p class="bl pl3 mb4 m">github.com/joshavanier/log</p>
-
-      <p class="mb3 m">If you have any thoughts, comments, suggestions, questions, or if you simply want to say hello:</p>
-      <p class="bl pl3 mb4 m">Twitter: @joshavanier</p>
-      <p>&mdash; Josh</p>
     </div>
   </div>
 
@@ -735,7 +907,6 @@
     <input id="con" type="text" class="wf bg-0 blanc on bn p3" autofocus="autofocus" placeholder="Log.console" />
   </form>
 
-  <script src="js/utils.js"></script>
   <!-- <script src="js/drop.js"></script> -->
   <script src="js/log.js"></script>
   <script src="js/options.js"></script>
@@ -798,9 +969,7 @@
     Log.path = dataStore.path;
 
     // 1839.73 ms
-    console.time('Log')
     Log.init();
-    console.timeEnd('Log')
 
     dataStore.set('config', user.config);
     dataStore.set('palette', user.palette);
