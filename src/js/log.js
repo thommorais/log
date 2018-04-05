@@ -572,6 +572,11 @@ var Log = {
     Log.journal.display();
   },
 
+  refresh() {
+    Log.reset();
+    Log.load();
+  },
+
   init() {
     if (localStorage.hasOwnProperty('logHistory')) {
       Log.console.history = JSON.parse(localStorage.getItem('logHistory'));
