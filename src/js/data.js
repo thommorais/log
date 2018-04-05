@@ -628,22 +628,31 @@ Log.data = {
 
       const l = sort[i].length;
       if (l === 0) continue;
-      for (let o = 0; o < l; o++) {
-        if (sort[i][o].e === undefined) continue;
 
-        o === 0 && (lastHeight = 0);
-
-        height = (
-          Log.time.parse(sort[i][o].e) - Log.time.parse(sort[i][o].s)
-        ) / 86400 * 100;
-
+      if (Log.config.ui.colourMode === 'none') {
         set[i][set[i].length] = {
-          col: sort[i][o][colour] || colour,
-          pos: `${lastHeight}%`,
-          wh: `${height}%`
+          col: colour,
+          pos: '0%',
+          wh: `${Log.data.lp(sort[i])}%`
         }
+      } else {
+        for (let o = 0; o < l; o++) {
+          if (sort[i][o].e === undefined) continue;
 
-        lastHeight += height;
+          o === 0 && (lastHeight = 0);
+
+          height = (
+            Log.time.parse(sort[i][o].e) - Log.time.parse(sort[i][o].s)
+          ) / 86400 * 100;
+
+          set[i][set[i].length] = {
+            col: sort[i][o][colour] || colour,
+            pos: `${lastHeight}%`,
+            wh: `${height}%`
+          }
+
+          lastHeight += height;
+        }
       }
     }
 
