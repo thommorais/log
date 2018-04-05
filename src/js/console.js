@@ -103,7 +103,7 @@ Log.console = {
     try {
       s = fs.readFileSync(path[0], 'utf-8');
     } catch (e) {
-      window.Notification('An error occured while trying to load this file.');
+      new window.Notification('An error occured while trying to load this file.');
       return;
     }
 
@@ -114,8 +114,9 @@ Log.console = {
     localStorage.setItem('user', s);
     user = JSON.parse(localStorage.getItem('user'));
 
-    new window.Notification('Your log data was successfully imported.');
-    Log.options.update.all();
+    new window.Notification('Log data was successfully imported.');
+    Log.reset();
+    Log.load();
   },
 
   /**
