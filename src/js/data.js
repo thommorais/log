@@ -1,5 +1,3 @@
-'use strict';
-
 Date.prototype.addDays = function(n) {
   const d = new Date(this.valueOf());
   d.setDate(d.getDate() + n);
@@ -11,32 +9,29 @@ const days = [
   'Thursday', 'Friday', 'Saturday',
 ];
 
-const entByDateCache = {};
-
-var Log = window.Log || {};
 Log.data = {
 
   /**
    * Parse log data
-   * @param {Object[]} [ent] - Entries
+   * @param {Object[]} [entries] - Entries
+   * @returns {Object[]} Parsed entries
    */
-  parse(ent = Log.log) {
-    if (typeof(ent) !== 'object' || ent.length === 0) return;
-    if (typeof(ent[0]) !== 'object') return;
+  parse(entries = Log.log) {
+    if (typeof entries !== 'object' || entries.length === 0) return;
+    if (typeof entries[0] !== 'object') return;
 
-    const uic = user.config.ui.colour;
-    const p = [];
+    const parsed = [];
 
-    for (let i = 0, l = ent.length; i < l; i++) {
-      const sCol = user.palette[ent[i].c] || uic;
-      const pCol = user.projectPalette[ent[i].t] || uic;
+    for (let i = 0, l = entries.length; i < l; i++) {
+      let sc = user.palette[entries[i].c] || Log.config.ui.colour;
+      let pc = user.projectPalette[entries[i].t] || Log.config.ui.colour;
 
-      // Split entries that span across midnight
       if (
-        Log.time.date(ent[i].s) !== Log.time.date(ent[i].e) &&
-        ent[i].e !== undefined) {
-        const a = Log.time.convert(ent[i].s);
-        const b = Log.time.convert(ent[i].e);
+        Log.time.date(entries[i].s) !== Log.time.date(entries[i].e) &&
+        entries[i].e !== undefined
+      ) {
+        const a = Log.time.convert(entries[i].s);
+        const b = Log.time.convert(entries[i].e);
 
         const e = Log.time.toHex(
           new Date(a.getFullYear(), a.getMonth(), a.getDate(), 23, 59, 59)
@@ -46,95 +41,138 @@ Log.data = {
           new Date(b.getFullYear(), b.getMonth(), b.getDate(), 0, 0, 0)
         );
 
-        p[p.length] = {
-          e,
-          sCol,
-          pCol,
+        parsed[parsed.length] = {
+          e, sc, pc,
           id: i,
-          s: ent[i].s,
-          c: ent[i].c,
-          t: ent[i].t,
-          d: ent[i].d,
-          dur: Log.time.duration(ent[i].s, e)
+          s: entries[i].s,
+          c: entries[i].c,
+          t: entries[i].t,
+          d: entries[i].d,
+          dur: Log.time.duration(entries[i].s, e)
         };
 
-        p[p.length] = {
-          s,
-          sCol,
-          pCol,
+        parsed[parsed.length] = {
+          s, sc, pc,
           id: i,
-          e: ent[i].e,
-          c: ent[i].c,
-          t: ent[i].t,
-          d: ent[i].d,
-          dur: Log.time.duration(s, ent[i].e)
+          e: entries[i].e,
+          c: entries[i].c,
+          t: entries[i].t,
+          d: entries[i].d,
+          dur: Log.time.duration(s, entries[i].e)
         };
       } else {
-        p[p.length] = {
-          sCol,
-          pCol,
+        parsed[parsed.length] = {
+          sc, pc,
           id: i,
-          s: ent[i].s,
-          e: ent[i].e,
-          c: ent[i].c,
-          t: ent[i].t,
-          d: ent[i].d,
-          dur: Log.time.duration(ent[i].s, ent[i].e)
+          s: entries[i].s,
+          e: entries[i].e,
+          c: entries[i].c,
+          t: entries[i].t,
+          d: entries[i].d,
+          dur: Log.time.duration(entries[i].s, entries[i].e)
         };
       }
     }
 
-    return p;
+    return parsed;
   },
 
-  /**
-   * Get entries by date
-   * @param {Object} [d] - Date
-   * @returns {Object[]} Entries under specified date
-   */
-  entByDate(d = new Date()) {
-    if (typeof(d) !== 'object' || d.getTime() > new Date().getTime()) return;
+  entries: {
 
-    if (d in entByDateCache) return entByDateCache[d];
-
-    const entries = [];
-
-    for (let i = 0, l = Log.log.length; i < l; i++) {
-      if (Log.log[i].e === undefined) continue;
-      const a = Log.time.convert(Log.log[i].s);
+    /**
+     * Get entries by date
+     * @param {Object} [date] - Date
+     * @returns {Object[]} Entries under specified date
+     */
+    byDate(date = new Date()) {
       if (
-        a.getFullYear() === d.getFullYear() &&
-        a.getMonth() === d.getMonth() &&
-        a.getDate() === d.getDate()
-      ) {
-        entries[entries.length] = Log.log[i];
+        typeof date !== 'object' ||
+        date.getTime() > new Date().getTime()
+      ) return;
+
+      const entries = [];
+
+      for (let i = 0, l = Log.log.length; i < l; i++) {
+        if (Log.log[i].e === undefined) continue;
+        const a = Log.time.convert(Log.log[i].s);
+        if (
+          a.getFullYear() === date.getFullYear() &&
+          a.getMonth() === date.getMonth() &&
+          a.getDate() === date.getDate()
+        ) {
+          entries[entries.length] = Log.log[i];
+        }
       }
-    }
 
-    return entByDateCache[d] = entries;
-  },
+      return entries;
+    },
 
-  /**
-   * Get entries from a period
-   * @param {Object} start - Period start
-   * @param {Object} [end] - Period end
-   * @returns {Object[]} Entries under specified period
-   */
-  entByPeriod(start, end = new Date()) {
-    if (start === undefined) return;
-    if (typeof(start) !== 'object') return;
-    if (typeof(end) !== 'object') return;
+    /**
+     * Get entries from a period
+     * @param {Object} start - Start date
+     * @param {Object} [end] - End date
+     * @returns {Object[]} Entries in period
+     */
+    byPeriod(start, end = new Date()) {
+      if (start === undefined) return;
+      if (typeof start !== 'object') return;
+      if (typeof end !== 'object') return;
 
-    if (start.getTime() > end.getTime()) return;
+      if (start.getTime() > end.getTime()) return;
 
-    let entries = [];
+      let entries = [];
 
-    for (let current = start; current <= end;) {
-      entries = entries.concat(Log.data.entByDate(current));
-      current = current.addDays(1);
-    }
+      for (let current = start; current <= end;) {
+        entries = entries.concat(Log.data.entries.byDate(current));
+        current = current.addDays(1);
+      }
 
-    return entries;
+      return entries;
+    },
+
+    /**
+     * Get entries of a specific day of the week
+     * @param {number} day - A day of the week (0 - 6)
+     * @param {Object[]} [entries] - Entries
+     * @returns {Object[]} Entries
+     */
+    byDay(day, entries = Log.log) {
+      if (day === undefined) return;
+      if (typeof day !== 'number' || day < 0 || day > 6) return;
+      if (typeof entries !== 'object' || entries.length === 0) return;
+      if (typeof entries[0] !== 'object') return;
+
+      return entries.filter(({s, e}) => e !== undefined && Log.time.convert(s).getDay() === day);
+    },
+
+    /**
+     * Get entries of a specific project
+     * @param {string} project - Project
+     * @param {Object[]} [entries] - Entries
+     * @returns {Object[]} Entries
+     */
+    byPro(project, entries = Log.log) {
+      if (project === undefined) return;
+      if (typeof project !== 'string' || project.length === 0) return;
+      if (typeof entries !== 'object' || entries.length === 0) return;
+
+      return entries.filter(({e, t}) => e !== undefined && t === project);
+    },
+
+    /**
+     * Get entries of a specific sector
+     * @param {string} sector - Sector
+     * @param {Object[]} [entries] - Entries
+     * @returns {Object[]} Entries
+     */
+    bySec(sector, entries = Log.log) {
+      if (sector === undefined) return;
+      if (typeof sector !== 'string' || sector.length === 0) return;
+      if (Log.cache.sec.indexOf(sector) === -1) return;
+      if (typeof entries !== 'object' || entries.length === 0) return;
+
+      return entries.filter(({e, c}) => e !== undefined && c === sector);
+    },
   },
 
   /**
@@ -143,65 +181,23 @@ Log.data = {
    * @returns {Object[]} Entries
    */
   recEnt(n = 1) {
-    return typeof(n) !== 'number' || n < 1 ?
-      undefined : Log.data.entByPeriod(new Date().addDays(-n));
-  },
-
-  /**
-   * Get entries of a specific day of the week
-   * @param {number} d - A day of the week (0 - 6)
-   * @param {Object[]} [a] - Entries
-   * @returns {Object[]} Entries
-   */
-  entByDay(d, a = Log.log) {
-    if (d === undefined) return;
-    if (typeof(d) !== 'number' || d < 0 || d > 6) return;
-    if (typeof(a) !== 'object' || a.length === 0) return;
-    if (typeof(a[0]) !== 'object') return;
-
-    return a.filter(({s, e}) => e !== undefined && Log.time.convert(s).getDay() === d);
-  },
-
-  /**
-   * Get entries of a specific project
-   * @param {string} p - Project
-   * @param {Object[]} [a] - Entries
-   * @returns {Object[]} Entries
-   */
-  entByPro(p, a = Log.log) {
-    if (p === undefined) return;
-    if (typeof(p) !== 'string' || p.length === 0) return;
-    if (typeof(a) !== 'object' || a.length === 0) return;
-
-    return a.filter(({e, t}) => e !== undefined && t === p);
-  },
-
-  /**
-   * Get entries of a specific sector
-   * @param {string} s - Sector
-   * @param {Object[]} [a] - Entries
-   * @returns {Object[]} Entries
-   */
-  entBySec(s, a = Log.log) {
-    if (s === undefined) return;
-    if (typeof(s) !== 'string' || s.length === 0) return;
-    if (typeof(a) !== 'object' || a.length === 0) return;
-
-    return a.filter(({e, c}) => e !== undefined && c === s);
+    return typeof n !== 'number' || n < 1 ?
+      undefined : Log.data.entries.byPeriod(new Date().addDays(-n));
   },
 
   /**
    * Sort entries by date
-   * @param {Object[]} [ent] - Entries
+   * @param {Object[]} [entries] - Entries
    * @param {Object} [end] - End date
+   * @returns {Object[]} Entries sorted by date
    */
-  sortEnt(ent = Log.log, end = new Date()) {
-    if (typeof(ent) !== 'object' || ent.length === 0) return;
-    if (typeof(ent[0]) !== 'object') return;
-    if (typeof(end) !== 'object') return;
+  sortEnt(entries = Log.log, end = new Date()) {
+    if (typeof entries !== 'object' || entries.length === 0) return;
+    if (typeof entries[0] !== 'object') return;
+    if (typeof end !== 'object') return;
 
-    const dates = Log.time.listDates(Log.time.convert(ent[0].s), end);
-    const sort = [];
+    const dates = Log.time.listDates(Log.time.convert(entries[0].s), end);
+    const sorted = [];
     const list = [];
 
     for (let i = 0, l = dates.length; i < l; i++) {
@@ -211,63 +207,62 @@ Log.data = {
           dates[i].getDate(), 0, 0, 0
         ))
       );
-      sort[sort.length] = [];
+      sorted[sorted.length] = [];
     }
 
-    for (let i = 0, l = ent.length; i < l; i++) {
-      const x = list.indexOf(Log.time.date(ent[i].s));
-      if (x > -1) sort[x][sort[x].length] = ent[i];
+    for (let i = 0, l = entries.length; i < l; i++) {
+      const x = list.indexOf(Log.time.date(entries[i].s));
+      if (x > -1) sorted[x][sorted[x].length] = entries[i];
     }
 
-    return sort;
+    return sorted;
   },
 
   /**
    * Sort entries by day
-   * @param {Object[]} [a] - Entries
+   * @param {Object[]} [entries] - Entries
    * @returns {Object[]} Entries sorted by day
    */
-  sortEntByDay(a = Log.log) {
-    if (typeof(a) !== 'object' || a.length === 0) return;
-    const s = [];
+  sortEntByDay(entries = Log.log) {
+    if (typeof entries !== 'object' || entries.length === 0) return;
+    const sorted = [];
     for (let i = 0; i < 7; i++) {
-      s[s.length] = Log.data.entByDay(i, a);
+      sorted[sorted.length] = Log.data.entries.byDay(i, entries);
     }
-    return s;
+    return sorted;
   },
 
   /**
    * Sort array of objects by values
-   * @param {Object[]} ent - Entries
-   * @param {number} mod - Sector (0) or project (1)
+   * @param {Object[]} entries - Entries
+   * @param {number} mode - Sector (0) or project (1)
    * @param {string} hp - Hour or percentage
    * @returns {Object[]} Array of arrays sorted by values
    */
-  sortValues(ent, mod, hp) {
-    if (ent === undefined || mod === undefined || hp === undefined) return;
-    if (typeof(ent) !== 'object' || ent.length === 0) return;
-    if (typeof(mod) !== 'number' || mod < 0 || mod > 1) return;
-
+  sortValues(entries, mode, hp) {
+    if (entries === undefined || mode === undefined || hp === undefined) return;
+    if (typeof entries !== 'object' || entries.length === 0) return;
+    if (typeof mode !== 'number' || mode < 0 || mode > 1) return;
     if (typeof hp !== 'number' || hp < 0 || hp > 1) return;
 
-    const list = mod === 0 ? Log.data.listSec(ent) : Log.data.listPro(ent);
+    const list = mode === 0 ? Log.data.listSec(entries) : Log.data.listPro(entries);
     const temp = [];
-    const sor = [];
+    const sorted = [];
 
     for (let i = 0, l = list.length; i < l; i++) {
-      const lh = mod === 0 ?
-        Log.data.lh(Log.data.entBySec(list[i], ent)) :
-        Log.data.lh(Log.data.entByPro(list[i], ent));
-      temp[list[i]] = hp === 0 ? lh : lh / Log.data.lh(ent) * 100;
+      const lh = mode === 0 ?
+        Log.data.lh(Log.data.entries.bySec(list[i], entries)) :
+        Log.data.lh(Log.data.entries.byPro(list[i], entries));
+      temp[list[i]] = hp === 0 ? lh : lh / Log.data.lh(entries) * 100;
     }
 
-    const sorted = Object.keys(temp).sort((a, b) => temp[a] - temp[b]).reverse();
+    const sor = Object.keys(temp).sort((a, b) => temp[a] - temp[b]).reverse();
 
-    for (const key in sorted) {
-      sor[sor.length] = [sorted[key], temp[sorted[key]]];
+    for (const key in sor) {
+      sorted[sorted.length] = [sor[key], temp[sor[key]]];
     }
 
-    return sor;
+    return sorted;
   },
 
   /**
@@ -276,7 +271,7 @@ Log.data = {
    * @returns {Object[]} List of projects
    */
   listPro(a = Log.log) {
-    if (typeof(a) !== 'object' || a.length === 0) return;
+    if (typeof a !== 'object' || a.length === 0) return;
 
     const list = [];
 
@@ -295,7 +290,7 @@ Log.data = {
    * @returns {Object[]} List of sectors
    */
   listSec(a = Log.log) {
-    if (typeof(a) !== 'object' || a.length === 0) return;
+    if (typeof a !== 'object' || a.length === 0) return;
 
     const list = [];
 
@@ -314,7 +309,7 @@ Log.data = {
    * @returns {Object[]} Peak days
    */
   peakDays(a = Log.log) {
-    if (typeof(a) !== 'object' || a.length === 0) return;
+    if (typeof a !== 'object' || a.length === 0) return;
     const week = [0, 0, 0, 0, 0, 0, 0];
 
     for (let i = a.length - 1; i >= 0; i--) {
@@ -332,7 +327,7 @@ Log.data = {
    * @returns {string} Peak day
    */
   peakDay(p = Log.cache.pkd) {
-    return typeof(p) !== 'object' || p.length === 0 ?
+    return typeof p !== 'object' || p.length === 0 ?
       '-' : days[p.indexOf(Math.max(...p))];
   },
 
@@ -342,7 +337,7 @@ Log.data = {
    * @returns {Object[]} Peak hours
    */
   peakHours(ent = Log.log) {
-    if (typeof(ent) !== 'object' || ent.length === 0) return;
+    if (typeof ent !== 'object' || ent.length === 0) return;
 
     const hours = [
       0, 0, 0, 0, 0,
@@ -353,22 +348,22 @@ Log.data = {
     ];
 
     for (let i = ent.length - 1; i >= 0; i--) {
-      if (ent[i].e !== undefined) {
-        let index = Log.time.convert(ent[i].s).getHours();
-        const rem = ent[i].dur % 1;
-        let block = ent[i].dur - rem;
+      if (ent[i].e === undefined) continue;
 
-        hours[index] += block - (block - 1);
-        index++;
+      let index = Log.time.convert(ent[i].s).getHours();
+      const rem = ent[i].dur % 1;
+      let block = ent[i].dur - rem;
 
-        while (block > 1) {
-          if (index > 24) break;
-          block--;
-          hours[index++] += block - (block - 1);
-        }
+      hours[index] += block - (block - 1);
+      index++;
 
-        hours[index++] += rem;
+      while (block > 1) {
+        if (index > 24) break;
+        block--;
+        hours[index++] += block - (block - 1);
       }
+
+      hours[index++] += rem;
     }
 
     return hours;
@@ -380,7 +375,7 @@ Log.data = {
    * @returns {string} Peak hour
    */
   peakHour(h = Log.cache.pkh) {
-    return typeof(h) !== 'object' || h.length === 0 ?
+    return typeof h !== 'object' || h.length === 0 ?
       '-' : `${h.indexOf(Math.max(...h))}:00`;
   },
 
@@ -392,15 +387,15 @@ Log.data = {
   listDur(a = Log.log) {
     if (typeof a !== 'object' || a.length === 0) return;
 
-    const dur = [];
+    const durations = [];
 
     for (let i = 0, l = a.length; i < l; i++) {
       if (a[i].e !== undefined) {
-        dur[dur.length] = a[i].dur;
+        durations[durations.length] = a[i].dur;
       }
     }
 
-    return dur;
+    return durations;
   },
 
   /**
@@ -494,8 +489,9 @@ Log.data = {
     if (s === undefined) return;
     if (typeof s !== 'string' || s.length === 0) return;
     if (typeof e !== 'object') return;
+
     return e.length === 0 ?
-      0 : Log.data.lh(Log.data.entBySec(s, e)) / Log.data.lh(e) * 100;
+      0 : Log.data.lh(Log.data.entries.bySec(s, e)) / Log.data.lh(e) * 100;
   },
 
   /**
@@ -604,47 +600,50 @@ Log.data = {
    * @returns {Object[]} Bar chart data
    */
   bar(ent = Log.log) {
-    if (typeof(ent) !== 'object' || ent.length === 0) return;
+    if (typeof ent !== 'object' || ent.length === 0) return;
 
-    const arr = Log.data.sortEnt(ent);
+    const sort = Log.data.sortEnt(ent);
 
     let set = [];
-    let col = '';
-    let lw = 0;
-    let wh = 0;
+    let colour = '';
+    let lastHeight = 0;
+    let height = 0;
 
     switch (Log.config.ui.colourMode) {
       case 'sector':
-        col = 'sCol';
+      case 'sec':
+        colour = 'sc';
         break;
       case 'project':
-        col = 'pCol';
+      case 'pro':
+        colour = 'pc';
         break;
       default:
-        col = Log.config.ui.colour;
+        colour = Log.config.ui.colour;
         break;
     }
 
-    for (let i = arr.length - 1; i >= 0; i--) {
+    for (let i = sort.length - 1; i >= 0; i--) {
       set[i] = [];
 
-      if (arr[i].length === 0) continue;
+      const l = sort[i].length;
+      if (l === 0) continue;
+      for (let o = 0; o < l; o++) {
+        if (sort[i][o].e === undefined) continue;
 
-      for (let o = 0, ol = arr[i].length; o < ol; o++) {
-        if (arr[i][o].e === undefined) continue;
+        o === 0 && (lastHeight = 0);
 
-        o === 0 && (lw = 0);
-
-        wh = (Log.time.parse(arr[i][o].e) - Log.time.parse(arr[i][o].s)) /
-          86400 * 100;
+        height = (
+          Log.time.parse(sort[i][o].e) - Log.time.parse(sort[i][o].s)
+        ) / 86400 * 100;
 
         set[i][set[i].length] = {
-          col: arr[i][o][col] || col,
-          pos: `${lw}%`,
-          wh: `${wh}%`
+          col: sort[i][o][colour] || colour,
+          pos: `${lastHeight}%`,
+          wh: `${height}%`
         }
 
-        lw += wh;
+        lastHeight += height;
       }
     }
 
@@ -657,49 +656,51 @@ Log.data = {
    * @returns {Object[]} Line visualisation data
    */
   line(ent = Log.log) {
-    if (typeof(ent) !== 'object' || ent.length === 0) return;
+    if (typeof ent !== 'object' || ent.length === 0) return;
 
-    const arr = Log.data.sortEnt(ent);
+    const sort = Log.data.sortEnt(ent);
 
-    let set = [];
-    let col = '';
-    let lp = 0;
+    let data = [];
+    let colour = '';
+    let lastPosition = 0;
 
     switch (Log.config.ui.colourMode) {
       case 'project':
-        col = 'pCol';
+      case 'pro':
+        colour = 'pc';
         break;
       case 'sector':
-        col = 'sCol';
+      case 'sec':
+        colour = 'sc';
         break;
       default:
-        col = Log.config.ui.colour;
+        colour = Log.config.ui.colour;
         break;
     }
 
-    for (let i = arr.length - 1; i >= 0; i--) {
-      set[i] = [];
+    for (let i = sort.length - 1; i >= 0; i--) {
+      data[i] = [];
 
-      if (arr[i].length === 0) continue;
+      if (sort[i].length === 0) continue;
 
-      for (let o = 0, ol = arr[i].length; o < ol; o++) {
-        if (arr[i][o] === undefined) continue;
+      for (let o = 0, ol = sort[i].length; o < ol; o++) {
+        if (sort[i][o] === undefined) continue;
 
-        o === 0 && (lp = 0);
+        o === 0 && (lastPosition = 0);
 
-        const wd = arr[i][o].dur * 3600 / 86400 * 100;
-        const dp = Log.utils.calcDP(arr[i][o].s);
+        const width = sort[i][o].dur * 3600 / 86400 * 100;
+        const dp = Log.utils.calcDP(sort[i][o].s);
 
-        set[i][set[i].length] = {
-          col: arr[i][o][col] || col,
-          mg: `${dp - lp}%`,
-          wd: `${wd}%`
+        data[i][data[i].length] = {
+          col: sort[i][o][colour] || colour,
+          mg: `${dp - lastPosition}%`,
+          wd: `${width}%`
         }
 
-        lp = wd + dp;
+        lastPosition = width + dp;
       }
     }
 
-    return set;
+    return data;
   }
 };

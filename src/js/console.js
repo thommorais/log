@@ -1,8 +1,5 @@
-'use strict';
-
 const timer = require('headless-work-timer');
 
-var Log = window.Log || {};
 Log.console = {
   history: [],
 
@@ -68,7 +65,7 @@ Log.console = {
    */
   getParams(s) {
     if (s === undefined) return;
-    if (typeof (s) !== 'string' || !s.includes('"')) return;
+    if (typeof s !== 'string' || !s.includes('"')) return;
 
     const part = s.slice(0, s.indexOf('"') - 1).split(' ');
     const p = s.split('');
@@ -95,8 +92,12 @@ Log.console = {
    * Import user data
    */
   importUser() {
-    const path = dialog.showOpenDialog({ properties: ['openFile'] });
+    const path = dialog.showOpenDialog({
+      properties: ['openFile']
+    });
+
     if (!path) return;
+
     let s = '';
 
     try {
@@ -106,7 +107,6 @@ Log.console = {
       return;
     }
 
-    // Start writing directly to the imported file
     Log.path = path[0];
     localStorage.setItem('logDataPath', path[0]);
     dataStore.path = Log.path;
@@ -124,9 +124,9 @@ Log.console = {
   exportUser() {
     const data = JSON.stringify(JSON.parse(localStorage.getItem('user')));
 
-    dialog.showSaveDialog((file) => {
+    dialog.showSaveDialog(file => {
       if (file === undefined) return;
-      fs.writeFile(file, data, (err) => {
+      fs.writeFile(file, data, err => {
         if (err) {
           new window.Notification(`An error occured creating the file ${err.message}`);
         } else {
@@ -163,10 +163,11 @@ Log.console = {
    */
   startLog(s) {
     if (s === undefined) return;
-    if (user.log !== 0 && user.log.slice(-1)[0].e === undefined); Log.console.endLog();
+    if (user.log !== 0 && user.log.slice(-1)[0].e === undefined);
+    Log.console.endLog();
 
     let p = [];
-    let x = []; // indices
+    let indices = [];
     let c = ''; // sector
     let t = ''; // project
     let d = ''; // description
@@ -174,11 +175,11 @@ Log.console = {
     if (s.includes('"')) {
       p = s.split('');
 
-      p.map((e, i) => e === '"' && (x[x.length] = i));
+      p.map((e, i) => e === '"' && (indices[indices.length] = i));
 
-      for (let i = x[0] + 1; i < x[1]; i++) c += p[i];
-      for (let i = x[2] + 1; i < x[3]; i++) t += p[i];
-      for (let i = x[4] + 1; i < x[5]; i++) d += p[i];
+      for (let i = indices[0] + 1; i < indices[1]; i++) c += p[i];
+      for (let i = indices[2] + 1; i < indices[3]; i++) t += p[i];
+      for (let i = indices[4] + 1; i < indices[5]; i++) d += p[i];
     } else {
       if (s.includes(';')) {
         p = s.split(';');
@@ -194,9 +195,11 @@ Log.console = {
     }
 
     user.log[user.log.length] = {
+      c,
+      t,
+      d,
       s: Log.time.toHex(new Date()),
-      e: undefined,
-      c, t, d
+      e: undefined
     }
 
     new window.Notification(`Log started: ${c} - ${t} - ${d}`);
@@ -280,11 +283,11 @@ Log.console = {
       case 'sector':
       case 'cat':
       case 'sec':
-        Log.options.setColourCode(i);
+        Log.options.setColourCode(0, i);
         break;
       case 'project':
       case 'pro':
-        Log.options.setProjectColourCode(i);
+        Log.options.setColourCode(1, i);
         break;
       default:
         return;
@@ -330,7 +333,7 @@ Log.console = {
     if (user.log.length === 0) return;
     const id = Number(i) - 1;
 
-    switch(a) {
+    switch (a) {
       case 'start':
         user.log[id].s = Log.time.convertDateTime(v);
         break;
@@ -378,15 +381,19 @@ Log.console = {
     };
 
     if (m === 'sector') {
-      if (Log.data.entBySec(o).length !== 0) {
-        user.log.map((e) => { if (e.c === o) e.c = n; });
+      if (Log.data.entries.bySec(o).length !== 0) {
+        user.log.map((e) => {
+          if (e.c === o) e.c = n;
+        });
       } else {
         nf();
         return;
       }
     } else {
-      if (Log.data.entByPro(o).length !== 0) {
-        user.log.map((e) => { if (e.t === o) e.t = n; });
+      if (Log.data.entries.byPro(o).length !== 0) {
+        user.log.map((e) => {
+          if (e.t === o) e.t = n;
+        });
       } else {
         nf();
         return;

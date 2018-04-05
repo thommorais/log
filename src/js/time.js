@@ -1,24 +1,24 @@
-'use strict';
-
 const Aequirys = require('aequirys');
 const Monocal = require('./utils/monocal.min.js');
 const Desamber = require('./utils/desamber.js');
 
-const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+const months = [
+  'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+  'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+];
 
 const toHexCache = {};
 const dateCache = {};
 
-var Log = window.Log || {};
 Log.time = {
 
   /**
    * Convert hexadecimal to decimal
-   * @param {string} s - Hexadecimal string
+   * @param {string} h - Hexadecimal
    * @returns {number} Decimal conversion
    */
-  parse(s) {
-    return parseInt(s, 16);
+  parse(h) {
+    return parseInt(h, 16);
   },
 
   /**
@@ -38,8 +38,8 @@ Log.time = {
   },
 
   /**
-   * Convert Unix time
-   * @param {number} h - Hexadecimal time
+   * Convert to Unix time
+   * @param {string} h - Hexadecimal time
    * @returns {Object} Date
    */
   convert(h) {
@@ -58,9 +58,10 @@ Log.time = {
 
   /**
    * Convert to decimal time
+   * @param {Object} d - Date object
    */
-  decimal(time) {
-    return parseInt((time - new Date(time).setHours(0, 0, 0, 0)) / 864 * 10);
+  decimal(d) {
+    return parseInt((d - new Date(d).setHours(0, 0, 0, 0)) / 864 * 10);
   },
 
   toDecimal(sec) {
@@ -87,10 +88,10 @@ Log.time = {
   /**
    * Convert to 12-hour time
    * @param {Object} d - Date
-   * @returns {string} 12-hour format
+   * @returns {string} 12-hour time
    */
   twelveHours(d) {
-    let h = d.getHours();
+    const h = d.getHours();
     const x = h >= 12 ? 'PM' : 'AM';
     return `${`0${(h %= 12) ?
       h : 12}`.slice(-2)}:${`0${d.getMinutes()}`.slice(-2)} ${x}`;
@@ -153,42 +154,42 @@ Log.time = {
    * @returns {Object[]} List of dates
    */
   listDates(s, e) {
-    const l = [];
+    const list = [];
     let c = new Date(s.getFullYear(), s.getMonth(), s.getDate(), 0, 0, 0);
 
     for (; c <= e;) {
-      l[l.length] = new Date(c);
+      list[list.length] = new Date(c);
       c = Date.prototype.addDays.call(c, 1);
     }
 
-    return l;
+    return list;
   },
 
   /**
    * Calculate duration
-   * @param {number} a - Start (Hex time)
-   * @param {number} b - End (Hex time)
+   * @param {number} s - Start hex time
+   * @param {number} e - End hex time
    * @returns {number} Duration
    */
-  duration(a, b) {
-    return Log.time.durationSeconds(a, b) / 3600;
+  duration(s, e) {
+    return Log.time.durationSeconds(s, e) / 3600;
   },
 
   /**
    * Calculate duration in seconds
-   * @param {number} a - Start (Hex time)
-   * @param {number} b - End (Hex time)
+   * @param {number} s - Start hex time
+   * @param {number} e - End hex time
    * @returns {number} Duration
    */
-  durationSeconds(a, b) {
-    return Log.time.parse(b) - Log.time.parse(a);
+  durationSeconds(s, e) {
+    return Log.time.parse(e) - Log.time.parse(s);
   },
 
   /**
    * Returns a timestamp `duration` seconds after `start`
-   * @param {string} s - hexadecimal timestamp
-   * @param {number} d - duration to offset by (seconds)
-   * @returns {string} end - hexadecimal timestamp
+   * @param {string} s - Hexadecimal timestamp
+   * @param {number} d - Duration to offset by (seconds)
+   * @returns {string} Hexadecimal timestamp
    */
   offset(s, d) {
     return (Log.time.parse(s) + d).toString(16);

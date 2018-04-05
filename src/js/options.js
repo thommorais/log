@@ -1,6 +1,3 @@
-'use strict';
-
-var Log = window.Log || {};
 Log.options = {
 
   /**
@@ -107,28 +104,23 @@ Log.options = {
 
   /**
    * Set sector colour code
-   * @param {string} s - Sector
+   * @param {number} m - Sector (0) or project (1)
+   * @param {string} s - Sector or project
    * @param {string} c - Colour
    */
-  setColourCode(s, c) {
-    if (s === undefined || c === undefined) return;
+  setColourCode(m, s, c) {
+    if (m === undefined || s === undefined || c === undefined) return;
+    if (typeof m !== 'number' || m < 0 || m > 1) return;
     if (typeof s !== 'string' || s.length === 0) return;
     if (typeof c !== 'string' || c.length === 0) return;
-    user.palette[s] = c;
-    Log.options.update.palette();
-  },
 
-  /**
-   * Set project colour code
-   * @param {string} p - Project
-   * @param {string} c - Colour
-   */
-  setProjectColourCode(p, c) {
-    if (p === undefined || c === undefined) return;
-    if (typeof p !== 'string' || p.length === 0) return;
-    if (typeof c !== 'string' || c.length === 0) return;
-    user.projectPalette[p] = c;
-    Log.options.update.projectPalette();
+    if (m === 0) {
+      user.palette[s] = c;
+      Log.options.update.palette();
+    } else {
+      user.projectPalette[p] = c;
+      Log.options.update.projectPalette();
+    }
   },
 
   /**

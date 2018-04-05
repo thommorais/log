@@ -8,10 +8,9 @@
 
 'use strict';
 
-const mainSectors = [phc, pdc, dyc, ovc, pth, pdh, secBars, proBars, secList, proList, visual, logbook, focusChart, secFocBar, secLegSum, jNav, jDyc, jEnt, cal];
+const mainSectors = [phc, pdc, dyc, ovc, pth, pdh, secBars, proBars, secList, proList, visual, logbook, focusChart, secFocBar, secLegSum, jDyc, jEnt, cal];
 
 const secSectors = [secChart, sPKH, sPKD, proFocDetail, proLeg, sFoc, secLog];
-
 const proSectors = [proChart, secFocDetail, secLeg, pPKH, pPKD, pFoc, proLog];
 
 const secDetailCache = {};
@@ -156,18 +155,18 @@ var Log = {
       let pkh = [];
       let pkd = [];
 
-      if (pro in secDetailCache) {
+      if (sec in secDetailCache) {
         ent = secDetailCache[sec].ent;
         his = secDetailCache[sec].his;
         dur = secDetailCache[sec].dur;
         pkh = secDetailCache[sec].pkh;
         pkd = secDetailCache[sec].pkd;
       } else {
-        ent = Log.data.entBySec(
+        ent = Log.data.entries.bySec(
           sec, Log.data.recEnt(Log.config.ui.view - 1)
         );
 
-        his = Log.data.entBySec(sec);
+        his = Log.data.entries.bySec(sec);
         dur = Log.data.listDur(his);
         pkh = Log.data.peakHours(his);
         pkd = Log.data.peakDays(his);
@@ -211,7 +210,7 @@ var Log = {
 
       if (typeof ent !== 'object' || ent.length === 0) return;
 
-      const arr = Log.data.entBySec(sec);
+      const arr = Log.data.entries.bySec(sec);
       const rev = arr.slice(arr.length - 100).reverse();
 
       for (let i = 0, l = rev.length; i < l; i++) {
@@ -256,19 +255,31 @@ var Log = {
       proSectors.map(e => e.innerHTML = '');
 
       let ent = [];
+      let his = [];
+      let dur = [];
+      let pkh = [];
+      let pkd = [];
+
       if (pro in proDetailCache) {
-        ent = proDetailCache[pro];
+        ent = proDetailCache[pro].ent;
+        his = proDetailCache[pro].his;
+        dur = proDetailCache[pro].dur;
+        pkh = proDetailCache[pro].pkh;
+        pkd = proDetailCache[pro].pkd;
       } else {
-        ent = Log.data.entByPro(
+        ent = Log.data.entries.byPro(
           pro, Log.data.recEnt(Log.config.ui.view - 1)
         );
-        proDetailCache[pro] = ent;
-      }
 
-      const his = Log.data.entByPro(pro);
-      const dur = Log.data.listDur(his);
-      const pkh = Log.data.peakHours(his);
-      const pkd = Log.data.peakDays(his);
+        his = Log.data.entries.byPro(pro);
+        dur = Log.data.listDur(his);
+        pkh = Log.data.peakHours(his);
+        pkd = Log.data.peakDays(his);
+
+        proDetailCache[pro] = {
+          ent, his, dur, pkh, pkd
+        }
+      }
 
       proTtl.innerHTML = pro;
 
@@ -302,7 +313,7 @@ var Log = {
         Log.vis.legend(0, ent, secLeg);
       }
 
-      const arr = Log.data.entByPro(pro);
+      const arr = Log.data.entries.byPro(pro);
       const rev = arr.slice(arr.length - 100).reverse();
 
       for (let i = 0, l = rev.length; i < l; i++) {
@@ -377,7 +388,7 @@ var Log = {
       b[i].className = n;
     }
 
-    document.getElementById(s).style.display = 'block';
+    document.getElementById(s).style.display = 'grid';
     document.getElementById(`b-${s}`).className = `${v ?
       `db mb3 ${t}` : `pv1 ${t}`} on bg-cl of mr3`;
   },
@@ -440,7 +451,7 @@ var Log = {
       Log.cache.pkh = Log.data.peakHours();
       Log.cache.pkd = Log.data.peakDays();
       Log.cache.dur = Log.data.listDur();
-      Log.cache.entByDay = Log.data.entByDay(new Date().getDay());
+      Log.cache.entByDay = Log.data.entries.byDay(new Date().getDay());
     },
 
     stats: {
@@ -454,14 +465,14 @@ var Log = {
         const now = Log.log.slice(-1)[0];
         const st = Log.time.stamp(Log.time.convert(now.s));
 
+        tFOC.innerHTML = Log.data.proFocus(Log.data.listPro(en)).toFixed(2);
+        tLPT.innerHTML = `${Log.data.lp(en).toFixed(2)}%`;
         tLHT.innerHTML = Log.data.sum(dur).toFixed(2);
         tLSN.innerHTML = Log.data.min(dur).toFixed(2);
         tLSX.innerHTML = Log.data.max(dur).toFixed(2);
         tASD.innerHTML = Log.data.avg(dur).toFixed(2);
-        tLPT.innerHTML = `${Log.data.lp(en).toFixed(2)}%`;
-        tFOC.innerHTML = Log.data.proFocus(Log.data.listPro(en)).toFixed(2);
-        tENC.innerHTML = en.length;
         tSTK.innerHTML = Log.data.streak();
+        tENC.innerHTML = en.length;
 
         leid.innerHTML = user.log.length;
         ltim.innerHTML = now.e === undefined ?
@@ -481,16 +492,16 @@ var Log = {
        */
       details(mn) {
         LHH.innerHTML = Log.data.sum(Log.cache.dur).toFixed(2);
-        LNH.innerHTML = Math.min(...Log.cache.dur).toFixed(2);
-        LXH.innerHTML = Math.max(...Log.cache.dur).toFixed(2);
+        LNH.innerHTML = Log.data.min(Log.cache.dur).toFixed(2);
+        LXH.innerHTML = Log.data.max(Log.cache.dur).toFixed(2);
         ASD.innerHTML = Log.data.avg(Log.cache.dur).toFixed(2);
-        ALH.innerHTML = Log.data.avgLh().toFixed(2);
         LPH.innerHTML = `${Log.data.lp().toFixed(2)}%`;
-        EHC.innerHTML = user.log.length;
+        ALH.innerHTML = Log.data.avgLh().toFixed(2);
         SCC.innerHTML = Log.cache.sec.length;
         PRC.innerHTML = Log.cache.pro.length;
         PHH.innerHTML = Log.data.peakHour();
         PDH.innerHTML = Log.data.peakDay();
+        EHC.innerHTML = user.log.length;
 
         Log.vis.peakChart(0, Log.cache.pkh, pth);
         Log.vis.peakChart(1, Log.cache.pkd, pdh);
@@ -498,8 +509,8 @@ var Log = {
 
         if (Log.cache.proFoc.length !== 0) {
           Favg.innerHTML = Log.data.avg(Log.cache.proFoc).toFixed(2);
-          Fmin.innerHTML = Math.min(...Log.cache.proFoc).toFixed(2);
-          Fmax.innerHTML = Math.max(...Log.cache.proFoc).toFixed(2);
+          Fmin.innerHTML = Log.data.min(Log.cache.proFoc).toFixed(2);
+          Fmax.innerHTML = Log.data.max(Log.cache.proFoc).toFixed(2);
         }
 
         Log.vis.focusBar(0, Log.log, secFocBar);
@@ -533,9 +544,9 @@ var Log = {
     Log.vis.peakChart(1, Log.cache.pkd, pdc);
 
     if (Log.log.length !== 1) {
-      fsf.innerHTML = Log.data.forecast.sf();
       flh.innerHTML = Log.data.forecast.lh().toFixed(2);
       fsd.innerHTML = Log.data.forecast.sd().toFixed(2);
+      fsf.innerHTML = Log.data.forecast.sf();
     }
 
     Log.vis.meterLines(ovwMeter);
@@ -543,7 +554,7 @@ var Log = {
     Log.vis.bar(Log.data.bar(mn), ovc);
 
     // Today's stats
-    const en = Log.data.entByDate();
+    const en = Log.data.entries.byDate();
     if (en.length !== 0) Log.gen.stats.today(en);
 
     // Details stats
@@ -566,7 +577,7 @@ var Log = {
 
   init() {
     if (localStorage.hasOwnProperty('logHistory')) {
-      Log.console.history = JSON.parse(localStorage.getItem('logHistory')) || [];
+      Log.console.history = JSON.parse(localStorage.getItem('logHistory'));
     } else {
       Log.console.history = [];
       localStorage.setItem('logHistory', JSON.stringify(Log.console.history));
@@ -590,7 +601,7 @@ var Log = {
     if (!Log.keyEventInitialized) {
       Log.keyEventInitialized = true;
 
-      document.onkeydown = (e) => {
+      document.onkeydown = e => {
         if (e.which >= 65 && e.which <= 90) {
           cmd.style.display = 'block';
           con.focus();
@@ -645,6 +656,8 @@ var Log = {
       log: dataStore.get('log') || [],
     }
 
+    console.time('Log')
     Log.load();
+    console.timeEnd('Log')
   }
 };

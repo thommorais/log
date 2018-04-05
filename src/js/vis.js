@@ -1,151 +1,138 @@
-'use strict';
-
-var Log = window.Log || {};
 Log.vis = {
 
   /**
    * Display line visualisation
-   * @param {Object[]} d - Line data
-   * @param {Object} c - Container
+   * @param {Object[]} data - Data
+   * @param {Object} con - Container
    */
-  line(d, c) {
-    if (d === undefined || c === undefined) return;
+  line(data, con) {
+    if (data === undefined || con === undefined) return;
 
-    const l = d.length
+    const l = data.length;
 
-    if (typeof d !== 'object' || l === 0) return;
-    if (typeof c !== 'object' || c === null) return;
+    if (typeof data !== 'object' || l === 0) return;
+    if (typeof con !== 'object' || con === null) return;
 
-    // Generate rows
     for (let i = 0; i < l; i++) {
       const row = document.createElement('div');
-      row.className = 'db wf sh1 mt2 mb3';
-      c.appendChild(row);
+      row.className = 'db wf sh1 mt1 mb2';
+      con.appendChild(row);
 
-      if (d[i].length === 0) continue;
-
-      // Generate entries
-      for (let o = 0, ol = d[i].length; o < ol; o++) {
-        const ent = document.createElement('div');
-        ent.className = 'psr t0 hf mb2 lf';
-        ent.style.backgroundColor = d[i][o].col;
-        ent.style.marginLeft = d[i][o].mg;
-        ent.style.width = d[i][o].wd;
-        row.appendChild(ent);
+      if (data[i].length === 0) continue;
+      for (let o = 0, ol = data[i].length; o < ol; o++) {
+        const entry = document.createElement('div');
+        entry.style.backgroundColor = data[i][o].col;
+        entry.style.marginLeft = data[i][o].mg;
+        entry.className = 'psr t0 hf mb1 lf';
+        entry.style.width = data[i][o].wd;
+        row.appendChild(entry);
       }
     }
   },
 
   /**
    * Display a bar visualisation
-   * @param {Object[]} d - Bar data
-   * @param {Object} c - Container
-   * @param {boolean} [lines] - Lines
+   * @param {Object[]} data - Data
+   * @param {Object} con - Container
    */
-  bar(d, c, lines = true) {
-    lines && Log.vis.gridLines(c);
+  bar(data, con) {
+    if (data === undefined || con === undefined) return;
 
-    if (d === undefined || c === undefined) return;
+    const l = data.length;
 
-    const l = d.length
+    if (typeof data !== 'object' || l === 0) return;
+    if (typeof con !== 'object' || con === null) return;
 
-    if (typeof d !== 'object' || l === 0) return;
-    if (typeof c !== 'object' || c === null) return;
+    Log.vis.gridLines(con);
 
     const width = `${100 / Log.config.ui.view}%`;
 
-    // Generate columns
     for (let i = 0; i < l; i++) {
-      const col = document.createElement('div');
-      col.className = 'dib psr hf';
-      col.style.width = width;
-      c.appendChild(col);
+      const column = document.createElement('div');
+      column.className = 'dib psr hf';
+      column.style.width = width;
+      con.appendChild(column);
 
-      if (d[i].length === 0) continue;
-
-      // Generate entries
-      for (let o = 0, ol = d[i].length; o < ol; o++) {
-        const ent = document.createElement('div');
-        ent.style.backgroundColor = d[i][o].col;
-        ent.style.bottom = d[i][o].pos;
-        ent.style.height = d[i][o].wh;
-        ent.className = 'psa sw1';
-        col.appendChild(ent);
+      if (data[i].length === 0) continue;
+      for (let o = 0, ol = data[i].length; o < ol; o++) {
+        const entry = document.createElement('div');
+        entry.style.backgroundColor = data[i][o].col;
+        entry.style.bottom = data[i][o].pos;
+        entry.style.height = data[i][o].wh;
+        entry.className = 'psa sw1';
+        column.appendChild(entry);
       }
     }
   },
 
   /**
    * Display a day chart
-   * @param {Object} [d] - Date
+   * @param {Object} [date] - Date
    * @param {Object} [con] - Container
    */
-  day(d = new Date(), c = dyc) {
-    if (typeof d !== 'object') return;
-    if (typeof c !== 'object' || c === null) return;
+  day(date = new Date(), con = dyc) {
+    if (typeof date !== 'object') return;
+    if (typeof con !== 'object' || con === null) return;
 
-    const ent = d in entByDateCache ?
-      entByDateCache[d] : Log.data.entByDate(d);
-
+    const ent = Log.data.entries.byDate(date);
     if (ent.length === 0) return;
 
-    let cl = '';
+    let colour = '';
     switch (Log.config.ui.colourMode) {
       case 'sector':
-        cl = 'sCol';
+      case 'sec':
+        colour = 'sc';
         break;
       case 'project':
-        cl = 'pCol';
+      case 'pro':
+        colour = 'pc';
         break;
       default:
-        cl = Log.config.ui.colour;
+        colour = Log.config.ui.colour;
         break;
     }
 
-    let lw = 0; // Last width
-    let lp = 0; // Last percentage
+    let lastWidth = 0;
+    let lastPercentage = 0;
 
-    // Generate entries
     for (let i = 0, l = ent.length; i < l; i++) {
-      // Exclude ongoing entry
       if (ent[i].e === undefined) continue;
 
       const wd = ent[i].dur * 3600 / 86400 * 100;
       const en = document.createElement('a');
       const dp = Log.utils.calcDP(ent[i].s);
 
-      en.style.backgroundColor = ent[i][cl] || cl;
-      en.style.marginLeft = `${dp - (lw + lp)}%`;
+      en.style.marginLeft = `${dp - (lastWidth + lastPercentage)}%`;
+      en.style.backgroundColor = ent[i][colour] || colour;
       en.style.width = `${wd}%`;
       en.className = 'hf lf';
 
-      c.appendChild(en);
+      con.appendChild(en);
 
-      lw = wd;
-      lp = dp;
+      lastWidth = wd;
+      lastPercentage = dp;
     }
   },
 
   /**
    * Display peak days chart
-   * @param {number} m - Hours (0) or days (1)
-   * @param {Object[]} p - Peaks
-   * @param {Object} c - Container
+   * @param {number} mode - Hours (0) or days (1)
+   * @param {Object[]} peaks - Peaks
+   * @param {Object} con - Container
    */
-  peakChart(m, p, c) {
-    if (m === undefined || p === undefined || c === undefined) return;
+  peakChart(mode, peaks, con) {
+    if (mode === undefined || peaks === undefined || con === undefined) return;
 
-    const l = p.length
+    const l = peaks.length;
 
-    if (typeof m !== 'number' || m < 0 || m > 1) return;
-    if (typeof p !== 'object' || l === 0) return;
-    if (typeof c !== 'object' || c === null) return;
+    if (typeof mode !== 'number' || mode < 0 || mode > 1) return;
+    if (typeof peaks !== 'object' || l === 0) return;
+    if (typeof con !== 'object' || con === null) return;
 
-    const now = m === 0 ? (new Date()).getHours() : (new Date()).getDay();
-    const max = Math.max(...p);
+    const now = mode === 0 ? (new Date()).getHours() : (new Date()).getDay();
+    const max = Math.max(...peaks);
     const wid = `${100 / l}%`;
 
-    // Generate columns
     for (let i = 0; i < l; i++) {
       const col = document.createElement('div');
       const inn = document.createElement('div');
@@ -158,54 +145,57 @@ Log.vis = {
       cor.style.backgroundColor = i === now ?
         Log.config.ui.accent : Log.config.ui.colour;
 
-      cor.style.height = `${p[i] / max * 100}%`;
+      cor.style.height = `${peaks[i] / max * 100}%`;
       col.style.width = wid;
 
       inn.appendChild(cor);
       col.appendChild(inn);
-      c.appendChild(col);
+      con.appendChild(col);
     }
   },
 
   /**
    * List sectors or projects
-   * @param {number} mod - Sector (0) or project (1)
+   * @param {number} mode - Sector (0) or project (1)
    * @param {number} val - Hours (0) or percentages (1)
    * @param {Object} con - Container
    * @param {Object[]} [ent] - Entries
    */
-  list(mod, val, con, ent = Log.log) {
-    if (mod === undefined || val === undefined || con === undefined) return;
-    if (typeof mod !== 'number' || mod < 0 || mod > 1) return;
+  list(mode, val, con, ent = Log.log) {
+    if (mode === undefined || val === undefined || con === undefined) return;
+    if (typeof mode !== 'number' || mode < 0 || mode > 1) return;
     if (typeof val !== 'number' || val < 0 || val > 1) return;
     if (typeof con !== 'object' || con === null) return;
     if (typeof ent !== 'object' || ent.length === 0) return;
 
-    const arr = Log.data.sortValues(ent, mod, val);
-    const uic = Log.config.ui.colour;
+    const arr = Log.data.sortValues(ent, mode, val);
     const lhe = Log.data.lh(ent);
 
     let col = '';
     let wid = 0;
     let key = '';
+    let palette = {};
+
+    if (mode === 0) {
+      key = 'sec';
+      palette = Log.palette;
+    } else {
+      key = 'pro';
+      palette = Log.projectPalette;
+    }
 
     for (let i = 0, l = arr.length; i < l; i++) {
-      if (mod === 0) {
-        col = Log.palette[arr[i][0]];
-        wid = Log.data.lh(Log.data.entBySec(arr[i][0], ent)) / lhe * 100;
-        key = 'sec';
-      } else {
-        col = Log.projectPalette[arr[i][0]];
-        wid = Log.data.lh(Log.data.entByPro(arr[i][0], ent)) / lhe * 100;
-        key = 'pro';
-      }
-
-      if (Log.config.ui.colourMode === 'none') col = uic;
-
       const nam = document.createElement('span');
       const dur = document.createElement('span');
       const bar = document.createElement('div');
       const itm = document.createElement('li');
+
+      wid = mode === 0 ?
+        Log.data.lh(Log.data.entries.bySec(arr[i][0], ent)) / lhe * 100 :
+        Log.data.lh(Log.data.entries.byPro(arr[i][0], ent)) / lhe * 100;
+
+      col = Log.config.ui.colourMode === 'none' ?
+        Log.config.ui.colour : palette[arr[i][0]];
 
       itm.className = 'mb4 c-pt';
       itm.setAttribute('onclick', `Log.detail.${key}('${arr[i][0]}')`);
@@ -217,7 +207,7 @@ Log.vis = {
       dur.innerHTML = arr[i][1].toFixed(2);
 
       bar.className = 'sh1';
-      bar.style.backgroundColor = col || uic;
+      bar.style.backgroundColor = col || Log.config.ui.colour;
       bar.style.width = `${wid}%`;
 
       itm.appendChild(nam);
@@ -240,19 +230,15 @@ Log.vis = {
     if (typeof con !== 'object' || con === null) return;
 
     const val = Log.data.sortValues(ent, mod, 1);
+    const pal = mod === 0 ? Log.palette : Log.projectPalette;
 
-    // console.time('a')
     for (let i = 0, l = val.length; i < l; i++) {
       const div = document.createElement('div');
-      div.className = 'hf lf';
-      div.style.backgroundColor = (
-        mod === 0 ?
-          Log.palette[val[i][0]] : Log.projectPalette[val[i][0]]
-      ) || Log.config.ui.colour;
+      div.style.backgroundColor = pal[val[i][0]] || Log.config.ui.colour;
       div.style.width = `${val[i][1]}%`;
+      div.className = 'hf lf';
       con.appendChild(div);
     }
-    // console.timeEnd('a')
   },
 
   /**
@@ -268,16 +254,13 @@ Log.vis = {
     if (typeof con !== 'object' || con === null) return;
 
     const val = Log.data.sortValues(ent, mod, 1);
-    const uic = Log.config.ui.colour;
+    const pal = mod === 0 ? Log.palette : Log.projectPalette;
 
     for (let i = 0, l = val.length; i < l; i++) {
-      const col = (
-        mod === 0 ? Log.palette[val[i][0]] : Log.projectPalette[val[i][0]]
-      ) || uic;
-
+      const col = pal[val[i][0]] || Log.config.ui.colour;
+      const itm = document.createElement('li');
       const ico = document.createElement('div');
       const inf = document.createElement('div');
-      const itm = document.createElement('li');
 
       itm.className = 'c4 mb3 f6 lhc';
 
@@ -299,21 +282,20 @@ Log.vis = {
    * @param {Object[]} [ent] - Entries
    * @param {string} [con] - Container
    */
-  focusChart(mod, ent = Log.log, con = document.getElementById('focusChart')) {
+  focusChart(mod, ent = Log.log, con = focusChart) {
     if (mod === undefined) return;
     if (typeof mod !== 'number' || mod < 0 || mod > 1) return;
     if (typeof ent !== 'object' || ent.length === 0) return;
     if (typeof con !== 'object' || con === null) return;
 
     const set = Log.data.sortEnt(ent);
-    const wid = `${100 / set.length}%`;
-    const uic = Log.config.ui.colour;
+    const l = set.length;
+    const wid = `${100 / l}%`;
+    const listFunc = mod === 0 ?
+      Log.data.listSec : Log.data.listPro;
 
-    for (let i = 0, l = set.length; i < l; i++) {
-      const list = mod === 0 ?
-        Log.data.listSec(set[i]) :
-        Log.data.listPro(set[i]);
-
+    for (let i = 0; i < l; i++) {
+      const list = listFunc(set[i]);
       const col = document.createElement('div');
       const inn = document.createElement('div');
 
@@ -321,7 +303,7 @@ Log.vis = {
       col.style.width = wid;
 
       inn.className = 'psa sw1 b0';
-      inn.style.backgroundColor = uic;
+      inn.style.backgroundColor = Log.config.ui.colour;
       inn.style.height = `${list === undefined ? 0 : 1 / list.length * 100}%`;
 
       col.appendChild(inn);
@@ -331,13 +313,13 @@ Log.vis = {
 
   /**
    * Create chart lines
-   * @param {Object} c - Container
+   * @param {Object} con - Container
    */
-  gridLines(c) {
-    if (c === undefined) return;
-    if (typeof c !== 'object' || c === null) return;
+  gridLines(con) {
+    if (con === undefined) return;
+    if (typeof con !== 'object' || con === null) return;
 
-    c.innerHTML = '';
+    con.innerHTML = '';
 
     const d1 = document.createElement('div');
     const d2 = document.createElement('div');
@@ -356,11 +338,11 @@ Log.vis = {
     d3.style.top = '50%';
     d2.style.top = '25%';
 
-    c.appendChild(d1);
-    c.appendChild(d2);
-    c.appendChild(d3);
-    c.appendChild(d4);
-    c.appendChild(d5);
+    con.appendChild(d1);
+    con.appendChild(d2);
+    con.appendChild(d3);
+    con.appendChild(d4);
+    con.appendChild(d5);
   },
 
   /**

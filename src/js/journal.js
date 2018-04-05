@@ -1,22 +1,19 @@
-'use strict';
-
 const journalCache = {};
 
-var Log = window.Log || {};
 Log.journal = {
 
   /**
    * Display entries from a date
-   * @param {Object} [hex] - Hex code
+   * @param {Object} [date] - Date
    */
   display(date = new Date()) {
-    if (typeof (date) !== 'object') return;
+    if (typeof date !== 'object') return;
 
     let ent = [];
     if (date in journalCache) {
       ent = journalCache[date];
     } else {
-      ent = Log.data.entByDate(date);
+      ent = Log.data.entries.byDate(date);
       journalCache[date] = ent;
     }
 
@@ -34,7 +31,7 @@ Log.journal = {
     jLHT.innerHTML = Log.data.sum(dur).toFixed(2);
     jLSN.innerHTML = Log.data.min(dur).toFixed(2);
     jLSX.innerHTML = Log.data.max(dur).toFixed(2);
-    jASDT.innerHTML = Log.data.avg(dur).toFixed(2);
+    jASD.innerHTML = Log.data.avg(dur).toFixed(2);
     jLPT.innerHTML = `${Log.data.lp(ent).toFixed(2)}%`;
     jFT.innerHTML = Log.data.proFocus(Log.data.listPro(ent)).toFixed(2);
 
@@ -90,7 +87,7 @@ Log.journal = {
       return b;
     };
 
-    const diff = Log.time.convert(ent[0][0].s).getDay();
+    // const diff = Log.time.convert(ent[0][0].s).getDay();
 
     for (let i = 0; i < 7; i++) {
       const rw = cal.insertRow(i);

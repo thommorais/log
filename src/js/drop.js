@@ -1,10 +1,10 @@
-window.addEventListener('dragover', (e) => {
+window.addEventListener('dragover', e => {
   e.preventDefault();
   e.stopPropagation();
   e.dataTransfer.dropEffect = 'copy';
 });
 
-window.addEventListener('drop', (e) => {
+window.addEventListener('drop', e => {
   e.preventDefault();
   e.stopPropagation();
 
