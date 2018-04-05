@@ -549,7 +549,6 @@ var Log = {
       fsf.innerHTML = Log.data.forecast.sf();
     }
 
-    Log.vis.meterLines(ovwMeter);
     Log.vis.day();
     Log.vis.bar(Log.data.bar(mn), ovc);
 
@@ -567,11 +566,9 @@ var Log = {
       Log.vis.list(1, 0, proList);
     }
 
-    Log.vis.meterLines(visMeter);
     Log.vis.line(Log.data.line(mn), visual);
     Log.display(user.log, 100);
     Log.journal.cal();
-    Log.vis.meterLines(jMeter);
     Log.journal.display();
   },
 
