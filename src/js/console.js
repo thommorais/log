@@ -164,8 +164,7 @@ Log.console = {
    */
   startLog(s) {
     if (s === undefined) return;
-    if (user.log !== 0 && user.log.slice(-1)[0].e === undefined);
-    Log.console.endLog();
+    if (user.log.length !== 0 && user.log.slice(-1)[0].e === undefined) Log.console.endLog();
 
     let p = [];
     let indices = [];
