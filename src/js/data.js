@@ -350,30 +350,33 @@ Log.data = {
     if (typeof entries !== 'object' || l === 0) return;
 
     const hours = [
-      0, 0, 0, 0, 0,
-      0, 0, 0, 0, 0,
-      0, 0, 0, 0, 0,
-      0, 0, 0, 0, 0,
-      0, 0, 0, 0, 0,
+      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
     ];
 
     for (let i = l - 1; i >= 0; i--) {
       if (entries[i].e === undefined) continue;
 
       let index = Log.time.convert(entries[i].s).getHours();
-      const rem = entries[i].dur % 1;
-      let block = entries[i].dur - rem;
 
-      hours[index] += block - (block - 1);
-      index++;
+      if (entries[i].dur > 1) {
+        const rem = entries[i].dur % 1;
+        let block = entries[i].dur - rem;
 
-      while (block > 1) {
-        if (index > 24) break;
+        hours[index]++;
         block--;
-        hours[index++] += block - (block - 1);
-      }
+        index++;
 
-      hours[index++] += rem;
+        while (block > 1) {
+          hours[index]++;
+          index++;
+          block--;
+        }
+
+        hours[index] += rem;
+      } else {
+        hours[index] += entries[i].dur;
+      }
     }
 
     return hours;
