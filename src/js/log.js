@@ -227,7 +227,7 @@ var Log = {
         const st = Log.time.stamp(dt);
 
         ic.className = 'pl0';
-        ic.innerHTML = rev[i].id;
+        ic.innerHTML = rev[i].id + 1;
         dc.innerHTML = Log.time.displayDate(dt);
 
         if (rev[i].e === undefined) {
@@ -330,7 +330,7 @@ var Log = {
         const st = Log.time.stamp(dt);
 
         ic.className = 'pl0';
-        ic.innerHTML = rev[i].id;
+        ic.innerHTML = rev[i].id + 1;
         dc.innerHTML = Log.time.displayDate(dt);
 
         if (rev[i].e === undefined) {
@@ -544,8 +544,8 @@ var Log = {
     Log.vis.peakChart(1, Log.cache.pkd, pdc);
 
     if (Log.log.length !== 1) {
-      flh.innerHTML = Log.data.forecast.lh().toFixed(2);
-      fsd.innerHTML = Log.data.forecast.sd().toFixed(2);
+      flh.innerHTML = Log.data.forecast.lh();
+      fsd.innerHTML = Log.data.forecast.sd();
       fsf.innerHTML = Log.data.forecast.sf();
     }
 
