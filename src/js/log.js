@@ -467,7 +467,7 @@ var Log = {
         const st = Log.time.stamp(Log.time.convert(now.s));
 
         tFOC.innerHTML = Log.data.proFocus(Log.data.listPro(en)).toFixed(2);
-        tLPT.innerHTML = `${Log.data.lp(en).toFixed(2)}%`;
+        tLPT.innerHTML = Log.data.lp(en);
         tLHT.innerHTML = Log.data.sum(dur).toFixed(2);
         tLSN.innerHTML = Log.data.min(dur).toFixed(2);
         tLSX.innerHTML = Log.data.max(dur).toFixed(2);
@@ -496,7 +496,7 @@ var Log = {
         LNH.innerHTML = Log.data.min(Log.cache.dur).toFixed(2);
         LXH.innerHTML = Log.data.max(Log.cache.dur).toFixed(2);
         ASD.innerHTML = Log.data.avg(Log.cache.dur).toFixed(2);
-        LPH.innerHTML = `${Log.data.lp().toFixed(2)}%`;
+        LPH.innerHTML = Log.data.lp();
         ALH.innerHTML = Log.data.avgLh().toFixed(2);
         SCC.innerHTML = Log.cache.sec.length;
         PRC.innerHTML = Log.cache.pro.length;

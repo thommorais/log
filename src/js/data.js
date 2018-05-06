@@ -475,21 +475,19 @@ Log.data = {
 
   /**
    * Calculate how much of a time period was logged
-   * @param {Object[]} [a] - Entries
-   * @returns {number} Log percentage
+   * @param {Object[]} [entries] - Entries
+   * @returns {string} Log percentage
    */
-  lp(a = Log.log) {
-    if (typeof a !== 'object') return;
-    if (a.length === 0) return 0;
+  lp(entries = Log.log) {
+    if (typeof entries !== 'object' || entries.length === 0) return 0;
 
-    const e = Log.time.convert(a[0].s);
-    const d = Log.time.convert(a.slice(-1)[0].s);
-    const n = Math.ceil((
-      new Date(d.getFullYear(), d.getMonth(), d.getDate()) -
-      new Date(e.getFullYear(), e.getMonth(), e.getDate())
-    ) / 864E5);
+    const start = Log.time.convert(entries[0].s);
+    const end = Log.time.convert(entries.slice(-1)[0].s);
+    const diff = (end - start) / 864E5;
+    let n = diff << 0;
+    n = n === diff ? n : n + 1;
 
-    return Log.data.lh(a) / (24 * (n + 1)) * 100;
+    return `${(Log.data.lh(entries) / (24 * n) * 100).toFixed(2)}%`;
   },
 
   /**
@@ -648,7 +646,7 @@ Log.data = {
         set[i][set[i].length] = {
           col: colour,
           pos: '0%',
-          wh: `${Log.data.lp(sort[i])}%`
+          wh: Log.data.lp(sort[i])
         }
       } else {
         for (let o = 0; o < l; o++) {
