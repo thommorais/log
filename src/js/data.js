@@ -23,8 +23,8 @@ Log.data = {
     const parsed = [];
 
     for (let i = 0, l = entries.length; i < l; i++) {
-      let sc = user.palette[entries[i].c] || Log.config.ui.colour;
-      let pc = user.projectPalette[entries[i].t] || Log.config.ui.colour;
+      const sc = user.palette[entries[i].c] || Log.config.ui.colour;
+      const pc = user.projectPalette[entries[i].t] || Log.config.ui.colour;
 
       if (
         Log.time.date(entries[i].s) !== Log.time.date(entries[i].e) &&
@@ -85,6 +85,8 @@ Log.data = {
      * @returns {Object[]} Entries under specified date
      */
     byDate(date = new Date()) {
+      const l = Log.log.length;
+      if (l === 0) return;
       if (
         typeof date !== 'object' ||
         date.getTime() > new Date().getTime()
@@ -92,7 +94,7 @@ Log.data = {
 
       const entries = [];
 
-      for (let i = 0, l = Log.log.length; i < l; i++) {
+      for (let i = 0; i < l; i++) {
         if (Log.log[i].e === undefined) continue;
         const a = Log.time.convert(Log.log[i].s);
         if (
@@ -224,10 +226,12 @@ Log.data = {
    * @returns {Object[]} Entries sorted by day
    */
   sortEntByDay(entries = Log.log) {
-    if (typeof entries !== 'object' || entries.length === 0) return;
-    const sorted = [];
-    for (let i = 0; i < 7; i++) {
-      sorted[sorted.length] = Log.data.entries.byDay(i, entries);
+    const l = entries.length;
+    if (typeof entries !== 'object' || l === 0) return;
+    const sorted = [[], [], [], [], [], [], []];
+    for (let i = l - 1; i >= 0; i--) {
+      const day = Log.time.convert(entries[i].s).getDay();
+      sorted[day][sorted[day].length] = entries[i];
     }
     return sorted;
   },
@@ -245,11 +249,14 @@ Log.data = {
     if (typeof mode !== 'number' || mode < 0 || mode > 1) return;
     if (typeof hp !== 'number' || hp < 0 || hp > 1) return;
 
-    const list = mode === 0 ? Log.data.listSec(entries) : Log.data.listPro(entries);
+    const list = mode === 0 ?
+      Log.data.listSec(entries) :
+      Log.data.listPro(entries);
+
     const temp = [];
     const sorted = [];
 
-    for (let i = 0, l = list.length; i < l; i++) {
+    for (let i = list.length - 1; i >= 0; i--) {
       const lh = mode === 0 ?
         Log.data.lh(Log.data.entries.bySec(list[i], entries)) :
         Log.data.lh(Log.data.entries.byPro(list[i], entries));
@@ -267,17 +274,18 @@ Log.data = {
 
   /**
    * List projects
-   * @param {Object[]} [a] - Entries
+   * @param {Object[]} [entries] - Entries
    * @returns {Object[]} List of projects
    */
-  listPro(a = Log.log) {
-    if (typeof a !== 'object' || a.length === 0) return;
+  listPro(entries = Log.log) {
+    const l = entries.length;
+    if (typeof entries !== 'object' || l === 0) return;
 
     const list = [];
 
-    for (let i = a.length - 1; i >= 0; i--) {
-      if (a[i].e !== undefined && list.indexOf(a[i].t) === -1) {
-        list[list.length] = a[i].t;
+    for (let i = l - 1; i >= 0; i--) {
+      if (entries[i].e !== undefined && list.indexOf(entries[i].t) === -1) {
+        list[list.length] = entries[i].t;
       }
     }
 
@@ -286,17 +294,18 @@ Log.data = {
 
   /**
    * List sectors
-   * @param {Object[]} [a] - Entries
+   * @param {Object[]} [entries] - Entries
    * @returns {Object[]} List of sectors
    */
-  listSec(a = Log.log) {
-    if (typeof a !== 'object' || a.length === 0) return;
+  listSec(entries = Log.log) {
+    const l = entries.length;
+    if (typeof entries !== 'object' || l === 0) return;
 
     const list = [];
 
-    for (let i = a.length - 1; i >= 0; i--) {
-      if (a[i].e !== undefined && list.indexOf(a[i].c) === -1) {
-        list[list.length] = a[i].c;
+    for (let i = l - 1; i >= 0; i--) {
+      if (entries[i].e !== undefined && list.indexOf(entries[i].c) === -1) {
+        list[list.length] = entries[i].c;
       }
     }
 
@@ -305,17 +314,17 @@ Log.data = {
 
   /**
    * Get peak days
-   * @param {Object[]} [a] - Entries
+   * @param {Object[]} [entries] - Entries
    * @returns {Object[]} Peak days
    */
-  peakDays(a = Log.log) {
-    if (typeof a !== 'object' || a.length === 0) return;
+  peakDays(entries = Log.log) {
+    const l = entries.length;
+    if (typeof entries !== 'object' || l === 0) return;
     const week = [0, 0, 0, 0, 0, 0, 0];
 
-    for (let i = a.length - 1; i >= 0; i--) {
-      if (a[i].e !== undefined) {
-        week[Log.time.convert(a[i].s).getDay()] += a[i].dur;
-      }
+    for (let i = l - 1; i >= 0; i--) {
+      if (entries[i].e === undefined) continue;
+      week[Log.time.convert(entries[i].s).getDay()] += entries[i].dur;
     }
 
     return week;
@@ -333,11 +342,12 @@ Log.data = {
 
   /**
    * Get peak hours
-   * @param {Object[]} [ent] - Entries
+   * @param {Object[]} [entries] - Entries
    * @returns {Object[]} Peak hours
    */
-  peakHours(ent = Log.log) {
-    if (typeof ent !== 'object' || ent.length === 0) return;
+  peakHours(entries = Log.log) {
+    const l = entries.length;
+    if (typeof entries !== 'object' || l === 0) return;
 
     const hours = [
       0, 0, 0, 0, 0,
@@ -347,12 +357,12 @@ Log.data = {
       0, 0, 0, 0, 0,
     ];
 
-    for (let i = ent.length - 1; i >= 0; i--) {
-      if (ent[i].e === undefined) continue;
+    for (let i = l - 1; i >= 0; i--) {
+      if (entries[i].e === undefined) continue;
 
-      let index = Log.time.convert(ent[i].s).getHours();
-      const rem = ent[i].dur % 1;
-      let block = ent[i].dur - rem;
+      let index = Log.time.convert(entries[i].s).getHours();
+      const rem = entries[i].dur % 1;
+      let block = entries[i].dur - rem;
 
       hours[index] += block - (block - 1);
       index++;
@@ -381,18 +391,18 @@ Log.data = {
 
   /**
    * List durations
-   * @param {Object[]} [a] - Entries
+   * @param {Object[]} [entries] - Entries
    * @returns {Object[]} List of durations
    */
-  listDur(a = Log.log) {
-    if (typeof a !== 'object' || a.length === 0) return;
+  listDur(entries = Log.log) {
+    const l = entries.length;
+    if (typeof entries !== 'object' || l === 0) return;
 
     const durations = [];
 
-    for (let i = 0, l = a.length; i < l; i++) {
-      if (a[i].e !== undefined) {
-        durations[durations.length] = a[i].dur;
-      }
+    for (let i = l - 1; i >= 0; i--) {
+      if (entries[i].e === undefined) continue;
+      durations[durations.length] = entries[i].dur;
     }
 
     return durations;
@@ -496,15 +506,16 @@ Log.data = {
 
   /**
    * Calculate streak
-   * @param {Object[]} [a] - Sorted entries
+   * @param {Object[]} [entries] - Sorted entries
    * @returns {number} Streak
    */
-  streak(a = Log.cache.sortEnt) {
-    if (typeof a !== 'object') return;
+  streak(entries = Log.cache.sortEnt) {
+    if (typeof entries !== 'object') return;
     let streak = 0;
-    if (a.length === 0) return streak;
-    for (let i = 0, l = a.length; i < l; i++) {
-      streak = a[i].length === 0 ? 0 : streak + 1;
+    const l = entries.length;
+    if (l === 0) return streak;
+    for (let i = 0; i < l; i++) {
+      streak = entries[i].length === 0 ? 0 : streak + 1;
     }
     return streak;
   },
@@ -516,17 +527,18 @@ Log.data = {
    * @returns {Object[]} Array of focus stats
    */
   listFocus(m, s = Log.cache.sortEnt) {
+    const l = s.length;
     if (m === undefined) return;
     if (typeof m !== 'number' || m < 0 || m > 1) return;
-    if (typeof s !== 'object' || s.length === 0) return;
+    if (typeof s !== 'object' || l === 0) return;
 
     const list = [];
 
-    for (let i = 0, l = s.length; i < l; i++) {
+    for (let i = 0; i < l; i++) {
       if (s[i].length === 0) continue;
-      const l = m === 0 ? Log.data.listSec(s[i]) : Log.data.listPro(s[i]);
-      if (l === undefined) continue;
-      list[list.length] = l.length === 0 ? 0 : 1 / l.length;
+      const sl = m === 0 ? Log.data.listSec(s[i]) : Log.data.listPro(s[i]);
+      if (sl === undefined) continue;
+      list[list.length] = sl.length === 0 ? 0 : 1 / sl.length;
     }
 
     return list;
@@ -581,7 +593,7 @@ Log.data = {
      */
     lh() {
       return Log.cache.entByDay.length === 0 ?
-        '-' : Log.data.avg(Log.data.listDur(Log.cache.entByDay)) * 10;
+        '-' : (Log.data.avg(Log.data.listDur(Log.cache.entByDay)) * 10).toFixed(2);
     },
 
     /**
@@ -590,7 +602,7 @@ Log.data = {
      */
     sd() {
       return Log.cache.entByDay.length === 0 ?
-        '-' : Log.data.avg(Log.data.listDur(Log.cache.entByDay));
+        '-' : (Log.data.avg(Log.data.listDur(Log.cache.entByDay))).toFixed(2);
     },
   },
 

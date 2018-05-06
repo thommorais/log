@@ -119,7 +119,7 @@ var Log = {
       dc.setAttribute('onclick', `Log.nav.toJournal('${arr[i].s}')`);
 
       if (arr[i].e === undefined) {
-        tc.innerHTML = `${st}`;
+        tc.innerHTML = st;
         rc.innerHTML = '—';
       } else {
         tc.innerHTML = `${st} – ${Log.time.stamp(Log.time.convert(arr[i].e))}`;
@@ -134,6 +134,7 @@ var Log = {
       pc.className = 'c-pt hvl';
       pc.setAttribute('onclick', `Log.nav.toProDetail('${arr[i].t}')`);
 
+      nc.className = 'pr0'
       nc.innerHTML = arr[i].d;
     }
   },
