@@ -13,10 +13,12 @@ Log.vis = {
     if (typeof data !== 'object' || l === 0) return;
     if (typeof con !== 'object' || con === null) return;
 
+    const frag = document.createDocumentFragment();
+
     for (let i = 0; i < l; i++) {
       const row = document.createElement('div');
       row.className = 'db wf sh1 mt1 mb2';
-      con.appendChild(row);
+      frag.appendChild(row);
 
       if (data[i].length === 0) continue;
       for (let o = 0, ol = data[i].length; o < ol; o++) {
@@ -28,6 +30,8 @@ Log.vis = {
         row.appendChild(entry);
       }
     }
+
+    con.appendChild(frag);
   },
 
   /**
@@ -45,13 +49,14 @@ Log.vis = {
 
     Log.vis.gridLines(con);
 
+    const frag = document.createDocumentFragment();
     const width = `${100 / Log.config.ui.view}%`;
 
     for (let i = 0; i < l; i++) {
       const column = document.createElement('div');
       column.className = 'dib psr hf';
       column.style.width = width;
-      con.appendChild(column);
+      frag.appendChild(column);
 
       if (data[i].length === 0) continue;
       for (let o = 0, ol = data[i].length; o < ol; o++) {
@@ -63,6 +68,8 @@ Log.vis = {
         column.appendChild(entry);
       }
     }
+
+    con.appendChild(frag);
   },
 
   /**
@@ -74,6 +81,7 @@ Log.vis = {
     if (typeof date !== 'object') return;
     if (typeof con !== 'object' || con === null) return;
 
+    const frag = document.createDocumentFragment();
     const ent = Log.data.entries.byDate(date);
     if (ent.length === 0) return;
 
@@ -107,11 +115,13 @@ Log.vis = {
       en.style.width = `${wd}%`;
       en.className = 'hf lf';
 
-      con.appendChild(en);
+      frag.appendChild(en);
 
       lastWidth = wd;
       lastPercentage = dp;
     }
+
+    con.appendChild(frag);
   },
 
   /**
@@ -129,6 +139,7 @@ Log.vis = {
     if (typeof peaks !== 'object' || l === 0) return;
     if (typeof con !== 'object' || con === null) return;
 
+    const frag = document.createDocumentFragment();
     const now = mode === 0 ? (new Date()).getHours() : (new Date()).getDay();
     const max = Math.max(...peaks);
     const wid = `${100 / l}%`;
@@ -150,8 +161,10 @@ Log.vis = {
 
       inn.appendChild(cor);
       col.appendChild(inn);
-      con.appendChild(col);
+      frag.appendChild(col);
     }
+
+    con.appendChild(frag);
   },
 
   /**
@@ -168,6 +181,7 @@ Log.vis = {
     if (typeof con !== 'object' || con === null) return;
     if (typeof ent !== 'object' || ent.length === 0) return;
 
+    const frag = document.createDocumentFragment();
     const arr = Log.data.sortValues(ent, mode, val);
     const lhe = Log.data.lh(ent);
 
@@ -213,8 +227,10 @@ Log.vis = {
       itm.appendChild(nam);
       itm.appendChild(dur);
       itm.appendChild(bar);
-      con.appendChild(itm);
+      frag.appendChild(itm);
     }
+
+    con.appendChild(frag);
   },
 
   /**
@@ -229,6 +245,7 @@ Log.vis = {
     if (typeof ent !== 'object' || ent.length === 0) return;
     if (typeof con !== 'object' || con === null) return;
 
+    const frag = document.createDocumentFragment();
     const val = Log.data.sortValues(ent, mod, 1);
     const pal = mod === 0 ? Log.palette : Log.projectPalette;
 
@@ -237,8 +254,10 @@ Log.vis = {
       div.style.backgroundColor = pal[val[i][0]] || Log.config.ui.colour;
       div.style.width = `${val[i][1]}%`;
       div.className = 'hf lf';
-      con.appendChild(div);
+      frag.appendChild(div);
     }
+
+    con.appendChild(frag);
   },
 
   /**
@@ -253,6 +272,7 @@ Log.vis = {
     if (typeof ent !== 'object' || ent.length === 0) return;
     if (typeof con !== 'object' || con === null) return;
 
+    const frag = document.createDocumentFragment();
     const val = Log.data.sortValues(ent, mod, 1);
     const pal = mod === 0 ? Log.palette : Log.projectPalette;
 
@@ -272,8 +292,10 @@ Log.vis = {
 
       itm.appendChild(ico);
       itm.appendChild(inf);
-      con.appendChild(itm);
+      frag.appendChild(itm);
     }
+
+    con.appendChild(frag);
   },
 
   /**
@@ -288,6 +310,7 @@ Log.vis = {
     if (typeof ent !== 'object' || ent.length === 0) return;
     if (typeof con !== 'object' || con === null) return;
 
+    const frag = document.createDocumentFragment();
     const set = Log.data.sortEnt(ent);
     const l = set.length;
     const wid = `${100 / l}%`;
@@ -307,8 +330,10 @@ Log.vis = {
       inn.style.height = `${list === undefined ? 0 : 1 / list.length * 100}%`;
 
       col.appendChild(inn);
-      con.appendChild(col);
+      frag.appendChild(col);
     }
+
+    con.appendChild(frag);
   },
 
   /**
