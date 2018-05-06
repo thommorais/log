@@ -5,8 +5,19 @@
   <title>Log</title>
   <meta name="author" content="Josh Avanier">
   <meta name="description" content="A log and time-tracking system">
+  <link rel="stylesheet" href="css/font/inter-ui.css">
   <link rel="stylesheet" href="css/macian.min.css">
   <style>
+    body {
+      font-family: 'Inter UI', sans-serif;
+      font-feature-settings: 'calt';
+      font-feature-settings: 'case';
+    }
+
+    table {
+      font-feature-settings: 'tnum';
+    }
+
     #topbar {
       grid-column-start: 1;
       grid-column-end: 4;
@@ -144,7 +155,7 @@
 
   <div id="container" class="hf">
     <header id="topbar" class="mb2 f6 lhc">
-      <h1 class="dib mr3 f5 upc tk">Log <span id="ver"></span></h1>
+      <h1 class="dib mr3 f5 upc tk">Log</h1>
       <button id="b-ovw" class="pv1 tab on bg-cl of mr3" onclick="Log.tab('ovw', 'sect', 'tab')">Overview</button>
       <button id="b-lis" class="pv1 tab on bg-cl o5 mr3" onclick="Log.tab('lis', 'sect', 'tab')">Details</button>
       <button id="b-vis" class="pv1 tab on bg-cl o5 mr3" onclick="Log.tab('vis', 'sect', 'tab')">Visualisation</button>
@@ -923,8 +934,6 @@
     // const ipcRenderer = require('electron').ipcRenderer
     const Store = require('./js/store.js');
     const path = require('path');
-
-    ver.innerHTML = app.getVersion();
 
     let dataPath = '';
 
