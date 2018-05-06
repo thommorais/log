@@ -9,13 +9,16 @@ Log.console = {
    */
   parse(i) {
     const p = Log.console.getParams(i);
-    switch (i.split(' ')[0].toLowerCase()) {
+    const s = i.split(' ');
+    switch (s[0].toLowerCase()) {
       case 'start':
       case 'begin':
+      case 's':
         Log.console.startLog(i);
         break;
       case 'pomodoro':
       case 'tomato':
+      case 'pom':
         Log.console.startPomodoro(i);
         break;
       case 'stop':
@@ -34,8 +37,37 @@ Log.console = {
       case 'delete':
         Log.console.delete(i);
         break;
-      case 'set':
-        Log.console.set(i);
+      case 'background':
+      case 'bg':
+        Log.options.setBG(s[1]);
+        break;
+      case 'colour':
+      case 'color':
+      case 'foreground':
+      case 'fg':
+        Log.options.setColour(s[1]);
+        break;
+      case 'accent':
+      case 'highlight':
+      case 'ac':
+      case 'hl':
+        Log.options.setAccent(s[1]);
+        break;
+      case 'colourmode':
+      case 'colormode':
+      case 'cm':
+        Log.options.setColourMode(s[1]);
+        break;
+      case 'view':
+        Log.options.setView(Number(s[1]));
+        break;
+      case 'calendar':
+      case 'cal':
+        Log.options.setCalendar(s[1]);
+        break;
+      case 'time':
+      case 'clock':
+        Log.options.setTimeFormat(s[1]);
         break;
       case 'import':
         Log.console.importUser();
@@ -44,13 +76,16 @@ Log.console = {
         Log.console.exportUser();
         break;
       case 'rename':
+      case 'rn':
         Log.console.rename(p[1], p[2], p[3]);
         break;
       case 'invert':
+      case 'iv':
         Log.console.invert();
         break;
       case 'quit':
       case 'exit':
+      case 'q':
         app.quit();
         break;
       default:
@@ -243,55 +278,6 @@ Log.console = {
 
     new window.Notification(`Log resumed: ${last.c} - ${last.t} - ${last.d}`);
     Log.options.update.log();
-  },
-
-  /**
-   * Set a config attribute
-   * @param {string} i - Input
-   */
-  set(i) {
-    const c = i.split(' ');
-    switch (c[1].toLowerCase()) {
-      case 'view':
-        Log.options.setView(c[2]);
-        break;
-      case 'background':
-      case 'bg':
-        Log.options.setBG(c[2]);
-        break;
-      case 'color':
-      case 'colour':
-      case 'text':
-        Log.options.setColour(c[2]);
-        break;
-      case 'highlight':
-      case 'accent':
-        Log.options.setAccent(c[2]);
-        break;
-      case 'colourmode':
-      case 'colormode':
-        Log.options.setColourMode(c[2]);
-        break;
-      case 'cal':
-      case 'calendar':
-        Log.options.setCalendar(c[2]);
-        break;
-      case 'time':
-        Log.options.setTimeFormat(c[2]);
-        break;
-      case 'category':
-      case 'sector':
-      case 'cat':
-      case 'sec':
-        Log.options.setColourCode(0, i);
-        break;
-      case 'project':
-      case 'pro':
-        Log.options.setColourCode(1, i);
-        break;
-      default:
-        return;
-    }
   },
 
   /**
