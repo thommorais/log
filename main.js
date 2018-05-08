@@ -2,7 +2,7 @@ const {
   app,
   BrowserWindow,
   webFrame
-} = require('electron');
+} = require('electron')
 
 if (process.argv[2] && process.argv[2] === 'dev') {
   require('electron-reload')(__dirname);
@@ -14,18 +14,20 @@ app.on('ready', _ => {
   win = new BrowserWindow({
     icon: `${__dirname}/icon.ico`,
     backgroundColor: '#0c0c0c',
-    autoHideMenuBar: true,
+    autoHideMenuBar: false,
     resizable: false,
-    frame: false,
+    frame: true,
     height: 600,
     width: 960
   })
 
-  win.loadURL(`file://${__dirname}/src/index.html`);
+  console.log(`${__dirname}/icon.ico`)
 
-  win.on('closed', _ => {
-    win = null
-  })
+
+  win.loadURL(`file://${__dirname}/src/index.html`)
+
+  win.on('closed', _ => {win = null})
+
 })
 
 app.on('window-all-closed', _ => {
@@ -33,5 +35,5 @@ app.on('window-all-closed', _ => {
 })
 
 app.on('activate', _ => {
-  win === null && createWindow();
+  win === null && createWindow()
 })

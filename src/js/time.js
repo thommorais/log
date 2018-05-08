@@ -91,7 +91,7 @@ Log.time = {
    * @returns {string} 12-hour time
    */
   twelveHours(d) {
-    const h = d.getHours();
+    let h = d.getHours();
     const x = h >= 12 ? 'PM' : 'AM';
     return `${`0${(h %= 12) ?
       h : 12}`.slice(-2)}:${`0${d.getMinutes()}`.slice(-2)} ${x}`;
